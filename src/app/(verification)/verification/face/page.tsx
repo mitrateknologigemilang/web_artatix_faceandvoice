@@ -73,32 +73,36 @@ export default function FaceVerificationPage() {
 	return (
 		<div className="space-y-6">
 			{/* Event Info */}
-			<div className="text-center space-y-2">
-				<h1 className="text-2xl font-bold text-[#1e2a4a]">Vigorphoria</h1>
-				<div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-					<span className="flex items-center gap-1.5">
-						<CalendarDays className="w-4 h-4" />
-						28 Maret 2026 • 15:00 – 23:00
-					</span>
-					<span className="flex items-center gap-1.5">
-						<MapPin className="w-4 h-4" />
-						Lubuk Linggau, Kota Lubuk Linggau, Sumatera Selatan
-					</span>
+			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
+				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
+					Vigorphoria
+				</h1>
+				<div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 text-sm text-gray-500 w-full min-w-0">
+					<div className="flex items-center justify-center gap-1.5 shrink-0 max-w-full">
+						<CalendarDays className="w-4 h-4 shrink-0" />
+						<span className="truncate">28 Maret 2026 • 15:00 – 23:00</span>
+					</div>
+					<div className="flex items-center justify-center gap-1.5 min-w-0 max-w-full">
+						<MapPin className="w-4 h-4 shrink-0" />
+						<span className="truncate">
+							Lubuk Linggau, Kota Lubuk Linggau, Sumatera Selatan
+						</span>
+					</div>
 				</div>
 			</div>
 
 			{/* Main Card */}
 			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 				{/* Card Header */}
-				<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-					<div className="flex items-center gap-2">
-						<ScanFace className="w-5 h-5 text-[#3b5bdb]" />
-						<span className="font-semibold text-[#1e2a4a]">
+				<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
+					<div className="flex items-center gap-2 min-w-0">
+						<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+						<span className="font-semibold text-[#1e2a4a] truncate">
 							Pendaftaran Biometrik Wajah
 						</span>
 					</div>
 					<span
-						className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+						className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
 							state === "success"
 								? "text-emerald-600 bg-emerald-50 border-emerald-200"
 								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
@@ -106,20 +110,20 @@ export default function FaceVerificationPage() {
 						{state === "success"
 							? "Selesai"
 							: state === "failed"
-								? "Langkah 1 dari 2 selesai"
-								: "Langkah 1 dari 2 selesai"}
+								? "Langkah 1 dari 2"
+								: "Langkah 1 dari 2"}
 					</span>
 				</div>
 
 				{/* Card Body */}
-				<div className="px-6 py-10 flex flex-col items-center text-center">
+				<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
 					{state === "failed" && <FailedState />}
 					{state === "success" && <SuccessState />}
 					{state === "verifying" && <VerifyingState webcamRef={webcamRef} />}
 				</div>
 
 				{/* Card Footer */}
-				<div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+				<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
 					{state === "failed" && (
 						<button
 							onClick={() => setState("verifying")}
@@ -159,7 +163,7 @@ export default function FaceVerificationPage() {
 			</div>
 
 			{/* Security Banner */}
-			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
+			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
 				<div className="flex items-start gap-3">
 					<div className="mt-0.5">
 						<Shield className="w-5 h-5 text-[#3b5bdb]" />
@@ -428,7 +432,7 @@ function VerifyingState({
 				aksesoris (masker, kacamata, topi).
 			</p>
 
-			<div className="flex items-center gap-8">
+			<div className="flex items-center gap-4 sm:gap-8">
 				<div className="flex flex-col gap-2 items-center">
 					<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
 						<RiSurgicalMaskLine />

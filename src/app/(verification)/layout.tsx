@@ -33,12 +33,12 @@ export default function VerificationLayout({
 				</header>
 
 				{/* Main Content */}
-				<main className="flex-1 flex flex-col items-center p-4">
+				<main className="flex-1 flex flex-col items-center p-3 sm:p-4">
 					<div className="w-full max-w-[700px]">{children}</div>
 				</main>
 
 				{/* Footer */}
-				<footer className="py-6 text-center bg-white">
+				<footer className="py-4 sm:py-6 text-center bg-white">
 					<p className="text-sm text-gray-500">
 						© 2026 Artatix. All rights reserved.
 					</p>
