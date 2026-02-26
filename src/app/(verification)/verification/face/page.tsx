@@ -363,6 +363,7 @@ function VerifyingState({
 		};
 	}, [webcamRef]);
 
+	const { permissionGrantedTime } = useVerification();
 	const borderColor = faceInFrame ? "#16A34A" : "#DC2626";
 
 	return (
@@ -370,6 +371,7 @@ function VerifyingState({
 			{/* Camera Preview with Face Frame */}
 			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900">
 				<Webcam
+					key={permissionGrantedTime || "webcam-default"}
 					className="w-full h-auto block rounded-xl"
 					audio={false}
 					height={720}
