@@ -164,7 +164,7 @@ export default function FaceVerificationPage() {
 
 			{/* Security Banner */}
 			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-				<div className="flex items-start gap-3">
+				<div className="flex items-start gap-2">
 					<div className="mt-0.5">
 						<Shield className="w-5 h-5 text-[#3b5bdb]" />
 					</div>
