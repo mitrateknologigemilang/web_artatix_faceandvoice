@@ -4,6 +4,35 @@ import React, { useEffect, useState } from "react";
 import { Camera, Mic, ShieldAlert } from "lucide-react";
 import { useVerification } from "../VerificationContext";
 
+/**
+ * Try getUserMedia with fallback constraints for broader compatibility.
+ * Safari may not support certain constraints like facingMode on desktop.
+ */
+async function tryGetUserMedia(): Promise<MediaStream> {
+	const constraints: MediaStreamConstraints[] = [
+		{ video: { facingMode: { ideal: "user" } }, audio: true },
+		{ video: true, audio: true },
+	];
+
+	let lastError: unknown;
+	for (const constraint of constraints) {
+		try {
+			return await navigator.mediaDevices.getUserMedia(constraint);
+		} catch (err: any) {
+			lastError = err;
+			// Only retry on constraint-related errors, not permission denials
+			if (
+				err.name === "NotAllowedError" ||
+				err.name === "PermissionDeniedError"
+			) {
+				throw err;
+			}
+			// OverconstrainedError, NotFoundError, etc → try next constraint
+		}
+	}
+	throw lastError;
+}
+
 export function PermissionPopup() {
 	const [show, setShow] = useState(false);
 	const [denied, setDenied] = useState(false);
@@ -11,98 +40,118 @@ export function PermissionPopup() {
 	const { setPermissionGrantedTime } = useVerification();
 
 	useEffect(() => {
-		checkPermissions();
+		checkExistingPermissions();
 	}, []);
 
-	const checkPermissions = async () => {
+	/**
+	 * Check if camera & mic permissions are already granted.
+	 * - Chrome/Edge: uses the Permissions API
+	 * - Safari/Firefox: falls back to a quick getUserMedia probe
+	 */
+	async function checkExistingPermissions() {
 		try {
-			// Modern browsers support querying 'camera' and 'microphone' permissions
-			const cam = await navigator.permissions.query({
-				name: "camera" as PermissionName,
-			});
-			const mic = await navigator.permissions.query({
-				name: "microphone" as PermissionName,
-			});
-
-			const checkState = () => {
-				if (cam.state === "denied" || mic.state === "denied") {
-					setDenied(true);
-					setShow(true);
-				} else if (cam.state !== "granted" || mic.state !== "granted") {
-					setShow(true);
-					setDenied(false);
-				} else {
-					setShow(false);
-					setDenied(false);
-				}
+			if (!navigator.mediaDevices?.getUserMedia) {
+				// No media device support at all
+				setDenied(true);
 				setIsChecking(false);
-			};
-
-			checkState();
-
-			cam.onchange = checkState;
-			mic.onchange = checkState;
-		} catch (error) {
-			// Fallback for browsers that don't support query (e.g. older Safari)
-			try {
-				const devices = await navigator.mediaDevices.enumerateDevices();
-				const hasVideoLabel = devices.some(
-					(d) => d.kind === "videoinput" && d.label !== "",
-				);
-				const hasAudioLabel = devices.some(
-					(d) => d.kind === "audioinput" && d.label !== "",
-				);
-
-				if (!hasVideoLabel || !hasAudioLabel) {
-					setShow(true);
-				} else {
-					setShow(false);
-				}
-			} catch (fallbackError) {
-				// If enumerateDevices also fails, just show the popup
 				setShow(true);
-			} finally {
+				return;
+			}
+
+			// Try the Permissions API first (Chrome, Edge)
+			if (navigator.permissions?.query) {
+				try {
+					const [camResult, micResult] = await Promise.all([
+						navigator.permissions.query({
+							name: "camera" as PermissionName,
+						}),
+						navigator.permissions.query({
+							name: "microphone" as PermissionName,
+						}),
+					]);
+
+					if (camResult.state === "granted" && micResult.state === "granted") {
+						// Already granted — skip popup
+						setPermissionGrantedTime(Date.now());
+						setIsChecking(false);
+						return;
+					}
+
+					if (camResult.state === "denied" || micResult.state === "denied") {
+						setDenied(true);
+						setShow(true);
+						setIsChecking(false);
+						return;
+					}
+
+					// state === "prompt" → show the popup
+					setShow(true);
+					setIsChecking(false);
+					return;
+				} catch {
+					// permissions.query threw (Safari doesn't support camera/mic query)
+					// Fall through to probe approach
+				}
+			}
+
+			// Fallback for Safari: do a quick getUserMedia probe
+			try {
+				const stream = await tryGetUserMedia();
+				stream.getTracks().forEach((t) => t.stop());
+				// Permission was already granted (or user just granted it)
+				setPermissionGrantedTime(Date.now());
+				setIsChecking(false);
+				return;
+			} catch (err: any) {
+				if (
+					err.name === "NotAllowedError" ||
+					err.name === "PermissionDeniedError"
+				) {
+					// On Safari, NotAllowedError during a non-user-gesture call
+					// means permission hasn't been granted yet → show popup
+					setShow(true);
+					setIsChecking(false);
+					return;
+				}
+				// Other error (no camera, etc.)
+				setDenied(true);
+				setShow(true);
 				setIsChecking(false);
 			}
+		} catch {
+			// Unexpected error
+			setShow(true);
+			setIsChecking(false);
 		}
-	};
+	}
 
 	const requestPermission = async () => {
 		try {
-			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+			if (!navigator.mediaDevices?.getUserMedia) {
 				setDenied(true);
-				alert(
-					"Browser Anda tidak mendukung akses kamera/mikrofon, atau koneksi tidak aman (harus HTTPS atau localhost).",
-				);
 				return;
 			}
-			const stream = await navigator.mediaDevices.getUserMedia({
-				video: true,
-				audio: true,
-			});
-			// Stop the stream immediately, because we only wanted to request permission
-			stream.getTracks().forEach((track) => track.stop());
+
+			const stream = await tryGetUserMedia();
+
+			// Stop tracks — we only needed to trigger the permission prompt
+			stream.getTracks().forEach((t) => t.stop());
+
 			setShow(false);
 			setDenied(false);
 			setPermissionGrantedTime(Date.now());
-
-			// Refresh permission state
-			checkPermissions();
 		} catch (e: any) {
 			console.error("Error requesting permissions", e);
-			if (
-				e.name === "NotAllowedError" ||
-				e.name === "PermissionDeniedError" ||
-				e.message?.includes("Permission denied")
-			) {
+
+			if (e.name === "NotAllowedError" || e.name === "PermissionDeniedError") {
 				setDenied(true);
+				setShow(true);
+			} else if (e.name === "NotFoundError" || e.name === "NotReadableError") {
+				// No camera/mic hardware found, or device is in use
+				setDenied(true);
+				setShow(true);
 			} else {
-				alert(
-					"Gagal mengakses perangkat: " +
-						(e.message || "Pastikan Anda menggunakan koneksi aman (HTTPS)."),
-				);
-				// We can just hide the popup or show a different error
-				setShow(false);
+				alert("Gagal mengakses kamera/mikrofon.");
 			}
 		}
 	};
