@@ -46,6 +46,7 @@ function dataURLtoBlob(dataURL: string): Blob {
 
 export default function FaceVerificationPage() {
 	const [state, setState] = useState<VerificationState>("verifying");
+	const [faceInFrame, setFaceInFrame] = useState(false);
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
@@ -119,7 +120,13 @@ export default function FaceVerificationPage() {
 				<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
 					{state === "failed" && <FailedState />}
 					{state === "success" && <SuccessState />}
-					{state === "verifying" && <VerifyingState webcamRef={webcamRef} />}
+					{state === "verifying" && (
+						<VerifyingState
+							webcamRef={webcamRef}
+							faceInFrame={faceInFrame}
+							setFaceInFrame={setFaceInFrame}
+						/>
+					)}
 				</div>
 
 				{/* Card Footer */}
@@ -134,8 +141,13 @@ export default function FaceVerificationPage() {
 					)}
 					{state === "verifying" && (
 						<button
+							disabled={!faceInFrame}
 							onClick={capture}
-							className="ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+							className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+								faceInFrame
+									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+									: "bg-gray-300 cursor-not-allowed"
+							}`}>
 							<Camera className="w-4 h-4" />
 							Ambil Foto
 						</button>
@@ -164,7 +176,7 @@ export default function FaceVerificationPage() {
 
 			{/* Security Banner */}
 			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-				<div className="flex items-start gap-3">
+				<div className="flex items-start gap-2">
 					<div className="mt-0.5">
 						<Shield className="w-5 h-5 text-[#3b5bdb]" />
 					</div>
@@ -291,11 +303,13 @@ function SuccessState() {
 
 function VerifyingState({
 	webcamRef,
+	faceInFrame,
+	setFaceInFrame,
 }: {
 	webcamRef: React.RefObject<Webcam | null>;
+	faceInFrame: boolean;
+	setFaceInFrame: (val: boolean) => void;
 }) {
-	const [faceInFrame, setFaceInFrame] = useState(false);
-
 	useEffect(() => {
 		let intervalId: NodeJS.Timeout;
 		let mounted = true;
@@ -369,16 +383,14 @@ function VerifyingState({
 	return (
 		<>
 			{/* Camera Preview with Face Frame */}
-			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900">
+			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900 aspect-video">
 				<Webcam
 					key={permissionGrantedTime || "webcam-default"}
-					className="w-full h-auto block rounded-xl"
+					className="absolute inset-0 w-full h-full object-cover rounded-xl"
 					audio={false}
-					height={720}
 					ref={webcamRef}
 					screenshotFormat="image/jpeg"
 					screenshotQuality={1}
-					width={1280}
 					mirrored
 					videoConstraints={videoConstraints}
 				/>

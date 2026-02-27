@@ -129,11 +129,11 @@ export default function SoundVerificationPage() {
 			const wavBlob = await convertToWav(audioBlob);
 
 			await submitBiometricData({
-				user_uuid: crypto.randomUUID(),
+				user_uuid: "2fb87310-db71-11f0-b3de-a5978fbf310c",
 				nik: Array.from({ length: 16 }, () =>
 					Math.floor(Math.random() * 10),
 				).join(""),
-				nama: "John Doe",
+				nama: "Super User Konser",
 				jenis_kelamin: "Pria",
 				file_wajah: faceBlob,
 				file_suara: wavBlob,
@@ -282,7 +282,7 @@ export default function SoundVerificationPage() {
 			{/* Bottom Info */}
 			{(state === "idle" || state === "recording") && (
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-					<div className="flex items-start gap-3">
+					<div className="flex items-start gap-2">
 						<Info className="w-5 h-5 text-[#3b5bdb] mt-0.5 shrink-0" />
 						<div>
 							<h3 className="font-semibold text-[#1e2a4a] text-sm mb-3">
@@ -744,7 +744,7 @@ function SecurityBanner({
 }) {
 	return (
 		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-			<div className="flex items-start gap-3">
+			<div className="flex items-start gap-2">
 				<div className="mt-0.5">
 					<Shield className="w-5 h-5 text-[#3b5bdb]" />
 				</div>
