@@ -22,12 +22,6 @@ import { useVerification } from "../../VerificationContext";
 
 type VerificationState = "verifying" | "success" | "failed";
 
-const videoConstraints = {
-	width: { ideal: 1920 },
-	height: { ideal: 1080 },
-	facingMode: "user",
-};
-
 // Oval frame constants (matching SVG viewBox 1280x720)
 const OVAL_CX = 640;
 const OVAL_CY = 330;
@@ -310,6 +304,23 @@ function VerifyingState({
 	faceInFrame: boolean;
 	setFaceInFrame: (val: boolean) => void;
 }) {
+	const [videoConstraints, setVideoConstraints] = useState<any>({
+		facingMode: "user",
+		width: { ideal: 1920 },
+		height: { ideal: 1080 },
+	});
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const isMobile = window.innerWidth < 768;
+			setVideoConstraints({
+				facingMode: "user",
+				width: { ideal: isMobile ? 1080 : 1920 },
+				height: { ideal: isMobile ? 1920 : 1080 },
+			});
+		}
+	}, []);
+
 	useEffect(() => {
 		let intervalId: NodeJS.Timeout;
 		let mounted = true;
@@ -341,13 +352,35 @@ function VerifyingState({
 					const { x, y, width, height } = face.box;
 					const vw = video.videoWidth;
 					const vh = video.videoHeight;
+					const W = video.clientWidth;
+					const H = video.clientHeight;
 
-					const scaleX = 1280 / vw;
-					const scaleY = 720 / vh;
+					if (vw === 0 || vh === 0 || W === 0 || H === 0) return;
 
-					// Face center (scaled to SVG viewBox)
-					const faceCenterX = (x + width / 2) * scaleX;
-					const faceCenterY = (y + height / 2) * scaleY;
+					// Calculate Display Scale for Video
+					const Sv = Math.max(W / vw, H / vh);
+					const videoScaledWidth = vw * Sv;
+					const videoScaledHeight = vh * Sv;
+					const videoOffsetX = (videoScaledWidth - W) / 2;
+					const videoOffsetY = (videoScaledHeight - H) / 2;
+
+					// Calculate Display Scale for SVG
+					const SVG_W = 1280;
+					const SVG_H = 720;
+					const Ss = Math.max(W / SVG_W, H / SVG_H);
+					const svgScaledWidth = SVG_W * Ss;
+					const svgScaledHeight = SVG_H * Ss;
+					const svgOffsetX = (svgScaledWidth - W) / 2;
+					const svgOffsetY = (svgScaledHeight - H) / 2;
+
+					// Physical pixels center
+					const px = (x + width / 2) * Sv - videoOffsetX;
+					const py = (y + height / 2) * Sv - videoOffsetY;
+
+					// Map physical to SVG
+					const faceCenterX = (px + svgOffsetX) / Ss;
+					const faceCenterY = (py + svgOffsetY) / Ss;
+					const faceWidth = (width * Sv) / Ss;
 
 					// Check if face center is inside the oval
 					const dxCenter = (faceCenterX - OVAL_CX) / OVAL_RX;
@@ -355,8 +388,7 @@ function VerifyingState({
 					const isCenterInOval = dxCenter * dxCenter + dyCenter * dyCenter <= 1;
 
 					// Face size checks
-					const faceWidth = width * scaleX;
-					const minFaceWidth = 1280 * 0.15;
+					const minFaceWidth = SVG_W * 0.15;
 					const isLargeEnough = faceWidth >= minFaceWidth;
 
 					const maxFaceWidth = OVAL_RX * 2 * 1.8;
@@ -383,7 +415,7 @@ function VerifyingState({
 	return (
 		<>
 			{/* Camera Preview with Face Frame */}
-			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900 aspect-video">
+			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900 aspect-3/4 sm:aspect-video">
 				<Webcam
 					key={permissionGrantedTime || "webcam-default"}
 					className="absolute inset-0 w-full h-full object-cover rounded-xl"
