@@ -13,12 +13,20 @@ import {
 	MapPin,
 	ScanFace,
 	XCircle,
+	Info,
 } from "lucide-react";
 import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import { useRouter } from "next/navigation";
 import { useVerification } from "../../VerificationContext";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 type VerificationState = "verifying" | "success" | "failed";
 
@@ -70,20 +78,8 @@ export default function FaceVerificationPage() {
 			{/* Event Info */}
 			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Vigorphoria
+					Jomlo Festival 2026 Chapter Bekasi
 				</h1>
-				<div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 text-sm text-gray-500 w-full min-w-0">
-					<div className="flex items-center justify-center gap-1.5 shrink-0 max-w-full">
-						<CalendarDays className="w-4 h-4 shrink-0" />
-						<span className="truncate">28 Maret 2026 • 15:00 – 23:00</span>
-					</div>
-					<div className="flex items-center justify-center gap-1.5 min-w-0 max-w-full">
-						<MapPin className="w-4 h-4 shrink-0" />
-						<span className="truncate">
-							Lubuk Linggau, Kota Lubuk Linggau, Sumatera Selatan
-						</span>
-					</div>
-				</div>
 			</div>
 
 			{/* Main Card */}
@@ -102,11 +98,7 @@ export default function FaceVerificationPage() {
 								? "text-emerald-600 bg-emerald-50 border-emerald-200"
 								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
 						}`}>
-						{state === "success"
-							? "Selesai"
-							: state === "failed"
-								? "Langkah 1 dari 2"
-								: "Langkah 1 dari 2"}
+						{state === "success" ? "Selesai" : "Langkah 2 dari 3"}
 					</span>
 				</div>
 
@@ -134,17 +126,25 @@ export default function FaceVerificationPage() {
 						</button>
 					)}
 					{state === "verifying" && (
-						<button
-							disabled={!faceInFrame}
-							onClick={capture}
-							className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-								faceInFrame
-									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-									: "bg-gray-300 cursor-not-allowed"
-							}`}>
-							<Camera className="w-4 h-4" />
-							Ambil Foto
-						</button>
+						<>
+							<button
+								onClick={() => router.push("/verification/ticket")}
+								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+								<ArrowLeft className="w-4 h-4" />
+								Kembali
+							</button>
+							<button
+								disabled={!faceInFrame}
+								onClick={capture}
+								className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+									faceInFrame
+										? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+										: "bg-gray-300 cursor-not-allowed"
+								}`}>
+								<Camera className="w-4 h-4" />
+								Ambil Foto
+							</button>
+						</>
 					)}
 					{state === "success" && (
 						<div className="flex w-full justify-between">
@@ -470,40 +470,73 @@ function VerifyingState({
 				)}
 			</div>
 
-			<h1 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Posisikan wajah Anda di dalam bingkai
-			</h1>
-			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Pastikan pencahayaan cukup terang dan wajah Anda terlihat jelas tanpa
-				aksesoris (masker, kacamata, topi).
-			</p>
-
-			<div className="flex items-center gap-4 sm:gap-8">
-				<div className="flex flex-col gap-2 items-center">
-					<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
-						<RiSurgicalMaskLine />
-					</div>
-					<p className="text-[12px] text-[#6B7280] uppercase font-medium">
-						Tanpa Masker
-					</p>
-				</div>
-				<div className="flex flex-col gap-2 items-center">
-					<div className="size-12 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-full text-[24px]">
-						<RiSunFill />
-					</div>
-					<p className="text-[12px] text-[#6B7280] uppercase font-medium">
-						Cahaya Cukup
-					</p>
-				</div>
-				<div className="flex flex-col gap-2 items-center">
-					<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
-						<RiEmotionFill />
-					</div>
-					<p className="text-[12px] text-[#6B7280] uppercase font-medium">
-						Wajah Jelas
-					</p>
-				</div>
-			</div>
+			<FaceTipsModal />
 		</>
+	);
+}
+
+function FaceTipsModal() {
+	const [open, setOpen] = useState(false);
+	const shownRef = useRef(false);
+
+	useEffect(() => {
+		if (!shownRef.current) {
+			setOpen(true);
+			shownRef.current = true;
+		}
+	}, []);
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+					<Info className="w-4 h-4" />
+					Lihat Tips Pengambilan Foto
+				</button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-md bg-white">
+				<DialogHeader>
+					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
+						<Info className="w-5 h-5 text-[#3b5bdb]" />
+						Tips Pengambilan Foto
+					</DialogTitle>
+				</DialogHeader>
+				<p className="text-gray-500 text-sm leading-relaxed">
+					Pastikan pencahayaan cukup terang dan wajah Anda terlihat jelas tanpa
+					aksesoris (masker, kacamata, topi).
+				</p>
+				<div className="flex items-center justify-around gap-4 py-4">
+					<div className="flex flex-col gap-2 items-center">
+						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
+							<RiSurgicalMaskLine />
+						</div>
+						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+							Tanpa Masker
+						</p>
+					</div>
+					<div className="flex flex-col gap-2 items-center">
+						<div className="size-12 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-full text-[24px]">
+							<RiSunFill />
+						</div>
+						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+							Cahaya Cukup
+						</p>
+					</div>
+					<div className="flex flex-col gap-2 items-center">
+						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
+							<RiEmotionFill />
+						</div>
+						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+							Wajah Jelas
+						</p>
+					</div>
+				</div>
+				<button
+					onClick={() => setOpen(false)}
+					className="mt-2 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+					Mengerti
+				</button>
+			</DialogContent>
+		</Dialog>
 	);
 }

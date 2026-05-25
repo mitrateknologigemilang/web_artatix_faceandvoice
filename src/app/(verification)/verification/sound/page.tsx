@@ -16,11 +16,19 @@ import {
 	Play,
 	Pause,
 	Loader2,
+	X,
 } from "lucide-react";
 import { useVerification } from "../../VerificationContext";
 import { submitBiometricData } from "@/services/verification.service";
 import { convertToWav } from "@/lib/audioConverter";
 import { useRouter } from "next/navigation";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 type RecordingState = "idle" | "recording" | "success" | "failed";
 type RecordingMethod = "read" | "sing";
@@ -33,7 +41,7 @@ export default function SoundVerificationPage() {
 	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
-	const { faceBlob } = useVerification();
+	const { faceBlob, kodeTiket } = useVerification();
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
@@ -123,18 +131,17 @@ export default function SoundVerificationPage() {
 			alert("Data wajah atau suara belum tersedia.");
 			return;
 		}
+		if (!kodeTiket) {
+			alert("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
+			router.push("/verification/ticket");
+			return;
+		}
 		setSubmitting(true);
 		try {
-			// Convert audio to WAV format (backend requires WAV)
 			const wavBlob = await convertToWav(audioBlob);
 
 			await submitBiometricData({
-				user_uuid: "2fb87310-db71-11f0-b3de-a5978fbf310c",
-				nik: Array.from({ length: 16 }, () =>
-					Math.floor(Math.random() * 10),
-				).join(""),
-				nama: "Super User Konser",
-				jenis_kelamin: "Pria",
+				kode_tiket: kodeTiket,
 				file_wajah: faceBlob,
 				file_suara: wavBlob,
 			});
@@ -145,7 +152,7 @@ export default function SoundVerificationPage() {
 		} finally {
 			setSubmitting(false);
 		}
-	}, [audioBlob, faceBlob]);
+	}, [audioBlob, faceBlob, kodeTiket, router]);
 
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60)
@@ -160,20 +167,8 @@ export default function SoundVerificationPage() {
 			{/* Event Info */}
 			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Vigorphoria
+					Jomlo Festival 2026 Chapter Bekasi
 				</h1>
-				<div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 text-sm text-gray-500 w-full min-w-0">
-					<div className="flex items-center justify-center gap-1.5 shrink-0 max-w-full">
-						<CalendarDays className="w-4 h-4 shrink-0" />
-						<span className="truncate">28 Maret 2026 • 15:00 – 23:00</span>
-					</div>
-					<div className="flex items-center justify-center gap-1.5 min-w-0 max-w-full">
-						<MapPin className="w-4 h-4 shrink-0" />
-						<span className="truncate">
-							Lubuk Linggau, Kota Lubuk Linggau, Sumatera Selatan
-						</span>
-					</div>
-				</div>
 			</div>
 
 			{/* Main Card */}
@@ -192,7 +187,7 @@ export default function SoundVerificationPage() {
 								? "text-emerald-600 bg-emerald-50 border-emerald-200"
 								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
 						}`}>
-						{state === "success" ? "Selesai" : "Langkah 2 dari 2"}
+						{state === "success" ? "Selesai" : "Langkah 3 dari 3"}
 					</span>
 				</div>
 
@@ -279,39 +274,7 @@ export default function SoundVerificationPage() {
 				</div>
 			</div>
 
-			{/* Bottom Info */}
-			{(state === "idle" || state === "recording") && (
-				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-					<div className="flex items-start gap-2">
-						<Info className="w-5 h-5 text-[#3b5bdb] mt-0.5 shrink-0" />
-						<div>
-							<h3 className="font-semibold text-[#1e2a4a] text-sm mb-3">
-								Tips Perekaman
-							</h3>
-							<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-								<div className="text-xs flex gap-3 text-gray-500 leading-relaxed">
-									<span className="block font-medium text-gray-700 mb-0.5">
-										•
-									</span>
-									Pastikan Anda berada di ruangan yang tenang
-								</div>
-								<div className="text-xs flex gap-3 text-gray-500 leading-relaxed">
-									<span className="block font-medium text-gray-700 mb-0.5">
-										•
-									</span>
-									Dekatkan mulut ke mikrofon perangkat
-								</div>
-								<div className="text-xs flex gap-3 text-gray-500 leading-relaxed">
-									<span className="block font-medium text-gray-700 mb-0.5">
-										•
-									</span>
-									Bicara dengan volume normal.
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
+			<TipsModal autoOpen={state === "idle"} />
 
 			{state === "failed" && (
 				<SecurityBanner
@@ -386,8 +349,8 @@ function IdleRecordingState({
 			{method === "read" && (
 				<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
 					<p className="text-gray-600 italic text-lg leading-relaxed">
-						&ldquo;Saya mengonfirmasi identitas saya untuk acara Vigorphoria
-						ini&rdquo;
+						&ldquo;Saya mengonfirmasi identitas saya untuk acara Jomlo Festival
+						2026 Chapter Bekasi ini&rdquo;
 					</p>
 				</div>
 			)}
@@ -732,6 +695,67 @@ function FailedState() {
 				Data suara Anda dienkripsi dan hanya digunakan untuk verifikasi.
 			</div>
 		</>
+	);
+}
+
+function TipsModal({ autoOpen }: { autoOpen: boolean }) {
+	const [open, setOpen] = useState(false);
+	const shownRef = useRef(false);
+
+	useEffect(() => {
+		if (autoOpen && !shownRef.current) {
+			setOpen(true);
+			shownRef.current = true;
+		}
+	}, [autoOpen]);
+
+	const tips = [
+		"Pastikan Anda berada di ruangan yang tenang",
+		"Dekatkan mulut ke mikrofon perangkat",
+		"Bicara dengan volume normal dan jelas",
+	];
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<button className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 text-left hover:border-[#3b5bdb]/30 transition-colors cursor-pointer">
+					<div className="flex items-center justify-between gap-2">
+						<div className="flex items-center gap-2">
+							<Info className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<span className="font-semibold text-[#1e2a4a] text-sm">
+								Lihat Tips Perekaman
+							</span>
+						</div>
+						<ArrowRight className="w-4 h-4 text-gray-400" />
+					</div>
+				</button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-md bg-white">
+				<DialogHeader>
+					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
+						<Info className="w-5 h-5 text-[#3b5bdb]" />
+						Tips Perekaman
+					</DialogTitle>
+				</DialogHeader>
+				<ul className="space-y-3 mt-2">
+					{tips.map((tip, i) => (
+						<li
+							key={i}
+							className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
+							<span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-[#3b5bdb] text-xs font-bold shrink-0">
+								{i + 1}
+							</span>
+							{tip}
+						</li>
+					))}
+				</ul>
+				<button
+					onClick={() => setOpen(false)}
+					className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+					Mengerti
+				</button>
+			</DialogContent>
+		</Dialog>
 	);
 }
 
