@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState } from "react";
 
 interface VerificationContextType {
+	kodeTiket: string | null;
+	setKodeTiket: (code: string | null) => void;
 	faceBlob: Blob | null;
 	setFaceBlob: (blob: Blob | null) => void;
 	permissionGrantedTime: number | null;
@@ -10,6 +12,8 @@ interface VerificationContextType {
 }
 
 const VerificationContext = createContext<VerificationContextType>({
+	kodeTiket: null,
+	setKodeTiket: () => {},
 	faceBlob: null,
 	setFaceBlob: () => {},
 	permissionGrantedTime: null,
@@ -23,6 +27,7 @@ export function VerificationProvider({
 }: {
 	children: React.ReactNode;
 }) {
+	const [kodeTiket, setKodeTiket] = useState<string | null>(null);
 	const [faceBlob, setFaceBlob] = useState<Blob | null>(null);
 	const [permissionGrantedTime, setPermissionGrantedTime] = useState<
 		number | null
@@ -31,6 +36,8 @@ export function VerificationProvider({
 	return (
 		<VerificationContext.Provider
 			value={{
+				kodeTiket,
+				setKodeTiket,
 				faceBlob,
 				setFaceBlob,
 				permissionGrantedTime,

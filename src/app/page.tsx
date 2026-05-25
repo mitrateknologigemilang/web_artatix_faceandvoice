@@ -7,7 +7,7 @@ export default function HomePage() {
 	const router = useRouter();
 
 	useEffect(() => {
-		router.replace("/verification/face");
+		router.replace("/verification/ticket");
 	}, [router]);
 
 	// Show a loading state while redirecting
