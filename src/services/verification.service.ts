@@ -1,7 +1,7 @@
 import api from "@/lib/axios";
 
 interface SubmitBiometricPayload {
-	kode_tiket: string;
+	ticketCode: string;
 	file_wajah: Blob;
 	file_suara: Blob;
 }
@@ -13,7 +13,7 @@ export async function submitBiometricData(payload: SubmitBiometricPayload) {
 	);
 	const formData = new FormData();
 
-	formData.append("kode_tiket", payload.kode_tiket);
+	formData.append("ticketCode", payload.ticketCode);
 	formData.append("file_wajah", payload.file_wajah, "face.jpg");
 	formData.append("file_suara", payload.file_suara, "sound.wav");
 

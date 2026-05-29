@@ -141,7 +141,7 @@ export default function SoundVerificationPage() {
 			const wavBlob = await convertToWav(audioBlob);
 
 			await submitBiometricData({
-				kode_tiket: kodeTiket,
+				ticketCode: kodeTiket,
 				file_wajah: faceBlob,
 				file_suara: wavBlob,
 			});
