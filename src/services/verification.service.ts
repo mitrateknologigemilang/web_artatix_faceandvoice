@@ -17,6 +17,7 @@ export async function submitBiometricData(payload: SubmitBiometricPayload) {
 	formData.append("file_wajah", payload.file_wajah, "face.jpg");
 	formData.append("file_suara", payload.file_suara, "sound.wav");
 
-	const response = await api.post("/api/data_diri", formData);
+	const response = await api.post("/api/ref/registerDataDiri", formData);
 	return response.data;
 }
+4
