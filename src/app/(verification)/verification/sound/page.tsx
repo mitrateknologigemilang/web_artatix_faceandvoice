@@ -145,7 +145,7 @@ export default function SoundVerificationPage() {
 				file_wajah: faceBlob,
 				file_suara: wavBlob,
 			});
-			alert("Data biometrik berhasil dikirim!");
+			router.push("/verification/success");
 		} catch (error) {
 			console.error("Submit error:", error);
 			alert("Gagal mengirim data. Silakan coba lagi.");
