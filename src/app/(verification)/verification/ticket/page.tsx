@@ -61,6 +61,7 @@ export default function TicketVerificationPage() {
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
+		e.target.value = "";
 		if (file) handleFile(file);
 	};
 
