@@ -33,4 +33,32 @@ api.interceptors.response.use(
 	},
 );
 
+// Separate client for the Artatix API (different domain, public endpoints).
+export const artatixApi = axios.create({
+	baseURL: process.env.NEXT_PUBLIC_ARTATIX_API_URL,
+	timeout: 30000,
+});
+
+artatixApi.interceptors.request.use(
+	(config) => {
+		const token = process.env.NEXT_PUBLIC_ARTATIX_TOKEN;
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+		return config;
+	},
+	(error) => Promise.reject(error),
+);
+
+artatixApi.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		console.error(
+			"Artatix API Error:",
+			error?.response?.data || error.message,
+		);
+		return Promise.reject(error);
+	},
+);
+
 export default api;

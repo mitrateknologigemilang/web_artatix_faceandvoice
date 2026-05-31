@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useVerification } from "../../VerificationContext";
+import { getTicketDetail, type TicketDetail } from "@/services/verification.service";
 
-type ScanState = "idle" | "scanning" | "success" | "failed";
+type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
 
 export default function TicketVerificationPage() {
 	const [state, setState] = useState<ScanState>("idle");
@@ -22,10 +23,38 @@ export default function TicketVerificationPage() {
 	const [fileName, setFileName] = useState<string>("");
 	const [manualMode, setManualMode] = useState(false);
 	const [manualCode, setManualCode] = useState("");
+	const [ticketDetail, setTicketDetail] = useState<TicketDetail | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
 	const { kodeTiket, setKodeTiket } = useVerification();
 
+	// Step 2: validate the decoded/entered ticket code against the backend.
+	const validateCode = useCallback(
+		async (code: string) => {
+			setState("validating");
+			setErrorMsg("");
+			try {
+				const detail = await getTicketDetail(code);
+				if (!detail) {
+					setErrorMsg(
+						"Kode tiket tidak ditemukan. Pastikan tiket sesuai dengan acara ini.",
+					);
+					setState("failed");
+					return;
+				}
+				setTicketDetail(detail);
+				setKodeTiket(detail.ticket?.ticketCode || code);
+				setState("success");
+			} catch (err) {
+				console.error(err);
+				setErrorMsg("Gagal memvalidasi tiket. Periksa koneksi lalu coba lagi.");
+				setState("failed");
+			}
+		},
+		[setKodeTiket],
+	);
+
+	// Step 1: decode QR/barcode from the uploaded file.
 	const handleFile = useCallback(
 		async (file: File) => {
 			const isPdf = file.type === "application/pdf";
@@ -48,15 +77,14 @@ export default function TicketVerificationPage() {
 					setState("failed");
 					return;
 				}
-				setKodeTiket(code);
-				setState("success");
+				await validateCode(code);
 			} catch (err) {
 				console.error(err);
 				setErrorMsg("Gagal memproses file. Coba file lain.");
 				setState("failed");
 			}
 		},
-		[setKodeTiket],
+		[validateCode],
 	);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,15 +103,15 @@ export default function TicketVerificationPage() {
 		setState("idle");
 		setErrorMsg("");
 		setFileName("");
+		setTicketDetail(null);
 		setKodeTiket(null);
 	};
 
 	const handleManualSubmit = () => {
 		const trimmed = manualCode.trim();
 		if (!trimmed) return;
-		setKodeTiket(trimmed);
-		setState("success");
 		setFileName("Input manual");
+		validateCode(trimmed);
 	};
 
 	const handleContinue = () => {
@@ -133,8 +161,13 @@ export default function TicketVerificationPage() {
 						/>
 					)}
 					{state === "scanning" && <ScanningState fileName={fileName} />}
+					{state === "validating" && <ValidatingState />}
 					{state === "success" && (
-						<SuccessState fileName={fileName} kodeTiket={kodeTiket} />
+						<SuccessState
+							fileName={fileName}
+							kodeTiket={kodeTiket}
+							detail={ticketDetail}
+						/>
 					)}
 					{state === "failed" && (
 						<FailedState
@@ -319,9 +352,11 @@ function ScanningState({ fileName }: { fileName: string }) {
 function SuccessState({
 	fileName,
 	kodeTiket,
+	detail,
 }: {
 	fileName: string;
 	kodeTiket: string | null;
+	detail: TicketDetail | null;
 }) {
 	return (
 		<>
@@ -332,18 +367,58 @@ function SuccessState({
 					</div>
 				</div>
 			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Kode Tiket Ditemukan!
-			</h2>
+			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">Tiket Valid!</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-4">
 				Sumber: <span className="font-medium text-[#1e2a4a]">{fileName}</span>
 			</p>
-			<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-4">
-				<p className="text-xs text-gray-500 mb-1">Kode Tiket</p>
-				<p className="font-mono text-base font-bold text-[#1e2a4a] break-all">
-					{kodeTiket}
-				</p>
+
+			<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-left space-y-3">
+				{detail?.detailTransactionDocument?.name && (
+					<DetailRow
+						label="Nama"
+						value={detail.detailTransactionDocument.name}
+					/>
+				)}
+				{detail?.ticket?.category && (
+					<DetailRow label="Kategori" value={detail.ticket.category} />
+				)}
+				{detail?.status && (
+					<DetailRow label="Status" value={detail.status} />
+				)}
+				<div>
+					<p className="text-xs text-gray-500 mb-1">Kode Tiket</p>
+					<p className="font-mono text-base font-bold text-[#1e2a4a] break-all">
+						{detail?.ticket?.ticketCode || kodeTiket}
+					</p>
+				</div>
 			</div>
+		</>
+	);
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+	return (
+		<div>
+			<p className="text-xs text-gray-500 mb-0.5">{label}</p>
+			<p className="text-sm font-semibold text-[#1e2a4a]">{value}</p>
+		</div>
+	);
+}
+
+function ValidatingState() {
+	return (
+		<>
+			<div className="relative mb-6">
+				<div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
+					<Loader2 className="w-12 h-12 text-[#3b5bdb] animate-spin" />
+				</div>
+			</div>
+			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
+				Memvalidasi Tiket...
+			</h2>
+			<p className="text-gray-500 text-sm max-w-md">
+				Memeriksa keabsahan kode tiket ke server.
+			</p>
 		</>
 	);
 }
@@ -365,7 +440,7 @@ function FailedState({
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Gagal Memindai Barcode
+				Verifikasi Tiket Gagal
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-2">{message}</p>
 			<button
