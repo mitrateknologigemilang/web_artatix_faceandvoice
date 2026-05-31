@@ -279,7 +279,7 @@ function ManualInputState({
 							? "bg-[#3b5bdb] hover:bg-[#3451c5]"
 							: "bg-gray-300 cursor-not-allowed"
 					}`}>
-					Simpan Kode
+					Verifikasi Kode
 				</button>
 			</div>
 

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Camera, Mic, ShieldAlert } from "lucide-react";
 import { useVerification } from "../VerificationContext";
+import { Modal } from "./Modal";
 
 /**
  * Try getUserMedia with fallback constraints for broader compatibility.
@@ -37,6 +38,7 @@ export function PermissionPopup() {
 	const [show, setShow] = useState(false);
 	const [denied, setDenied] = useState(false);
 	const [isChecking, setIsChecking] = useState(true);
+	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const { setPermissionGrantedTime } = useVerification();
 
 	useEffect(() => {
@@ -151,56 +153,73 @@ export function PermissionPopup() {
 				setDenied(true);
 				setShow(true);
 			} else {
-				alert("Gagal mengakses kamera/mikrofon.");
+				setErrorMsg("Gagal mengakses kamera/mikrofon.");
 			}
 		}
 	};
 
-	if (isChecking || !show) return null;
+	if (isChecking || !show) {
+		return (
+			<Modal
+				open={!!errorMsg}
+				onClose={() => setErrorMsg(null)}
+				title="Terjadi Kesalahan"
+				description={errorMsg}
+			/>
+		);
+	}
 
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-			style={{ zIndex: 9999 }}>
-			<div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200">
-				<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
-					<Camera className="w-6 h-6 text-[#3b5bdb] absolute -ml-4 -mt-2" />
-					<Mic className="w-6 h-6 text-[#3b5bdb] absolute ml-4 mt-2" />
-				</div>
-
-				<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
-					{denied ? "Akses Ditolak" : "Izin Dibutuhkan"}
-				</h2>
-
-				<p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
-					{denied
-						? "Anda telah menolak akses kamera atau mikrofon. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
-						: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera dan mikrofon Anda."}
-				</p>
-
-				{denied ? (
-					<div className="bg-red-50 text-red-600 text-sm rounded-lg p-3 flex flex-col gap-2">
-						<div className="flex items-start gap-2">
-							<ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-							<p>
-								Silakan buka pengaturan situs (ikon gembok di URL bar) dan
-								izinkan Kamera & Mikrofon.
-							</p>
-						</div>
-						<button
-							onClick={() => window.location.reload()}
-							className="mt-2 text-sm font-medium bg-white border border-red-200 text-red-600 py-2 rounded-lg hover:bg-red-50 transition-colors">
-							Muat Ulang Halaman
-						</button>
+		<>
+			<Modal
+				open={!!errorMsg}
+				onClose={() => setErrorMsg(null)}
+				title="Terjadi Kesalahan"
+				description={errorMsg}
+			/>
+			<div
+				className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+				style={{ zIndex: 9999 }}>
+				<div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200">
+					<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+						<Camera className="w-6 h-6 text-[#3b5bdb] absolute -ml-4 -mt-2" />
+						<Mic className="w-6 h-6 text-[#3b5bdb] absolute ml-4 mt-2" />
 					</div>
-				) : (
-					<button
-						onClick={requestPermission}
-						className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
-						Izinkan Akses
-					</button>
-				)}
+
+					<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
+						{denied ? "Akses Ditolak" : "Izin Dibutuhkan"}
+					</h2>
+
+					<p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
+						{denied
+							? "Anda telah menolak akses kamera atau mikrofon. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
+							: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera dan mikrofon Anda."}
+					</p>
+
+					{denied ? (
+						<div className="bg-red-50 text-red-600 text-sm rounded-lg p-3 flex flex-col gap-2">
+							<div className="flex items-start gap-2">
+								<ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+								<p>
+									Silakan buka pengaturan situs (ikon gembok di URL bar) dan
+									izinkan Kamera & Mikrofon.
+								</p>
+							</div>
+							<button
+								onClick={() => window.location.reload()}
+								className="mt-2 text-sm font-medium bg-white border border-red-200 text-red-600 py-2 rounded-lg hover:bg-red-50 transition-colors">
+								Muat Ulang Halaman
+							</button>
+						</div>
+					) : (
+						<button
+							onClick={requestPermission}
+							className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
+							Izinkan Akses
+						</button>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

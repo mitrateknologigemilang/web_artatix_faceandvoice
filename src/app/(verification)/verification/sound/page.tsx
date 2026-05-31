@@ -29,11 +29,26 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Modal } from "../../components/Modal";
 
 type RecordingState = "idle" | "recording" | "success" | "failed";
 type RecordingMethod = "read" | "sing";
 
-const MAX_RECORDING_SECONDS = 180; // 3 minutes
+// BE requires min 3 minutes of speech for accurate voice recognition.
+const MIN_RECORDING_SECONDS = 180; // 3 minutes — required floor
+const MAX_RECORDING_SECONDS = 210; // small buffer above the floor
+const PROMPT_INTERVAL_SECONDS = 25; // rotate read-mode prompt every 25s
+
+const READ_PROMPTS = [
+	"Siapa nama lengkapmu? Coba kenalkan dirimu sedikit.",
+	"Dari mana asalmu? Ceritakan tentang kota atau daerahmu.",
+	"Berapa usiamu dan apa kesibukanmu sehari-hari?",
+	"Ceritakan sedikit, kenapa kamu tertarik datang ke event ini?",
+	"Sebutkan film, lagu, atau artis favoritmu dan kenapa kamu suka.",
+	"Apa hal paling seru yang kamu alami bulan ini?",
+	"Kalau bisa liburan ke mana saja, kamu pilih ke mana? Kenapa?",
+	"Sebutkan tiga hal yang kamu syukuri hari ini.",
+];
 
 export default function SoundVerificationPage() {
 	const [state, setState] = useState<RecordingState>("idle");
@@ -41,6 +56,7 @@ export default function SoundVerificationPage() {
 	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
+	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const { faceBlob, kodeTiket } = useVerification();
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -128,12 +144,11 @@ export default function SoundVerificationPage() {
 
 	const handleSubmit = useCallback(async () => {
 		if (!audioBlob || !faceBlob) {
-			alert("Data wajah atau suara belum tersedia.");
+			setErrorMsg("Data wajah atau suara belum tersedia.");
 			return;
 		}
 		if (!kodeTiket) {
-			alert("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
-			router.push("/verification/ticket");
+			setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
 			return;
 		}
 		setSubmitting(true);
@@ -148,11 +163,18 @@ export default function SoundVerificationPage() {
 			router.push("/verification/success");
 		} catch (error) {
 			console.error("Submit error:", error);
-			alert("Gagal mengirim data. Silakan coba lagi.");
+			setErrorMsg("Gagal mengirim data. Silakan coba lagi.");
 		} finally {
 			setSubmitting(false);
 		}
 	}, [audioBlob, faceBlob, kodeTiket, router]);
+
+	const handleErrorClose = useCallback(() => {
+		const wasMissingTicket =
+			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1.";
+		setErrorMsg(null);
+		if (wasMissingTicket) router.push("/verification/ticket");
+	}, [errorMsg, router]);
 
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60)
@@ -164,6 +186,13 @@ export default function SoundVerificationPage() {
 
 	return (
 		<div className="space-y-6">
+			<Modal
+				open={!!errorMsg}
+				onClose={handleErrorClose}
+				title="Terjadi Kesalahan"
+				description={errorMsg}
+			/>
+
 			{/* Event Info */}
 			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
@@ -222,22 +251,36 @@ export default function SoundVerificationPage() {
 								<ArrowLeft className="w-4 h-4" />
 								Kembali
 							</button>
-							<button
-								onClick={handleStartStop}
-								className={`inline-flex ml-auto items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-sm cursor-pointer transition-colors ${
-									state === "recording"
-										? "bg-red-500 text-white hover:bg-red-600"
-										: "bg-[#3b5bdb] text-white hover:bg-[#3451c5]"
-								}`}>
-								<span
-									className={`w-2 h-2 rounded-full ${
-										state === "recording"
-											? "bg-white animate-pulse"
-											: "bg-white"
-									}`}
-								/>
-								{state === "idle" ? "Mulai Rekam" : "Berhenti"}
-							</button>
+							{(() => {
+								const canStop =
+									state === "recording" &&
+									recordingTime >= MIN_RECORDING_SECONDS;
+								const stopLocked = state === "recording" && !canStop;
+								const remaining = MIN_RECORDING_SECONDS - recordingTime;
+								return (
+									<button
+										onClick={handleStartStop}
+										disabled={stopLocked}
+										className={`inline-flex ml-auto items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+											stopLocked
+												? "bg-gray-200 text-gray-400 cursor-not-allowed"
+												: state === "recording"
+													? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
+													: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
+										}`}>
+										<span
+											className={`w-2 h-2 rounded-full ${
+												stopLocked ? "bg-gray-400" : "bg-white animate-pulse"
+											}`}
+										/>
+										{state === "idle"
+											? "Mulai Rekam"
+											: stopLocked
+												? `${formatTime(remaining)} lagi`
+												: "Selesai"}
+									</button>
+								);
+							})()}
 						</>
 					)}
 					{state === "failed" && (
@@ -312,9 +355,13 @@ function IdleRecordingState({
 }) {
 	return (
 		<>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-4">
+			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
 				Rekam Sampel Suara Anda
 			</h2>
+			<p className="text-gray-500 text-sm mb-4 ">
+				Rekaman sekitar 3 menit membantu sistem mengenali suaramu dengan akurat.
+				Cukup ngobrol santai mengikuti panduan & tak perlu menghafal.
+			</p>
 
 			{/* Method Tabs */}
 			<div className="inline-flex bg-gray-100 rounded-lg p-1 mb-4">
@@ -345,18 +392,36 @@ function IdleRecordingState({
 				instruksi.
 			</p>
 
-			{/* Sentence Box */}
-			{method === "read" && (
-				<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
-					<p className="text-gray-600 italic text-lg leading-relaxed">
-						&ldquo;Saya mengonfirmasi identitas saya untuk acara Jomlo Festival
-						2026 Chapter Bekasi ini&rdquo;
-					</p>
-				</div>
-			)}
+			{/* Sentence Box — rotating prompts keep the 3 min feeling like a chat */}
+			{method === "read" &&
+				(() => {
+					const idx = isRecording
+						? Math.min(
+								Math.floor(recordingTime / PROMPT_INTERVAL_SECONDS),
+								READ_PROMPTS.length - 1,
+							)
+						: 0;
+					return (
+						<div className="w-full  bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
+							{isRecording && (
+								<p className="text-xs font-medium text-[#3b5bdb] mb-2">
+									Topik {idx + 1} dari {READ_PROMPTS.length}
+								</p>
+							)}
+							<p className="text-gray-600 italic text-lg leading-relaxed transition-opacity duration-300">
+								&ldquo;{READ_PROMPTS[idx]}&rdquo;
+							</p>
+							<p className="text-[11px] text-gray-400 mt-3">
+								{isRecording
+									? "Jawab santai. Topik berganti otomatis tak perlu buru-buru."
+									: "Tekan rekam, lalu ngobrol santai mengikuti topik yang muncul."}
+							</p>
+						</div>
+					);
+				})()}
 
 			{method === "sing" && (
-				<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
+				<div className="w-full  bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
 					<p className="text-gray-600 italic text-lg leading-relaxed">
 						Nyanyikan lagu apapun yang Anda suka
 					</p>
@@ -366,28 +431,54 @@ function IdleRecordingState({
 			{/* Live Waveform */}
 			<LiveWaveform isRecording={isRecording} stream={stream} />
 
-			{/* Timer */}
-			<div className="inline-flex items-center gap-1 border border-gray-200 rounded-lg px-4 py-2 mb-2">
-				<span
-					className={`text-lg font-mono font-bold ${
-						isRecording ? "text-red-500" : "text-[#3b5bdb]"
-					}`}>
-					{formatTime(recordingTime)}
-				</span>
-				<span className="text-lg font-mono text-gray-400">
-					/ {formatTime(MAX_RECORDING_SECONDS)}
-				</span>
-			</div>
-
-			{isRecording && (
-				<p className="text-xs text-red-500 mt-1 animate-pulse">● Merekam...</p>
-			)}
-
-			{/* Encryption Note */}
-			<div className="flex items-center gap-1.5 mt-4 text-xs text-gray-400">
-				<Lock className="w-3.5 h-3.5" />
-				Data suara Anda dienkripsi dan hanya digunakan untuk verifikasi.
-			</div>
+			{/* Progress — counts UP toward the goal (avoids countdown anxiety) */}
+			{(() => {
+				const pct = Math.min(
+					(recordingTime / MIN_RECORDING_SECONDS) * 100,
+					100,
+				);
+				const done = recordingTime >= MIN_RECORDING_SECONDS;
+				let milestone = "Mulai kapan saja, santai";
+				if (isRecording) {
+					if (done) milestone = "Selesai! Suara kamu sudah cukup ";
+					else if (pct >= 66) milestone = "Hampir selesai, sedikit lagi! ";
+					else if (pct >= 33) milestone = "Bagus, sudah sepertiga jalan ";
+					else milestone = "Mantap, terus mengalir saja ";
+				}
+				return (
+					<div className="w-full  mb-2">
+						<div className="flex items-center justify-between mb-1.5">
+							<span
+								className={`text-lg font-mono font-bold ${
+									done
+										? "text-emerald-500"
+										: isRecording
+											? "text-[#3b5bdb]"
+											: "text-gray-400"
+								}`}>
+								{formatTime(recordingTime)}
+							</span>
+							<span className="text-xs font-medium text-gray-500">
+								Target {formatTime(MIN_RECORDING_SECONDS)}
+							</span>
+						</div>
+						<div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
+							<div
+								className={`h-full rounded-full transition-all duration-500 ${
+									done ? "bg-emerald-500" : "bg-[#3b5bdb]"
+								}`}
+								style={{ width: `${pct}%` }}
+							/>
+						</div>
+						<p
+							className={`text-xs mt-2 ${
+								done ? "text-emerald-600" : "text-gray-500"
+							}`}>
+							{milestone}
+						</p>
+					</div>
+				);
+			})()}
 		</>
 	);
 }
@@ -461,7 +552,7 @@ function LiveWaveform({
 	}, [isRecording, stream]);
 
 	return (
-		<div className="w-full max-w-md flex items-center justify-center gap-[3px] h-12 mb-4">
+		<div className="w-full  flex items-center justify-center gap-0.75 h-12 mb-4">
 			{bars.map((height, i) => (
 				<div
 					key={i}
