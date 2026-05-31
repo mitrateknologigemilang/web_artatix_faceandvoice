@@ -1,5 +1,5 @@
 import axios from "axios";
-import api, { artatixApi } from "@/lib/axios";
+import api from "@/lib/axios";
 
 export interface TicketDetail {
 	orderId: string;
@@ -25,11 +25,11 @@ export async function getTicketDetail(
 	ticketCode: string,
 ): Promise<TicketDetail | null> {
 	try {
-		const res = await artatixApi.get(
-			`/creator/checkin/ticket/detail/${encodeURIComponent(ticketCode)}`,
+		const res = await api.get(
+			`/api/ref/getDetailTiket?kode=${encodeURIComponent(ticketCode)}`,
 		);
-		if (res.data?.message === "success" && res.data?.data) {
-			return res.data.data as TicketDetail;
+		if (res.data?.data?.message === "success" && res.data?.data?.data) {
+			return res.data.data.data as TicketDetail;
 		}
 		// e.g. { message: "Not found" }
 		return null;
