@@ -45,7 +45,7 @@ export async function getTicketDetail(
 interface SubmitBiometricPayload {
 	ticketCode: string;
 	file_wajah: Blob;
-	file_suara: Blob;
+	file_suara?: Blob;
 }
 
 export async function submitBiometricData(payload: SubmitBiometricPayload) {
@@ -57,7 +57,9 @@ export async function submitBiometricData(payload: SubmitBiometricPayload) {
 
 	formData.append("ticketCode", payload.ticketCode);
 	formData.append("file_wajah", payload.file_wajah, "face.jpg");
-	formData.append("file_suara", payload.file_suara, "sound.wav");
+	if (payload.file_suara) {
+		formData.append("file_suara", payload.file_suara, "sound.wav");
+	}
 
 	const response = await api.post("/api/ref/registerDataDiri", formData);
 	return response.data;

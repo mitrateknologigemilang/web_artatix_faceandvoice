@@ -143,8 +143,8 @@ export default function SoundVerificationPage() {
 	}, []);
 
 	const handleSubmit = useCallback(async () => {
-		if (!audioBlob || !faceBlob) {
-			setErrorMsg("Data wajah atau suara belum tersedia.");
+		if (!faceBlob) {
+			setErrorMsg("Data wajah belum tersedia.");
 			return;
 		}
 		if (!kodeTiket) {
@@ -153,7 +153,8 @@ export default function SoundVerificationPage() {
 		}
 		setSubmitting(true);
 		try {
-			const wavBlob = await convertToWav(audioBlob);
+			// Voice is optional — only convert & send when a recording exists.
+			const wavBlob = audioBlob ? await convertToWav(audioBlob) : undefined;
 
 			await submitBiometricData({
 				ticketCode: kodeTiket,
@@ -251,6 +252,17 @@ export default function SoundVerificationPage() {
 								<ArrowLeft className="w-4 h-4" />
 								Kembali
 							</button>
+							{state === "idle" && (
+								<button
+									onClick={handleSubmit}
+									disabled={submitting}
+									className={`inline-flex ml-auto mr-3 items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+									{submitting ? (
+										<Loader2 className="w-4 h-4 animate-spin" />
+									) : null}
+									{submitting ? "Mengirim..." : "Lewati"}
+								</button>
+							)}
 							{(() => {
 								const canStop =
 									state === "recording" &&
