@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
 	ArrowRight,
 	CheckCircle2,
@@ -12,7 +12,7 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useVerification } from "../../VerificationContext";
+import { useVerification, useVerificationGuard } from "../../VerificationContext";
 import { getTicketDetail, type TicketDetail } from "@/services/verification.service";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
@@ -23,10 +23,21 @@ export default function TicketVerificationPage() {
 	const [fileName, setFileName] = useState<string>("");
 	const [manualMode, setManualMode] = useState(false);
 	const [manualCode, setManualCode] = useState("");
-	const [ticketDetail, setTicketDetail] = useState<TicketDetail | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
-	const { kodeTiket, setKodeTiket } = useVerification();
+	const {
+		kodeTiket,
+		setKodeTiket,
+		ticketDetail,
+		setTicketDetail,
+		setStep,
+	} = useVerification();
+	const allowed = useVerificationGuard("ticket");
+
+	// Returning here (via "Kembali") with a validated ticket → show the result.
+	useEffect(() => {
+		if (allowed && kodeTiket) setState("success");
+	}, [allowed, kodeTiket]);
 
 	// Step 2: validate the decoded/entered ticket code against the backend.
 	const validateCode = useCallback(
@@ -107,6 +118,8 @@ export default function TicketVerificationPage() {
 		setKodeTiket(null);
 	};
 
+	if (!allowed) return null;
+
 	const handleManualSubmit = () => {
 		const trimmed = manualCode.trim();
 		if (!trimmed) return;
@@ -115,7 +128,10 @@ export default function TicketVerificationPage() {
 	};
 
 	const handleContinue = () => {
-		if (kodeTiket) router.push("/verification/face");
+		if (kodeTiket) {
+			setStep("face");
+			router.push("/verification/face");
+		}
 	};
 
 	return (

@@ -2,9 +2,17 @@
 
 import { CheckCircle2, Shield, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useVerification } from "../../VerificationContext";
 
 export default function VerificationSuccessPage() {
 	const router = useRouter();
+	const { clearVerification } = useVerification();
+
+	// All steps done — drop the saved progress so a reload starts fresh.
+	useEffect(() => {
+		clearVerification();
+	}, [clearVerification]);
 
 	return (
 		<div className="space-y-6">

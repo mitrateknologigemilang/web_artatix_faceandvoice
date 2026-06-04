@@ -19,7 +19,7 @@ import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import { useRouter } from "next/navigation";
-import { useVerification } from "../../VerificationContext";
+import { useVerification, useVerificationGuard } from "../../VerificationContext";
 import {
 	Dialog,
 	DialogContent,
@@ -52,7 +52,16 @@ export default function FaceVerificationPage() {
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
-	const { setFaceBlob } = useVerification();
+	const { faceBlob, setFaceBlob, setStep } = useVerification();
+	const allowed = useVerificationGuard("face");
+
+	// Returning here (via "Kembali") with a captured photo → show the result.
+	useEffect(() => {
+		if (allowed && faceBlob && !faceBlobRef.current) {
+			faceBlobRef.current = faceBlob;
+			setState("success");
+		}
+	}, [allowed, faceBlob]);
 
 	const capture = useCallback(() => {
 		if (!webcamRef.current) return;
@@ -69,9 +78,12 @@ export default function FaceVerificationPage() {
 	const handleContinue = useCallback(() => {
 		if (faceBlobRef.current) {
 			setFaceBlob(faceBlobRef.current);
+			setStep("sound");
 			router.push("/verification/sound");
 		}
-	}, [setFaceBlob, router]);
+	}, [setFaceBlob, setStep, router]);
+
+	if (!allowed) return null;
 
 	return (
 		<div className="space-y-6">
@@ -128,7 +140,10 @@ export default function FaceVerificationPage() {
 					{state === "verifying" && (
 						<>
 							<button
-								onClick={() => router.push("/verification/ticket")}
+								onClick={() => {
+									setStep("ticket");
+									router.push("/verification/ticket");
+								}}
 								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
 								<ArrowLeft className="w-4 h-4" />
 								Kembali

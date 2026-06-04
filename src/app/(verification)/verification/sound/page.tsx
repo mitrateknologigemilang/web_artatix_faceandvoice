@@ -18,7 +18,7 @@ import {
 	Loader2,
 	X,
 } from "lucide-react";
-import { useVerification } from "../../VerificationContext";
+import { useVerification, useVerificationGuard } from "../../VerificationContext";
 import { submitBiometricData } from "@/services/verification.service";
 import { convertToWav } from "@/lib/audioConverter";
 import { useRouter } from "next/navigation";
@@ -57,7 +57,8 @@ export default function SoundVerificationPage() {
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const { faceBlob, kodeTiket } = useVerification();
+	const { faceBlob, kodeTiket, setStep } = useVerification();
+	const allowed = useVerificationGuard("sound");
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
@@ -185,6 +186,8 @@ export default function SoundVerificationPage() {
 		return `${m}:${s}`;
 	};
 
+	if (!allowed) return null;
+
 	return (
 		<div className="space-y-6">
 			<Modal
@@ -247,7 +250,10 @@ export default function SoundVerificationPage() {
 					{(state === "idle" || state === "recording") && (
 						<>
 							<button
-								onClick={() => router.push("/verification/face")}
+								onClick={() => {
+									setStep("face");
+									router.push("/verification/face");
+								}}
 								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
 								<ArrowLeft className="w-4 h-4" />
 								Kembali
