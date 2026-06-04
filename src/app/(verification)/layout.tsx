@@ -24,7 +24,7 @@ export default function VerificationLayout({
 
 				{/* Main Content */}
 				<main className="flex-1 flex flex-col items-center p-3 sm:p-4">
-					<div className="w-full max-w-[700px]">{children}</div>
+					<div className="w-full max-w-175">{children}</div>
 				</main>
 
 				{/* Footer */}
