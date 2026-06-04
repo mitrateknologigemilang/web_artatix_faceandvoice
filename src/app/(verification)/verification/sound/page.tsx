@@ -16,9 +16,13 @@ import {
 	Play,
 	Pause,
 	Loader2,
+	SkipForward,
 	X,
 } from "lucide-react";
-import { useVerification, useVerificationGuard } from "../../VerificationContext";
+import {
+	useVerification,
+	useVerificationGuard,
+} from "../../VerificationContext";
 import { submitBiometricData } from "@/services/verification.service";
 import { convertToWav } from "@/lib/audioConverter";
 import { useRouter } from "next/navigation";
@@ -254,52 +258,54 @@ export default function SoundVerificationPage() {
 									setStep("face");
 									router.push("/verification/face");
 								}}
-								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+								className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
 								<ArrowLeft className="w-4 h-4" />
-								Kembali
+								<span className="hidden sm:inline">Kembali</span>
 							</button>
 							<div className="ml-auto flex items-center gap-2 sm:gap-3">
-							{state === "idle" && (
-								<button
-									onClick={handleSubmit}
-									disabled={submitting}
-									className={`inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
-									{submitting ? (
-										<Loader2 className="w-4 h-4 animate-spin" />
-									) : null}
-									{submitting ? "Mengirim..." : "Lewati"}
-								</button>
-							)}
-							{(() => {
-								const canStop =
-									state === "recording" &&
-									recordingTime >= MIN_RECORDING_SECONDS;
-								const stopLocked = state === "recording" && !canStop;
-								const remaining = MIN_RECORDING_SECONDS - recordingTime;
-								return (
+								{state === "idle" && (
 									<button
-										onClick={handleStartStop}
-										disabled={stopLocked}
-										className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-											stopLocked
-												? "bg-gray-200 text-gray-400 cursor-not-allowed"
-												: state === "recording"
-													? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
-													: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
-										}`}>
-										<span
-											className={`w-2 h-2 rounded-full ${
-												stopLocked ? "bg-gray-400" : "bg-white animate-pulse"
-											}`}
-										/>
-										{state === "idle"
-											? "Mulai Rekam"
-											: stopLocked
-												? `${formatTime(remaining)} lagi`
-												: "Selesai"}
+										onClick={handleSubmit}
+										disabled={submitting}
+										className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+										{submitting ? (
+											<Loader2 className="w-4 h-4 animate-spin" />
+										) : (
+											<SkipForward className="w-4 h-4" />
+										)}
+										{submitting ? "Mengirim..." : "Lewati"}
 									</button>
-								);
-							})()}
+								)}
+								{(() => {
+									const canStop =
+										state === "recording" &&
+										recordingTime >= MIN_RECORDING_SECONDS;
+									const stopLocked = state === "recording" && !canStop;
+									const remaining = MIN_RECORDING_SECONDS - recordingTime;
+									return (
+										<button
+											onClick={handleStartStop}
+											disabled={stopLocked}
+											className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+												stopLocked
+													? "bg-gray-200 text-gray-400 cursor-not-allowed"
+													: state === "recording"
+														? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
+														: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
+											}`}>
+											<span
+												className={`w-2 h-2 rounded-full ${
+													stopLocked ? "bg-gray-400" : "bg-white animate-pulse"
+												}`}
+											/>
+											{state === "idle"
+												? "Mulai Rekam"
+												: stopLocked
+													? `${formatTime(remaining)} lagi`
+													: "Selesai"}
+										</button>
+									);
+								})()}
 							</div>
 						</>
 					)}
