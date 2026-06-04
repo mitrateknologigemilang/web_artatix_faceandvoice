@@ -258,11 +258,12 @@ export default function SoundVerificationPage() {
 								<ArrowLeft className="w-4 h-4" />
 								Kembali
 							</button>
+							<div className="ml-auto flex items-center gap-2 sm:gap-3">
 							{state === "idle" && (
 								<button
 									onClick={handleSubmit}
 									disabled={submitting}
-									className={`inline-flex ml-auto mr-3 items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+									className={`inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
 									{submitting ? (
 										<Loader2 className="w-4 h-4 animate-spin" />
 									) : null}
@@ -279,7 +280,7 @@ export default function SoundVerificationPage() {
 									<button
 										onClick={handleStartStop}
 										disabled={stopLocked}
-										className={`inline-flex ml-auto items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+										className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
 											stopLocked
 												? "bg-gray-200 text-gray-400 cursor-not-allowed"
 												: state === "recording"
@@ -299,6 +300,7 @@ export default function SoundVerificationPage() {
 									</button>
 								);
 							})()}
+							</div>
 						</>
 					)}
 					{state === "failed" && (

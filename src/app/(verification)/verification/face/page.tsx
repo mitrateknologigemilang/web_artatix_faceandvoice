@@ -30,11 +30,21 @@ import {
 
 type VerificationState = "verifying" | "success" | "failed";
 
-// Oval frame constants (matching SVG viewBox 1280x720)
-const OVAL_CX = 640;
-const OVAL_CY = 330;
-const OVAL_RX = 200;
-const OVAL_RY = 260;
+// Oval frame config (SVG viewBox 1280x720). Mobile is portrait (aspect-3/4) so
+// the landscape oval ends up cramped — use a larger oval + easier distance there
+// so the face doesn't need to be held far away to fit.
+type FrameCfg = {
+	cx: number;
+	cy: number;
+	rx: number;
+	ry: number;
+	minFace: number; // min face width as a fraction of SVG width
+	maxScale: number; // max face width = rx * 2 * maxScale
+};
+const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
+	desktop: { cx: 640, cy: 330, rx: 200, ry: 260, minFace: 0.15, maxScale: 1.8 },
+	mobile: { cx: 640, cy: 350, rx: 280, ry: 340, minFace: 0.1, maxScale: 2.4 },
+};
 
 /** Helper: base64 data-url → Blob */
 function dataURLtoBlob(dataURL: string): Blob {
@@ -324,10 +334,15 @@ function VerifyingState({
 		width: { ideal: 1920 },
 		height: { ideal: 1080 },
 	});
+	const [frame, setFrame] = useState<FrameCfg>(FRAME.desktop);
+	const frameRef = useRef<FrameCfg>(FRAME.desktop);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			const isMobile = window.innerWidth < 768;
+			const cfg = isMobile ? FRAME.mobile : FRAME.desktop;
+			setFrame(cfg);
+			frameRef.current = cfg;
 			setVideoConstraints({
 				facingMode: "user",
 				width: { ideal: isMobile ? 1080 : 1920 },
@@ -398,15 +413,16 @@ function VerifyingState({
 					const faceWidth = (width * Sv) / Ss;
 
 					// Check if face center is inside the oval
-					const dxCenter = (faceCenterX - OVAL_CX) / OVAL_RX;
-					const dyCenter = (faceCenterY - OVAL_CY) / OVAL_RY;
+					const cfg = frameRef.current;
+					const dxCenter = (faceCenterX - cfg.cx) / cfg.rx;
+					const dyCenter = (faceCenterY - cfg.cy) / cfg.ry;
 					const isCenterInOval = dxCenter * dxCenter + dyCenter * dyCenter <= 1;
 
 					// Face size checks
-					const minFaceWidth = SVG_W * 0.15;
+					const minFaceWidth = SVG_W * cfg.minFace;
 					const isLargeEnough = faceWidth >= minFaceWidth;
 
-					const maxFaceWidth = OVAL_RX * 2 * 1.8;
+					const maxFaceWidth = cfg.rx * 2 * cfg.maxScale;
 					const isNotTooLarge = faceWidth <= maxFaceWidth;
 
 					setFaceInFrame(isCenterInOval && isLargeEnough && isNotTooLarge);
@@ -450,10 +466,10 @@ function VerifyingState({
 						<mask id="face-cutout">
 							<rect width="1280" height="720" fill="white" />
 							<ellipse
-								cx={OVAL_CX}
-								cy={OVAL_CY}
-								rx={OVAL_RX}
-								ry={OVAL_RY}
+								cx={frame.cx}
+								cy={frame.cy}
+								rx={frame.rx}
+								ry={frame.ry}
 								fill="black"
 							/>
 						</mask>
@@ -467,10 +483,10 @@ function VerifyingState({
 					/>
 					{/* Oval border — turns green when face is in frame */}
 					<ellipse
-						cx={OVAL_CX}
-						cy={OVAL_CY}
-						rx={OVAL_RX}
-						ry={OVAL_RY}
+						cx={frame.cx}
+						cy={frame.cy}
+						rx={frame.rx}
+						ry={frame.ry}
 						fill="none"
 						stroke={borderColor}
 						strokeWidth="3"

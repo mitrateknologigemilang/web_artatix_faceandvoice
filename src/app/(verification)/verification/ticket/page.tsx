@@ -5,6 +5,7 @@ import {
 	ArrowRight,
 	CheckCircle2,
 	FileText,
+	Keyboard,
 	Loader2,
 	ScanLine,
 	Shield,
@@ -286,8 +287,9 @@ function IdleState({
 
 			<button
 				onClick={onSwitchManual}
-				className="mt-4 text-sm text-[#3b5bdb] hover:underline cursor-pointer">
-				Masukkan kode tiket secara manual
+				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+				<Keyboard className="w-4 h-4" />
+				Masukkan Kode Tiket Manual
 			</button>
 		</>
 	);
