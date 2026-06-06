@@ -16,22 +16,56 @@ export interface TicketDetail {
 	};
 }
 
+export interface TicketLookupResult {
+	detail: TicketDetail;
+	registered: boolean;
+}
+
+export function getApiErrorMessage(
+	error: unknown,
+	fallback = "Terjadi kesalahan. Silakan coba lagi.",
+): string {
+	if (!axios.isAxiosError(error)) {
+		return error instanceof Error && error.message ? error.message : fallback;
+	}
+
+	const data = error.response?.data;
+	const candidates = [
+		data?.data?.data?.message,
+		data?.data?.message,
+		data?.message,
+		error.message,
+	];
+	const message = candidates.find(
+		(value): value is string => typeof value === "string" && value.trim() !== "",
+	);
+
+	return message || fallback;
+}
+
 /**
  * Validate a ticket code against the backend.
- * Returns the detail when found, or null when the ticket doesn't exist.
+ * Returns the detail and registration status, or null when the ticket doesn't exist.
  * Throws only on unexpected (network/server) errors.
  */
 export async function getTicketDetail(
 	ticketCode: string,
-): Promise<TicketDetail | null> {
+): Promise<TicketLookupResult | null> {
 	try {
 		const res = await api.get(
 			`/api/ref/getDetailTiket?kode=${encodeURIComponent(ticketCode)}`,
 		);
 		if (res.data?.data?.message === "success" && res.data?.data?.data) {
-			return res.data.data.data as TicketDetail;
+			return {
+				detail: res.data.data.data as TicketDetail,
+				registered: res.data.data.registered === true,
+			};
 		}
-		// e.g. { message: "Not found" }
+		const message =
+			res.data?.data?.message || res.data?.message || "Kode tiket tidak ditemukan.";
+		if (typeof message === "string" && message.toLowerCase() !== "not found") {
+			throw new Error(message);
+		}
 		return null;
 	} catch (err) {
 		// 404 → ticket not found (expected), anything else → rethrow
@@ -49,10 +83,6 @@ interface SubmitBiometricPayload {
 }
 
 export async function submitBiometricData(payload: SubmitBiometricPayload) {
-	console.log(
-		"🚀 ~ verification.service.ts:14 ~ submitBiometricData ~ payload:",
-		payload,
-	);
 	const formData = new FormData();
 
 	formData.append("ticketCode", payload.ticketCode);
@@ -64,4 +94,3 @@ export async function submitBiometricData(payload: SubmitBiometricPayload) {
 	const response = await api.post("/api/ref/registerDataDiri", formData);
 	return response.data;
 }
-4
