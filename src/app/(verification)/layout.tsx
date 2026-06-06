@@ -1,10 +1,6 @@
 import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { inter } from "@/lib/fonts";
-import artatixLogo from "@/assets/artatix-logo.svg";
-import jomloFestLogo from "@/assets/jomlo-fest-logo.svg";
 import { VerificationProvider } from "./VerificationContext";
+import { VerificationLogoLinks } from "./components/VerificationLogoLinks";
 
 export default function VerificationLayout({
 	children,
@@ -17,17 +13,7 @@ export default function VerificationLayout({
 				{/* Header */}
 				<header className="bg-white border-b border-gray-200 sticky top-0 z-50">
 					<div className="mx-auto flex justify-between px-4 sm:px-6 lg:px-12">
-						<Link href="/" className="flex items-center  h-16">
-							<Image width={100} height={25} src={artatixLogo} alt={""}></Image>
-						</Link>
-
-						<Link href="/" className="flex items-center  h-16">
-							<Image
-								width={70}
-								height={25}
-								src={jomloFestLogo}
-								alt={""}></Image>
-						</Link>
+						<VerificationLogoLinks />
 					</div>
 				</header>
 

@@ -110,6 +110,7 @@ export function VerificationProvider({
 	const clearVerification = useCallback(() => {
 		try {
 			localStorage.removeItem(STORAGE_KEY);
+			sessionStorage.removeItem(STORAGE_KEY);
 		} catch {}
 		setStep("ticket");
 		setKodeTiket(null);
