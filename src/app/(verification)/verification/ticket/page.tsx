@@ -230,33 +230,36 @@ export default function TicketVerificationPage() {
 						/>
 					</div>
 
-					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-end gap-2">
-						{state === "failed" && (
-							<button
-								onClick={handleRetry}
-								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-								Coba Lagi
-							</button>
-						)}
-						{state === "success" && (
-							<>
+					{["failed", "success"].includes(state) && (
+						<div
+							className={`px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-end gap-2 ${state === "failed" ? "justify-end" : "justify-between"}`}>
+							{state === "failed" && (
+								<button
+									onClick={handleRetry}
+									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+									Coba Lagi
+								</button>
+							)}
+							{state === "success" && (
 								<button
 									onClick={handleRetry}
 									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
 									Ganti Tiket
 								</button>
+							)}
+
+							{state === "success" && (
 								<button
 									onClick={handleContinue}
 									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
 									Lanjutkan
 									<ArrowRight className="w-4 h-4" />
 								</button>
-							</>
-						)}
-					</div>
+							)}
+						</div>
+					)}
 				</div>
 
-				<SecurityBanner />
 			</div>
 		</>
 	);
@@ -412,9 +415,6 @@ function SuccessState({
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">Tiket Valid!</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-4">
-				Sumber: <span className="font-medium text-[#1e2a4a]">{fileName}</span>
-			</p>
 
 			<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-left space-y-3">
 				{detail?.detailTransactionDocument?.name && (
@@ -489,24 +489,24 @@ function FailedState({
 	);
 }
 
-function SecurityBanner() {
-	return (
-		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-			<div className="flex items-start gap-2">
-				<Shield className="w-5 h-5 text-[#3b5bdb] mt-0.5 shrink-0" />
-				<div>
-					<h3 className="font-semibold text-[#1e2a4a] text-sm">
-						Tiket Anda Aman
-					</h3>
-					<p className="text-sm text-gray-500 mt-1 leading-relaxed">
-						File diproses sepenuhnya di perangkat Anda. Hanya kode tiket yang
-						akan digunakan untuk proses verifikasi.
-					</p>
-				</div>
-			</div>
-		</div>
-	);
-}
+// function SecurityBanner() {
+// 	return (
+// 		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
+// 			<div className="flex items-start gap-2">
+// 				<Shield className="w-5 h-5 text-[#3b5bdb] mt-0.5 shrink-0" />
+// 				<div>
+// 					<h3 className="font-semibold text-[#1e2a4a] text-sm">
+// 						Tiket Anda Aman
+// 					</h3>
+// 					<p className="text-sm text-gray-500 mt-1 leading-relaxed">
+// 						File diproses sepenuhnya di perangkat Anda. Hanya kode tiket yang
+// 						akan digunakan untuk proses verifikasi.
+// 					</p>
+// 				</div>
+// 			</div>
+// 		</div>
+// 	);
+// }
 
 async function scanBarcodeFromImage(file: File): Promise<string | null> {
 	const { BrowserMultiFormatReader } = await import("@zxing/browser");

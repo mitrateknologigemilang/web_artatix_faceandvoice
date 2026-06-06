@@ -122,7 +122,7 @@ export default function FaceVerificationPage() {
 						<div className="flex items-center gap-2 min-w-0">
 							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
-								Pendaftaran Biometrik Wajah
+								Pendaftaran Wajah
 							</span>
 						</div>
 						<span
@@ -202,25 +202,6 @@ export default function FaceVerificationPage() {
 								</button>
 							</div>
 						)}
-					</div>
-				</div>
-
-				{/* Security Banner */}
-				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-					<div className="flex items-start gap-2">
-						<div className="mt-0.5">
-							<Shield className="w-5 h-5 text-[#3b5bdb]" />
-						</div>
-						<div>
-							<h3 className="font-semibold text-[#1e2a4a] text-sm">
-								Data Biometrik Anda Aman
-							</h3>
-							<p className="text-sm text-gray-500 mt-1 leading-relaxed">
-								Data wajah Anda dienkripsi dan hanya digunakan untuk proses
-								verifikasi masuk pada hari acara. Data tidak akan dibagikan
-								kepada pihak ketiga.
-							</p>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -319,16 +300,9 @@ function SuccessState() {
 				Verifikasi Berhasil!
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Data biometrik Anda telah berhasil didaftarkan. Anda sekarang dapat
-				melanjutkan ke tahap berikutnya untuk menyelesaikan pemesanan tiket
-				Anda.
+				Data wajah Anda telah berhasil didaftarkan. Anda sekarang dapat
+				melanjutkan ke tahap berikutnya yaitu pendaftaran suara.
 			</p>
-
-			{/* Verified Badge */}
-			<div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600">
-				<CheckCircle2 className="w-4 h-4 text-emerald-500" />
-				Wajah terverifikasi aman
-			</div>
 		</>
 	);
 }

@@ -43,7 +43,7 @@ type RecordingState = "idle" | "recording" | "success" | "failed";
 const MIN_RECORDING_SECONDS = 15;
 const MAX_RECORDING_SECONDS = 15;
 const READING_TEXT =
-	"Halo, saya sedang melakukan verifikasi suara untuk Jomlo Festival dua ribu dua puluh enam. Saya membaca kalimat ini dengan suara yang jelas dan tenang agar sistem dapat mengenali suara saya dengan baik pada saat proses verifikasi berlangsung.";
+	"Halo, saya sedang melakukan pendaftaran suara untuk Jomlo Festival 2026. Saya membaca kalimat ini dengan suara yang jelas dan tenang agar sistem dapat mengenali suara saya dengan baik pada saat proses pendaftaran berlangsung.";
 
 export default function SoundVerificationPage() {
 	const [state, setState] = useState<RecordingState>("idle");
@@ -206,7 +206,7 @@ export default function SoundVerificationPage() {
 						<div className="flex items-center gap-2 min-w-0">
 							<AudioLines className="w-5 h-5 text-[#3b5bdb] shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
-								Verifikasi Suara
+								Pendaftaran Suara
 							</span>
 						</div>
 						<span
@@ -328,7 +328,7 @@ export default function SoundVerificationPage() {
 									) : (
 										<ArrowRight className="w-4 h-4" />
 									)}
-									{submitting ? "Mengirim..." : "Lanjutkan"}
+									{submitting ? "Mengirim..." : "Kirim"}
 								</button>
 							</div>
 						)}
@@ -336,20 +336,6 @@ export default function SoundVerificationPage() {
 				</div>
 
 				<TipsModal autoOpen={state === "idle"} />
-
-				{state === "failed" && (
-					<SecurityBanner
-						title="Data Biometrik Anda Aman"
-						description="Data suara Anda dienkripsi dan hanya digunakan untuk verifikasi."
-					/>
-				)}
-
-				{state === "success" && (
-					<SecurityBanner
-						title="Data Biometrik Anda Aman"
-						description="Data wajah Anda dienkripsi dan hanya digunakan untuk proses verifikasi masuk pada hari acara. Data tidak akan dibagikan kepada pihak ketiga."
-					/>
-				)}
 			</div>
 		</>
 	);
@@ -674,8 +660,8 @@ function SuccessState({
 				Pendaftaran Suara Berhasil!
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Sampel suara Anda telah berhasil direkam dan diverifikasi secara aman.
-				Identitas Anda kini terhubung untuk akses acara.
+				Sampel suara Anda telah berhasil direkam. Identitas Anda kini terhubung
+				untuk akses acara.
 			</p>
 
 			{/* Audio Preview */}
@@ -687,12 +673,6 @@ function SuccessState({
 					/>
 				</div>
 			)}
-
-			{/* Verified Badge */}
-			<div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600">
-				<CheckCircle2 className="w-4 h-4 text-emerald-500" />
-				Suara terverifikasi aman
-			</div>
 		</>
 	);
 }
@@ -811,26 +791,26 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 	);
 }
 
-function SecurityBanner({
-	title,
-	description,
-}: {
-	title: string;
-	description: string;
-}) {
-	return (
-		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-			<div className="flex items-start gap-2">
-				<div className="mt-0.5">
-					<Shield className="w-5 h-5 text-[#3b5bdb]" />
-				</div>
-				<div>
-					<h3 className="font-semibold text-[#1e2a4a] text-sm">{title}</h3>
-					<p className="text-sm text-gray-500 mt-1 leading-relaxed">
-						{description}
-					</p>
-				</div>
-			</div>
-		</div>
-	);
-}
+// function SecurityBanner({
+// 	title,
+// 	description,
+// }: {
+// 	title: string;
+// 	description: string;
+// }) {
+// 	return (
+// 		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
+// 			<div className="flex items-start gap-2">
+// 				<div className="mt-0.5">
+// 					<Shield className="w-5 h-5 text-[#3b5bdb]" />
+// 				</div>
+// 				<div>
+// 					<h3 className="font-semibold text-[#1e2a4a] text-sm">{title}</h3>
+// 					<p className="text-sm text-gray-500 mt-1 leading-relaxed">
+// 						{description}
+// 					</p>
+// 				</div>
+// 			</div>
+// 		</div>
+// 	);
+// }
