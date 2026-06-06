@@ -21,8 +21,11 @@ import {
 	getTicketDetail,
 	type TicketDetail,
 } from "@/services/verification.service";
+import { TransitionLoading } from "../../components/TransitionLoading";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function TicketVerificationPage() {
 	const [state, setState] = useState<ScanState>("idle");
@@ -30,6 +33,7 @@ export default function TicketVerificationPage() {
 	const [fileName, setFileName] = useState<string>("");
 	const [uploadMode, setUploadMode] = useState(false);
 	const [manualCode, setManualCode] = useState("");
+	const [isNavigating, setIsNavigating] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
 	const {
@@ -95,6 +99,11 @@ export default function TicketVerificationPage() {
 				setState("failed");
 				return;
 			}
+			if (file.size > MAX_FILE_SIZE) {
+				setErrorMsg("Ukuran file maksimal 5 MB.");
+				setState("failed");
+				return;
+			}
 			setFileName(file.name);
 			setState("scanning");
 			setErrorMsg("");
@@ -143,21 +152,26 @@ export default function TicketVerificationPage() {
 		setUploadMode(false);
 	};
 
-	if (!allowed) return null;
-
 	const handleManualSubmit = () => {
-		const trimmed = manualCode.trim();
+		const trimmed = manualCode.trim().toUpperCase();
 		if (!trimmed) return;
 		setFileName("Input manual");
 		validateCode(trimmed);
 	};
 
 	const handleContinue = () => {
-		if (kodeTiket) {
+		if (kodeTiket && !isNavigating) {
+			setIsNavigating(true);
 			setStep("face");
 			router.push("/verification/face");
 		}
 	};
+
+	if (isNavigating) {
+		return <TransitionLoading message="Menyiapkan verifikasi wajah..." />;
+	}
+
+	if (!allowed) return null;
 
 	return (
 		<>
@@ -251,6 +265,7 @@ export default function TicketVerificationPage() {
 							{state === "success" && (
 								<button
 									onClick={handleContinue}
+									disabled={isNavigating}
 									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
 									Lanjutkan
 									<ArrowRight className="w-4 h-4" />
@@ -259,7 +274,6 @@ export default function TicketVerificationPage() {
 						</div>
 					)}
 				</div>
-
 			</div>
 		</>
 	);
@@ -309,7 +323,7 @@ function UploadState({
 						Klik untuk pilih file atau seret ke sini
 					</p>
 					<p className="text-xs text-gray-500">
-						PDF atau gambar JPG/PNG (maks 10MB)
+						PDF atau gambar JPG/PNG (maks 5 MB)
 					</p>
 				</div>
 			</div>

@@ -30,6 +30,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { TransitionLoading } from "../../components/TransitionLoading";
 
 type VerificationState = "verifying" | "success" | "failed";
 
@@ -78,6 +79,7 @@ function dataURLtoBlob(dataURL: string): Blob {
 export default function FaceVerificationPage() {
 	const [state, setState] = useState<VerificationState>("verifying");
 	const [faceInFrame, setFaceInFrame] = useState(false);
+	const [isNavigating, setIsNavigating] = useState(false);
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
@@ -97,12 +99,17 @@ export default function FaceVerificationPage() {
 	}, [webcamRef]);
 
 	const handleContinue = useCallback(() => {
-		if (faceBlobRef.current) {
+		if (faceBlobRef.current && !isNavigating) {
+			setIsNavigating(true);
 			setFaceBlob(faceBlobRef.current);
 			setStep("sound");
 			router.push("/verification/sound");
 		}
-	}, [setFaceBlob, setStep, router]);
+	}, [isNavigating, setFaceBlob, setStep, router]);
+
+	if (isNavigating) {
+		return <TransitionLoading message="Menyiapkan verifikasi suara..." />;
+	}
 
 	if (!allowed) return null;
 
@@ -196,6 +203,7 @@ export default function FaceVerificationPage() {
 								</button>
 								<button
 									onClick={handleContinue}
+									disabled={isNavigating}
 									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
 									<ArrowRight className="w-4 h-4" />
 									Lanjutkan
