@@ -19,7 +19,10 @@ import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import { useRouter } from "next/navigation";
-import { useVerification, useVerificationGuard } from "../../VerificationContext";
+import {
+	useVerification,
+	useVerificationGuard,
+} from "../../VerificationContext";
 import {
 	Dialog,
 	DialogContent,
@@ -30,9 +33,8 @@ import {
 
 type VerificationState = "verifying" | "success" | "failed";
 
-// Oval frame config (SVG viewBox 1280x720). Mobile is portrait (aspect-3/4) so
-// the landscape oval ends up cramped — use a larger oval + easier distance there
-// so the face doesn't need to be held far away to fit.
+// Face frame config (SVG viewBox 1280x720). The detection area stays forgiving,
+// while the visible path follows a more natural forehead, cheek, jaw, and chin.
 type FrameCfg = {
 	cx: number;
 	cy: number;
@@ -40,10 +42,27 @@ type FrameCfg = {
 	ry: number;
 	minFace: number; // min face width as a fraction of SVG width
 	maxScale: number; // max face width = rx * 2 * maxScale
+	shoulderWidth: number;
 };
 const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
-	desktop: { cx: 640, cy: 330, rx: 200, ry: 260, minFace: 0.15, maxScale: 1.8 },
-	mobile: { cx: 640, cy: 350, rx: 280, ry: 340, minFace: 0.1, maxScale: 2.4 },
+	desktop: {
+		cx: 640,
+		cy: 300,
+		rx: 190,
+		ry: 225,
+		minFace: 0.15,
+		maxScale: 1.8,
+		shoulderWidth: 1.35,
+	},
+	mobile: {
+		cx: 640,
+		cy: 305,
+		rx: 190,
+		ry: 235,
+		minFace: 0.1,
+		maxScale: 2.4,
+		shoulderWidth: 1.65,
+	},
 };
 
 /** Helper: base64 data-url → Blob */
@@ -62,16 +81,8 @@ export default function FaceVerificationPage() {
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
-	const { faceBlob, setFaceBlob, setStep } = useVerification();
+	const { clearVerification, setFaceBlob, setStep } = useVerification();
 	const allowed = useVerificationGuard("face");
-
-	// Returning here (via "Kembali") with a captured photo → show the result.
-	useEffect(() => {
-		if (allowed && faceBlob && !faceBlobRef.current) {
-			faceBlobRef.current = faceBlob;
-			setState("success");
-		}
-	}, [allowed, faceBlob]);
 
 	const capture = useCallback(() => {
 		if (!webcamRef.current) return;
@@ -96,122 +107,124 @@ export default function FaceVerificationPage() {
 	if (!allowed) return null;
 
 	return (
-		<div className="space-y-6">
-			{/* Event Info */}
-			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
+		<>
+			<div className="text-center pb-3 sm:pb-4 w-full max-w-full overflow-hidden ">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
 					Jomlo Festival 2026 Chapter Bekasi
 				</h1>
 			</div>
 
-			{/* Main Card */}
-			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-				{/* Card Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
-					<div className="flex items-center gap-2 min-w-0">
-						<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
-						<span className="font-semibold text-[#1e2a4a] truncate">
-							Pendaftaran Biometrik Wajah
+			<div className="space-y-6">
+				{/* Main Card */}
+				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+					{/* Card Header */}
+					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
+						<div className="flex items-center gap-2 min-w-0">
+							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<span className="font-semibold text-[#1e2a4a] truncate">
+								Pendaftaran Biometrik Wajah
+							</span>
+						</div>
+						<span
+							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
+								state === "success"
+									? "text-emerald-600 bg-emerald-50 border-emerald-200"
+									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+							}`}>
+							{state === "success" ? "Selesai" : "Langkah 2 dari 3"}
 						</span>
 					</div>
-					<span
-						className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-							state === "success"
-								? "text-emerald-600 bg-emerald-50 border-emerald-200"
-								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
-						}`}>
-						{state === "success" ? "Selesai" : "Langkah 2 dari 3"}
-					</span>
-				</div>
 
-				{/* Card Body */}
-				<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-					{state === "failed" && <FailedState />}
-					{state === "success" && <SuccessState />}
-					{state === "verifying" && (
-						<VerifyingState
-							webcamRef={webcamRef}
-							faceInFrame={faceInFrame}
-							setFaceInFrame={setFaceInFrame}
-						/>
-					)}
-				</div>
+					{/* Card Body */}
+					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
+						{state === "failed" && <FailedState />}
+						{state === "success" && <SuccessState />}
+						{state === "verifying" && (
+							<VerifyingState
+								webcamRef={webcamRef}
+								faceInFrame={faceInFrame}
+								setFaceInFrame={setFaceInFrame}
+							/>
+						)}
+					</div>
 
-				{/* Card Footer */}
-				<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
-					{state === "failed" && (
-						<button
-							onClick={() => setState("verifying")}
-							className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-							<RefreshCw className="w-4 h-4" />
-							Ulangi
-						</button>
-					)}
-					{state === "verifying" && (
-						<>
+					{/* Card Footer */}
+					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
+						{state === "failed" && (
 							<button
-								onClick={() => {
-									setStep("ticket");
-									router.push("/verification/ticket");
-								}}
-								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-								<ArrowLeft className="w-4 h-4" />
-								Kembali
-							</button>
-							<button
-								disabled={!faceInFrame}
-								onClick={capture}
-								className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-									faceInFrame
-										? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-										: "bg-gray-300 cursor-not-allowed"
-								}`}>
-								<Camera className="w-4 h-4" />
-								Ambil Foto
-							</button>
-						</>
-					)}
-					{state === "success" && (
-						<div className="flex w-full justify-between">
-							<button
-								onClick={() => {
-									faceBlobRef.current = null;
-									setState("verifying");
-								}}
-								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-								<ArrowLeft className="w-4 h-4" />
-								Kembali
-							</button>
-							<button
-								onClick={handleContinue}
+								onClick={() => setState("verifying")}
 								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-								<ArrowRight className="w-4 h-4" />
-								Lanjutkan
+								<RefreshCw className="w-4 h-4" />
+								Ulangi
 							</button>
-						</div>
-					)}
+						)}
+						{state === "verifying" && (
+							<>
+								<button
+									onClick={() => {
+										clearVerification();
+										router.push("/verification/ticket");
+									}}
+									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									<ArrowLeft className="w-4 h-4" />
+									Kembali
+								</button>
+								<button
+									disabled={!faceInFrame}
+									onClick={capture}
+									className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+										faceInFrame
+											? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+											: "bg-gray-300 cursor-not-allowed"
+									}`}>
+									<Camera className="w-4 h-4" />
+									Ambil Foto
+								</button>
+							</>
+						)}
+						{state === "success" && (
+							<div className="flex w-full justify-between">
+								<button
+									onClick={() => {
+										faceBlobRef.current = null;
+										setFaceBlob(null);
+										setState("verifying");
+									}}
+									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									<ArrowLeft className="w-4 h-4" />
+									Ulangi Foto
+								</button>
+								<button
+									onClick={handleContinue}
+									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+									<ArrowRight className="w-4 h-4" />
+									Lanjutkan
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
-			</div>
 
-			{/* Security Banner */}
-			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
-				<div className="flex items-start gap-2">
-					<div className="mt-0.5">
-						<Shield className="w-5 h-5 text-[#3b5bdb]" />
-					</div>
-					<div>
-						<h3 className="font-semibold text-[#1e2a4a] text-sm">
-							Data Biometrik Anda Aman
-						</h3>
-						<p className="text-sm text-gray-500 mt-1 leading-relaxed">
-							Data wajah Anda dienkripsi dan hanya digunakan untuk proses
-							verifikasi masuk pada hari acara. Data tidak akan dibagikan kepada
-							pihak ketiga.
-						</p>
+				{/* Security Banner */}
+				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
+					<div className="flex items-start gap-2">
+						<div className="mt-0.5">
+							<Shield className="w-5 h-5 text-[#3b5bdb]" />
+						</div>
+						<div>
+							<h3 className="font-semibold text-[#1e2a4a] text-sm">
+								Data Biometrik Anda Aman
+							</h3>
+							<p className="text-sm text-gray-500 mt-1 leading-relaxed">
+								Data wajah Anda dienkripsi dan hanya digunakan untuk proses
+								verifikasi masuk pada hari acara. Data tidak akan dibagikan
+								kepada pihak ketiga.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
 
@@ -457,7 +470,7 @@ function VerifyingState({
 					mirrored
 					videoConstraints={videoConstraints}
 				/>
-				{/* Face frame overlay */}
+				{/* Human face outline frame overlay */}
 				<svg
 					className="absolute inset-0 w-full h-full pointer-events-none"
 					viewBox="0 0 1280 720"
@@ -465,31 +478,24 @@ function VerifyingState({
 					<defs>
 						<mask id="face-cutout">
 							<rect width="1280" height="720" fill="white" />
-							<ellipse
-								cx={frame.cx}
-								cy={frame.cy}
-								rx={frame.rx}
-								ry={frame.ry}
-								fill="black"
-							/>
+							<path d={getFramePath(frame, true)} fill="black" />
 						</mask>
 					</defs>
-					{/* Dark overlay with oval cutout */}
+					{/* Dark overlay with face-shaped cutout */}
 					<rect
 						width="1280"
 						height="720"
 						fill="rgba(0,0,0,0.5)"
 						mask="url(#face-cutout)"
 					/>
-					{/* Oval border — turns green when face is in frame */}
-					<ellipse
-						cx={frame.cx}
-						cy={frame.cy}
-						rx={frame.rx}
-						ry={frame.ry}
+					{/* Head, neck, and shoulder guide */}
+					<path
+						d={getFramePath(frame)}
 						fill="none"
 						stroke={borderColor}
-						strokeWidth="3"
+						strokeWidth="6"
+						strokeLinejoin="round"
+						strokeLinecap="round"
 						style={{ transition: "stroke 0.3s ease" }}
 					/>
 				</svg>
@@ -504,6 +510,32 @@ function VerifyingState({
 			<FaceTipsModal />
 		</>
 	);
+}
+
+function getFramePath(frame: FrameCfg, closeMask = false) {
+	const { cx, cy, rx, ry } = frame;
+	const shoulderY = cy + ry * 0.98;
+	const leftShoulderX = cx - rx * frame.shoulderWidth;
+	const rightShoulderX = cx + rx * frame.shoulderWidth;
+
+	const visiblePath = [
+		`M ${leftShoulderX} ${shoulderY}`,
+		`C ${cx - rx * 1.02} ${cy + ry * 0.88}, ${cx - rx * 0.7} ${cy + ry * 0.87}, ${cx - rx * 0.48} ${cy + ry * 0.82}`,
+		`C ${cx - rx * 0.37} ${cy + ry * 0.79}, ${cx - rx * 0.36} ${cy + ry * 0.72}, ${cx - rx * 0.36} ${cy + ry * 0.62}`,
+		`C ${cx - rx * 0.53} ${cy + ry * 0.52}, ${cx - rx * 0.66} ${cy + ry * 0.38}, ${cx - rx * 0.72} ${cy + ry * 0.2}`,
+		`C ${cx - rx * 0.84} ${cy + ry * 0.2}, ${cx - rx * 0.9} ${cy + ry * 0.08}, ${cx - rx * 0.9} ${cy - ry * 0.07}`,
+		`C ${cx - rx * 0.9} ${cy - ry * 0.22}, ${cx - rx * 0.84} ${cy - ry * 0.34}, ${cx - rx * 0.73} ${cy - ry * 0.35}`,
+		`C ${cx - rx * 0.7} ${cy - ry * 0.72}, ${cx - rx * 0.46} ${cy - ry * 0.98}, ${cx} ${cy - ry * 0.98}`,
+		`C ${cx + rx * 0.46} ${cy - ry * 0.98}, ${cx + rx * 0.7} ${cy - ry * 0.72}, ${cx + rx * 0.73} ${cy - ry * 0.35}`,
+		`C ${cx + rx * 0.84} ${cy - ry * 0.34}, ${cx + rx * 0.9} ${cy - ry * 0.22}, ${cx + rx * 0.9} ${cy - ry * 0.07}`,
+		`C ${cx + rx * 0.9} ${cy + ry * 0.08}, ${cx + rx * 0.84} ${cy + ry * 0.2}, ${cx + rx * 0.72} ${cy + ry * 0.2}`,
+		`C ${cx + rx * 0.66} ${cy + ry * 0.38}, ${cx + rx * 0.53} ${cy + ry * 0.52}, ${cx + rx * 0.36} ${cy + ry * 0.62}`,
+		`C ${cx + rx * 0.36} ${cy + ry * 0.72}, ${cx + rx * 0.37} ${cy + ry * 0.79}, ${cx + rx * 0.48} ${cy + ry * 0.82}`,
+		`C ${cx + rx * 0.7} ${cy + ry * 0.87}, ${cx + rx * 1.02} ${cy + ry * 0.88}, ${rightShoulderX} ${shoulderY}`,
+	].join(" ");
+
+	if (!closeMask) return visiblePath;
+	return `${visiblePath} L ${rightShoulderX} 760 L ${leftShoulderX} 760 Z`;
 }
 
 function FaceTipsModal() {

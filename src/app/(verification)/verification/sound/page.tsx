@@ -23,7 +23,10 @@ import {
 	useVerification,
 	useVerificationGuard,
 } from "../../VerificationContext";
-import { submitBiometricData } from "@/services/verification.service";
+import {
+	getApiErrorMessage,
+	submitBiometricData,
+} from "@/services/verification.service";
 import { convertToWav } from "@/lib/audioConverter";
 import { useRouter } from "next/navigation";
 import {
@@ -36,32 +39,19 @@ import {
 import { Modal } from "../../components/Modal";
 
 type RecordingState = "idle" | "recording" | "success" | "failed";
-type RecordingMethod = "read" | "sing";
 
-// BE requires min 3 minutes of speech for accurate voice recognition.
-const MIN_RECORDING_SECONDS = 180; // 3 minutes — required floor
-const MAX_RECORDING_SECONDS = 210; // small buffer above the floor
-const PROMPT_INTERVAL_SECONDS = 25; // rotate read-mode prompt every 25s
-
-const READ_PROMPTS = [
-	"Siapa nama lengkapmu? Coba kenalkan dirimu sedikit.",
-	"Dari mana asalmu? Ceritakan tentang kota atau daerahmu.",
-	"Berapa usiamu dan apa kesibukanmu sehari-hari?",
-	"Ceritakan sedikit, kenapa kamu tertarik datang ke event ini?",
-	"Sebutkan film, lagu, atau artis favoritmu dan kenapa kamu suka.",
-	"Apa hal paling seru yang kamu alami bulan ini?",
-	"Kalau bisa liburan ke mana saja, kamu pilih ke mana? Kenapa?",
-	"Sebutkan tiga hal yang kamu syukuri hari ini.",
-];
+const MIN_RECORDING_SECONDS = 15;
+const MAX_RECORDING_SECONDS = 15;
+const READING_TEXT =
+	"Halo, saya sedang melakukan verifikasi suara untuk Jomlo Festival dua ribu dua puluh enam. Saya membaca kalimat ini dengan suara yang jelas dan tenang agar sistem dapat mengenali suara saya dengan baik pada saat proses verifikasi berlangsung.";
 
 export default function SoundVerificationPage() {
 	const [state, setState] = useState<RecordingState>("idle");
-	const [method, setMethod] = useState<RecordingMethod>("read");
 	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const { faceBlob, kodeTiket, setStep } = useVerification();
+	const { faceBlob, kodeTiket, setFaceBlob, setStep } = useVerification();
 	const allowed = useVerificationGuard("sound");
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -158,7 +148,6 @@ export default function SoundVerificationPage() {
 		}
 		setSubmitting(true);
 		try {
-			// Voice is optional — only convert & send when a recording exists.
 			const wavBlob = audioBlob ? await convertToWav(audioBlob) : undefined;
 
 			await submitBiometricData({
@@ -166,10 +155,12 @@ export default function SoundVerificationPage() {
 				file_wajah: faceBlob,
 				file_suara: wavBlob,
 			});
-			router.push("/verification/success");
+			router.replace("/verification/success");
 		} catch (error) {
 			console.error("Submit error:", error);
-			setErrorMsg("Gagal mengirim data. Silakan coba lagi.");
+			setErrorMsg(
+				getApiErrorMessage(error, "Gagal mengirim data. Silakan coba lagi."),
+			);
 		} finally {
 			setSubmitting(false);
 		}
@@ -193,187 +184,185 @@ export default function SoundVerificationPage() {
 	if (!allowed) return null;
 
 	return (
-		<div className="space-y-6">
+		<>
 			<Modal
 				open={!!errorMsg}
 				onClose={handleErrorClose}
-				title="Terjadi Kesalahan"
+				title="Registrasi Gagal"
 				description={errorMsg}
 			/>
 
-			{/* Event Info */}
-			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
+			<div className="text-center pb-3 sm:pb-4 w-full max-w-full overflow-hidden ">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
 					Jomlo Festival 2026 Chapter Bekasi
 				</h1>
 			</div>
 
-			{/* Main Card */}
-			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-				{/* Card Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
-					<div className="flex items-center gap-2 min-w-0">
-						<AudioLines className="w-5 h-5 text-[#3b5bdb] shrink-0" />
-						<span className="font-semibold text-[#1e2a4a] truncate">
-							Verifikasi Suara
+			<div className="space-y-6">
+				{/* Main Card */}
+				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+					{/* Card Header */}
+					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
+						<div className="flex items-center gap-2 min-w-0">
+							<AudioLines className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<span className="font-semibold text-[#1e2a4a] truncate">
+								Verifikasi Suara
+							</span>
+						</div>
+						<span
+							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
+								state === "success"
+									? "text-emerald-600 bg-emerald-50 border-emerald-200"
+									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+							}`}>
+							{state === "success" ? "Selesai" : "Langkah 3 dari 3"}
 						</span>
 					</div>
-					<span
-						className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-							state === "success"
-								? "text-emerald-600 bg-emerald-50 border-emerald-200"
-								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
-						}`}>
-						{state === "success" ? "Selesai" : "Langkah 3 dari 3"}
-					</span>
-				</div>
 
-				{/* Card Body */}
-				<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-					{(state === "idle" || state === "recording") && (
-						<IdleRecordingState
-							method={method}
-							setMethod={setMethod}
-							isRecording={state === "recording"}
-							recordingTime={recordingTime}
-							formatTime={formatTime}
-							stream={streamRef.current}
-						/>
-					)}
-					{state === "success" && (
-						<SuccessState
-							audioBlob={audioBlob}
-							recordDuration={recordingTime}
-						/>
-					)}
-					{state === "failed" && <FailedState />}
-				</div>
+					{/* Card Body */}
+					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
+						{(state === "idle" || state === "recording") && (
+							<IdleRecordingState
+								isRecording={state === "recording"}
+								recordingTime={recordingTime}
+								formatTime={formatTime}
+								stream={streamRef.current}
+							/>
+						)}
+						{state === "success" && (
+							<SuccessState
+								audioBlob={audioBlob}
+								recordDuration={recordingTime}
+							/>
+						)}
+						{state === "failed" && <FailedState />}
+					</div>
 
-				{/* Card Footer */}
-				<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
-					{(state === "idle" || state === "recording") && (
-						<>
-							<button
-								onClick={() => {
-									setStep("face");
-									router.push("/verification/face");
-								}}
-								className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-								<ArrowLeft className="w-4 h-4" />
-								<span className="hidden sm:inline">Kembali</span>
-							</button>
-							<div className="ml-auto flex items-center gap-2 sm:gap-3">
-								{state === "idle" && (
-									<button
-										onClick={handleSubmit}
-										disabled={submitting}
-										className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
-										{submitting ? (
-											<Loader2 className="w-4 h-4 animate-spin" />
-										) : (
-											<SkipForward className="w-4 h-4" />
-										)}
-										{submitting ? "Mengirim..." : "Lewati"}
-									</button>
-								)}
-								{(() => {
-									const canStop =
-										state === "recording" &&
-										recordingTime >= MIN_RECORDING_SECONDS;
-									const stopLocked = state === "recording" && !canStop;
-									const remaining = MIN_RECORDING_SECONDS - recordingTime;
-									return (
+					{/* Card Footer */}
+					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
+						{(state === "idle" || state === "recording") && (
+							<>
+								<button
+									onClick={() => {
+										setFaceBlob(null);
+										setStep("face");
+										router.push("/verification/face");
+									}}
+									className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									<ArrowLeft className="w-4 h-4" />
+									<span className="hidden sm:inline">Kembali</span>
+								</button>
+								<div className="ml-auto flex items-center gap-2 sm:gap-3">
+									{state === "idle" && (
 										<button
-											onClick={handleStartStop}
-											disabled={stopLocked}
-											className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-												stopLocked
-													? "bg-gray-200 text-gray-400 cursor-not-allowed"
-													: state === "recording"
-														? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
-														: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
-											}`}>
-											<span
-												className={`w-2 h-2 rounded-full ${
-													stopLocked ? "bg-gray-400" : "bg-white animate-pulse"
-												}`}
-											/>
-											{state === "idle"
-												? "Mulai Rekam"
-												: stopLocked
-													? `${formatTime(remaining)} lagi`
-													: "Selesai"}
+											onClick={handleSubmit}
+											disabled={submitting}
+											className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+											{submitting ? (
+												<Loader2 className="w-4 h-4 animate-spin" />
+											) : (
+												<SkipForward className="w-4 h-4" />
+											)}
+											{submitting ? "Mengirim..." : "Lewati"}
 										</button>
-									);
-								})()}
+									)}
+									{(() => {
+										const canStop =
+											state === "recording" &&
+											recordingTime >= MIN_RECORDING_SECONDS;
+										const stopLocked = state === "recording" && !canStop;
+										const remaining = MIN_RECORDING_SECONDS - recordingTime;
+										return (
+											<button
+												onClick={handleStartStop}
+												disabled={stopLocked}
+												className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+													stopLocked
+														? "bg-gray-200 text-gray-400 cursor-not-allowed"
+														: state === "recording"
+															? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
+															: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
+												}`}>
+												<span
+													className={`w-2 h-2 rounded-full ${
+														stopLocked
+															? "bg-gray-400"
+															: "bg-white animate-pulse"
+													}`}
+												/>
+												{state === "idle"
+													? "Mulai Rekam"
+													: stopLocked
+														? `${formatTime(remaining)} lagi`
+														: "Selesai"}
+											</button>
+										);
+									})()}
+								</div>
+							</>
+						)}
+						{state === "failed" && (
+							<div className="flex w-full justify-end">
+								<button
+									onClick={handleRetry}
+									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+									<RefreshCw className="w-4 h-4" />
+									Ulangi
+								</button>
 							</div>
-						</>
-					)}
-					{state === "failed" && (
-						<div className="flex w-full justify-end">
-							<button
-								onClick={handleRetry}
-								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-								<RefreshCw className="w-4 h-4" />
-								Ulangi
-							</button>
-						</div>
-					)}
-					{state === "success" && (
-						<div className="flex w-full justify-between">
-							<button
-								onClick={handleRetry}
-								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-								<ArrowLeft className="w-4 h-4" />
-								Kembali
-							</button>
-							<button
-								onClick={handleSubmit}
-								disabled={submitting}
-								className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
-								{submitting ? (
-									<Loader2 className="w-4 h-4 animate-spin" />
-								) : (
-									<ArrowRight className="w-4 h-4" />
-								)}
-								{submitting ? "Mengirim..." : "Lanjutkan"}
-							</button>
-						</div>
-					)}
+						)}
+						{state === "success" && (
+							<div className="flex w-full justify-between">
+								<button
+									onClick={handleRetry}
+									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									<ArrowLeft className="w-4 h-4" />
+									Ulangi Rekaman
+								</button>
+								<button
+									onClick={handleSubmit}
+									disabled={submitting}
+									className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+									{submitting ? (
+										<Loader2 className="w-4 h-4 animate-spin" />
+									) : (
+										<ArrowRight className="w-4 h-4" />
+									)}
+									{submitting ? "Mengirim..." : "Lanjutkan"}
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
+
+				<TipsModal autoOpen={state === "idle"} />
+
+				{state === "failed" && (
+					<SecurityBanner
+						title="Data Biometrik Anda Aman"
+						description="Data suara Anda dienkripsi dan hanya digunakan untuk verifikasi."
+					/>
+				)}
+
+				{state === "success" && (
+					<SecurityBanner
+						title="Data Biometrik Anda Aman"
+						description="Data wajah Anda dienkripsi dan hanya digunakan untuk proses verifikasi masuk pada hari acara. Data tidak akan dibagikan kepada pihak ketiga."
+					/>
+				)}
 			</div>
-
-			<TipsModal autoOpen={state === "idle"} />
-
-			{state === "failed" && (
-				<SecurityBanner
-					title="Data Biometrik Anda Aman"
-					description="Data suara Anda dienkripsi dan hanya digunakan untuk verifikasi."
-				/>
-			)}
-
-			{state === "success" && (
-				<SecurityBanner
-					title="Data Biometrik Anda Aman"
-					description="Data wajah Anda dienkripsi dan hanya digunakan untuk proses verifikasi masuk pada hari acara. Data tidak akan dibagikan kepada pihak ketiga."
-				/>
-			)}
-		</div>
+		</>
 	);
 }
 
 /* ---------- Sub-components ---------- */
 
 function IdleRecordingState({
-	method,
-	setMethod,
 	isRecording,
 	recordingTime,
 	formatTime,
 	stream,
 }: {
-	method: RecordingMethod;
-	setMethod: (m: RecordingMethod) => void;
 	isRecording: boolean;
 	recordingTime: number;
 	formatTime: (s: number) => string;
@@ -385,74 +374,20 @@ function IdleRecordingState({
 				Rekam Sampel Suara Anda
 			</h2>
 			<p className="text-gray-500 text-sm mb-4 ">
-				Rekaman sekitar 3 menit membantu sistem mengenali suaramu dengan akurat.
-				Cukup ngobrol santai mengikuti panduan & tak perlu menghafal.
+				Tekan mulai rekam. Rekaman akan berhenti otomatis setelah 15 detik.
 			</p>
 
-			{/* Method Tabs */}
-			<div className="inline-flex bg-gray-100 rounded-lg p-1 mb-4">
-				<button
-					onClick={() => !isRecording && setMethod("read")}
-					disabled={isRecording}
-					className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-						method === "read"
-							? "bg-white text-[#3b5bdb] shadow-sm"
-							: "text-gray-500 hover:text-gray-700"
-					} ${isRecording ? "opacity-50 cursor-not-allowed" : ""}`}>
-					Baca Kalimat
-				</button>
-				<button
-					onClick={() => !isRecording && setMethod("sing")}
-					disabled={isRecording}
-					className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-						method === "sing"
-							? "bg-white text-[#3b5bdb] shadow-sm"
-							: "text-gray-500 hover:text-gray-700"
-					} ${isRecording ? "opacity-50 cursor-not-allowed" : ""}`}>
-					Nyanyi Bebas
-				</button>
+			{/* Sentence Box */}
+			<div
+				className={`w-full border rounded-xl px-6 py-5 mb-6 transition-colors ${
+					isRecording
+						? "bg-blue-50 border-[#3b5bdb]/30"
+						: "bg-gray-50 border-gray-200"
+				}`}>
+				<p className="text-[#1e2a4a] leading-relaxed">
+					&ldquo;{READING_TEXT}&rdquo;
+				</p>
 			</div>
-
-			<p className="text-gray-500 text-sm mb-5">
-				Silakan pilih metode perekaman di atas, tekan tombol rekam, dan ikuti
-				instruksi.
-			</p>
-
-			{/* Sentence Box — rotating prompts keep the 3 min feeling like a chat */}
-			{method === "read" &&
-				(() => {
-					const idx = isRecording
-						? Math.min(
-								Math.floor(recordingTime / PROMPT_INTERVAL_SECONDS),
-								READ_PROMPTS.length - 1,
-							)
-						: 0;
-					return (
-						<div className="w-full  bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
-							{isRecording && (
-								<p className="text-xs font-medium text-[#3b5bdb] mb-2">
-									Topik {idx + 1} dari {READ_PROMPTS.length}
-								</p>
-							)}
-							<p className="text-gray-600 italic text-lg leading-relaxed transition-opacity duration-300">
-								&ldquo;{READ_PROMPTS[idx]}&rdquo;
-							</p>
-							<p className="text-[11px] text-gray-400 mt-3">
-								{isRecording
-									? "Jawab santai. Topik berganti otomatis tak perlu buru-buru."
-									: "Tekan rekam, lalu ngobrol santai mengikuti topik yang muncul."}
-							</p>
-						</div>
-					);
-				})()}
-
-			{method === "sing" && (
-				<div className="w-full  bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mb-6">
-					<p className="text-gray-600 italic text-lg leading-relaxed">
-						Nyanyikan lagu apapun yang Anda suka
-					</p>
-				</div>
-			)}
 
 			{/* Live Waveform */}
 			<LiveWaveform isRecording={isRecording} stream={stream} />

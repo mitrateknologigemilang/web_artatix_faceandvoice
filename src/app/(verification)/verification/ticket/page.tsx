@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
 	ArrowRight,
 	CheckCircle2,
 	FileText,
-	Keyboard,
 	Loader2,
 	ScanLine,
 	Shield,
@@ -13,8 +12,15 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useVerification, useVerificationGuard } from "../../VerificationContext";
-import { getTicketDetail, type TicketDetail } from "@/services/verification.service";
+import {
+	useVerification,
+	useVerificationGuard,
+} from "../../VerificationContext";
+import {
+	getApiErrorMessage,
+	getTicketDetail,
+	type TicketDetail,
+} from "@/services/verification.service";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
 
@@ -22,7 +28,7 @@ export default function TicketVerificationPage() {
 	const [state, setState] = useState<ScanState>("idle");
 	const [errorMsg, setErrorMsg] = useState<string>("");
 	const [fileName, setFileName] = useState<string>("");
-	const [manualMode, setManualMode] = useState(false);
+	const [uploadMode, setUploadMode] = useState(false);
 	const [manualCode, setManualCode] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
@@ -31,39 +37,52 @@ export default function TicketVerificationPage() {
 		setKodeTiket,
 		ticketDetail,
 		setTicketDetail,
+		setFaceBlob,
 		setStep,
 	} = useVerification();
 	const allowed = useVerificationGuard("ticket");
-
-	// Returning here (via "Kembali") with a validated ticket → show the result.
-	useEffect(() => {
-		if (allowed && kodeTiket) setState("success");
-	}, [allowed, kodeTiket]);
 
 	// Step 2: validate the decoded/entered ticket code against the backend.
 	const validateCode = useCallback(
 		async (code: string) => {
 			setState("validating");
 			setErrorMsg("");
+			setTicketDetail(null);
+			setKodeTiket(null);
+			setFaceBlob(null);
 			try {
-				const detail = await getTicketDetail(code);
-				if (!detail) {
+				const result = await getTicketDetail(code);
+				if (!result) {
 					setErrorMsg(
 						"Kode tiket tidak ditemukan. Pastikan tiket sesuai dengan acara ini.",
 					);
 					setState("failed");
 					return;
 				}
+				if (result.registered) {
+					setErrorMsg(
+						"Tiket yang Anda input telah teregistrasi oleh sistem kami, silakan masukkan tiket lain.",
+					);
+					setState("failed");
+					return;
+				}
+				const { detail } = result;
 				setTicketDetail(detail);
 				setKodeTiket(detail.ticket?.ticketCode || code);
+				setFaceBlob(null);
 				setState("success");
 			} catch (err) {
 				console.error(err);
-				setErrorMsg("Gagal memvalidasi tiket. Periksa koneksi lalu coba lagi.");
+				setErrorMsg(
+					getApiErrorMessage(
+						err,
+						"Gagal memvalidasi tiket. Periksa koneksi lalu coba lagi.",
+					),
+				);
 				setState("failed");
 			}
 		},
-		[setKodeTiket],
+		[setFaceBlob, setKodeTiket, setTicketDetail],
 	);
 
 	// Step 1: decode QR/barcode from the uploaded file.
@@ -92,7 +111,9 @@ export default function TicketVerificationPage() {
 				await validateCode(code);
 			} catch (err) {
 				console.error(err);
-				setErrorMsg("Gagal memproses file. Coba file lain.");
+				setErrorMsg(
+					getApiErrorMessage(err, "Gagal memproses file. Coba file lain."),
+				);
 				setState("failed");
 			}
 		},
@@ -117,6 +138,9 @@ export default function TicketVerificationPage() {
 		setFileName("");
 		setTicketDetail(null);
 		setKodeTiket(null);
+		setFaceBlob(null);
+		setManualCode("");
+		setUploadMode(false);
 	};
 
 	if (!allowed) return null;
@@ -136,107 +160,109 @@ export default function TicketVerificationPage() {
 	};
 
 	return (
-		<div className="space-y-6">
-			<div className="text-center space-y-2 w-full max-w-full overflow-hidden px-2 sm:px-0">
+		<>
+			<div className="text-center w-full pb-3 sm:pb-4">
 				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
 					Jomlo Festival 2026 Chapter Bekasi
 				</h1>
 			</div>
 
-			<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
-					<div className="flex items-center gap-2 min-w-0">
-						<FileText className="w-5 h-5 text-[#3b5bdb] shrink-0" />
-						<span className="font-semibold text-[#1e2a4a] truncate">
-							Verifikasi Tiket
+			<div className="space-y-6">
+				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
+						<div className="flex items-center gap-2 min-w-0">
+							<FileText className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<span className="font-semibold text-[#1e2a4a] truncate">
+								Verifikasi Tiket
+							</span>
+						</div>
+						<span
+							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
+								state === "success"
+									? "text-emerald-600 bg-emerald-50 border-emerald-200"
+									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+							}`}>
+							{state === "success" ? "Selesai" : "Langkah 1 dari 3"}
 						</span>
 					</div>
-					<span
-						className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-							state === "success"
-								? "text-emerald-600 bg-emerald-50 border-emerald-200"
-								: "text-[#3b5bdb] bg-blue-50 border-blue-200"
-						}`}>
-						{state === "success" ? "Selesai" : "Langkah 1 dari 3"}
-					</span>
-				</div>
 
-				<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-					{state === "idle" && !manualMode && (
-						<IdleState
-							onPickFile={() => fileInputRef.current?.click()}
-							onDrop={handleDrop}
-							onSwitchManual={() => setManualMode(true)}
+					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
+						{state === "idle" && !uploadMode && (
+							<ManualInputState
+								value={manualCode}
+								onChange={setManualCode}
+								onSubmit={handleManualSubmit}
+								onSwitchUpload={() => setUploadMode(true)}
+							/>
+						)}
+						{state === "idle" && uploadMode && (
+							<UploadState
+								onPickFile={() => fileInputRef.current?.click()}
+								onDrop={handleDrop}
+								onSwitchManual={() => setUploadMode(false)}
+							/>
+						)}
+						{state === "scanning" && <ScanningState fileName={fileName} />}
+						{state === "validating" && <ValidatingState />}
+						{state === "success" && (
+							<SuccessState
+								fileName={fileName}
+								kodeTiket={kodeTiket}
+								detail={ticketDetail}
+							/>
+						)}
+						{state === "failed" && (
+							<FailedState
+								message={errorMsg}
+								onSwitchManual={() => {
+									setUploadMode(false);
+									setState("idle");
+									setErrorMsg("");
+								}}
+							/>
+						)}
+						<input
+							ref={fileInputRef}
+							type="file"
+							accept="application/pdf,image/*"
+							className="hidden"
+							onChange={handleFileChange}
 						/>
-					)}
-					{state === "idle" && manualMode && (
-						<ManualInputState
-							value={manualCode}
-							onChange={setManualCode}
-							onSubmit={handleManualSubmit}
-							onSwitchUpload={() => setManualMode(false)}
-						/>
-					)}
-					{state === "scanning" && <ScanningState fileName={fileName} />}
-					{state === "validating" && <ValidatingState />}
-					{state === "success" && (
-						<SuccessState
-							fileName={fileName}
-							kodeTiket={kodeTiket}
-							detail={ticketDetail}
-						/>
-					)}
-					{state === "failed" && (
-						<FailedState
-							message={errorMsg}
-							onSwitchManual={() => {
-								setManualMode(true);
-								setState("idle");
-								setErrorMsg("");
-							}}
-						/>
-					)}
-					<input
-						ref={fileInputRef}
-						type="file"
-						accept="application/pdf,image/*"
-						className="hidden"
-						onChange={handleFileChange}
-					/>
-				</div>
+					</div>
 
-				<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-end gap-2">
-					{state === "failed" && (
-						<button
-							onClick={handleRetry}
-							className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-							Coba Lagi
-						</button>
-					)}
-					{state === "success" && (
-						<>
+					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-end gap-2">
+						{state === "failed" && (
 							<button
 								onClick={handleRetry}
-								className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-								Ganti Tiket
-							</button>
-							<button
-								onClick={handleContinue}
 								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-								Lanjutkan
-								<ArrowRight className="w-4 h-4" />
+								Coba Lagi
 							</button>
-						</>
-					)}
+						)}
+						{state === "success" && (
+							<>
+								<button
+									onClick={handleRetry}
+									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									Ganti Tiket
+								</button>
+								<button
+									onClick={handleContinue}
+									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+									Lanjutkan
+									<ArrowRight className="w-4 h-4" />
+								</button>
+							</>
+						)}
+					</div>
 				</div>
-			</div>
 
-			<SecurityBanner />
-		</div>
+				<SecurityBanner />
+			</div>
+		</>
 	);
 }
 
-function IdleState({
+function UploadState({
 	onPickFile,
 	onDrop,
 	onSwitchManual,
@@ -288,8 +314,7 @@ function IdleState({
 			<button
 				onClick={onSwitchManual}
 				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
-				<Keyboard className="w-4 h-4" />
-				Masukkan Kode Tiket Manual
+				Kembali ke input kode tiket
 			</button>
 		</>
 	);
@@ -337,8 +362,9 @@ function ManualInputState({
 
 			<button
 				onClick={onSwitchUpload}
-				className="mt-4 text-sm text-[#3b5bdb] hover:underline cursor-pointer">
-				← Kembali ke unggah file
+				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+				<Upload className="w-4 h-4" />
+				Scan dari PDF / QR Code
 			</button>
 		</>
 	);
@@ -400,9 +426,7 @@ function SuccessState({
 				{detail?.ticket?.category && (
 					<DetailRow label="Kategori" value={detail.ticket.category} />
 				)}
-				{detail?.status && (
-					<DetailRow label="Status" value={detail.status} />
-				)}
+				{detail?.status && <DetailRow label="Status" value={detail.status} />}
 				<div>
 					<p className="text-xs text-gray-500 mb-1">Kode Tiket</p>
 					<p className="font-mono text-base font-bold text-[#1e2a4a] break-all">
@@ -461,11 +485,6 @@ function FailedState({
 				Verifikasi Tiket Gagal
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-2">{message}</p>
-			<button
-				onClick={onSwitchManual}
-				className="text-sm text-[#3b5bdb] hover:underline cursor-pointer">
-				Masukkan kode secara manual
-			</button>
 		</>
 	);
 }
