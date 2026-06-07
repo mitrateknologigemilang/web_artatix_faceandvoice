@@ -50,7 +50,7 @@ const MINIFAS_CONFIG = {
 	realThreshold: 0.75,
 };
 
-const REQUIRED_CONSECUTIVE_REAL = 8;
+const REQUIRED_CONSECUTIVE_REAL = 5;
 
 let runtimeConfigured = false;
 
@@ -175,7 +175,11 @@ export class FaceLivenessDetector {
 			throw new Error("MiniFASNet session is not loaded.");
 		}
 
-		const faceCrop = this.cropFace(videoElement, face, MINIFAS_CONFIG.inputSize);
+		const faceCrop = this.cropFace(
+			videoElement,
+			face,
+			MINIFAS_CONFIG.inputSize,
+		);
 		const input = this.preprocessMiniFASNet(faceCrop);
 		const feeds: Record<string, ort.Tensor> = {
 			[this.miniFASSession.inputNames[0]]: input,
@@ -208,8 +212,7 @@ export class FaceLivenessDetector {
 		}
 
 		return {
-			isRealRaw:
-				predClass === 1 && confidence > MINIFAS_CONFIG.realThreshold,
+			isRealRaw: predClass === 1 && confidence > MINIFAS_CONFIG.realThreshold,
 			rawLabel: predClass === 1 ? "REAL" : "FAKE",
 			confidence,
 			probabilities: {
@@ -364,7 +367,9 @@ export class FaceLivenessDetector {
 		return anchors;
 	}
 
-	private extractRetinaFaceOutput(results: ort.InferenceSession.OnnxValueMapType) {
+	private extractRetinaFaceOutput(
+		results: ort.InferenceSession.OnnxValueMapType,
+	) {
 		const inputSize = RF_CONFIG.inputSize;
 		const strides = [8, 16, 32];
 		const totalAnchors = 16800;

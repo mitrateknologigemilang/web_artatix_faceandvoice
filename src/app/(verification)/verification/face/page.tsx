@@ -84,6 +84,14 @@ export default function FaceVerificationPage() {
 	const [state, setState] = useState<VerificationState>("verifying");
 	const [faceInFrame, setFaceInFrame] = useState(false);
 	const [isNavigating, setIsNavigating] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const checkMobile = () => setIsMobile(window.innerWidth < 768);
+		checkMobile();
+		window.addEventListener("resize", checkMobile);
+		return () => window.removeEventListener("resize", checkMobile);
+	}, []);
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
@@ -129,7 +137,7 @@ export default function FaceVerificationPage() {
 				{/* Main Card */}
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 					{/* Card Header */}
-					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
+					<div className="relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
 							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
@@ -155,6 +163,8 @@ export default function FaceVerificationPage() {
 								webcamRef={webcamRef}
 								faceInFrame={faceInFrame}
 								setFaceInFrame={setFaceInFrame}
+								onCapture={capture}
+								isMobile={isMobile}
 							/>
 						)}
 					</div>
@@ -180,17 +190,20 @@ export default function FaceVerificationPage() {
 									<ArrowLeft className="w-4 h-4" />
 									Kembali
 								</button>
-								<button
-									disabled={!faceInFrame}
-									onClick={capture}
-									className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-										faceInFrame
-											? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-											: "bg-gray-300 cursor-not-allowed"
-									}`}>
-									<Camera className="w-4 h-4" />
-									Ambil Foto
-								</button>
+								{/* Desktop-only capture button in footer */}
+								{!isMobile && (
+									<button
+										disabled={!faceInFrame}
+										onClick={capture}
+										className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+											faceInFrame
+												? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+												: "bg-gray-300 cursor-not-allowed"
+										}`}>
+										<Camera className="w-4 h-4" />
+										Ambil Foto
+									</button>
+								)}
 							</>
 						)}
 						{state === "success" && (
@@ -323,10 +336,14 @@ function VerifyingState({
 	webcamRef,
 	faceInFrame,
 	setFaceInFrame,
+	onCapture,
+	isMobile,
 }: {
 	webcamRef: React.RefObject<Webcam | null>;
 	faceInFrame: boolean;
 	setFaceInFrame: (val: boolean) => void;
+	onCapture: () => void;
+	isMobile: boolean;
 }) {
 	const [livenessStatus, setLivenessStatus] =
 		useState<FaceLivenessStatus>("loading");
@@ -346,7 +363,6 @@ function VerifyingState({
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
-			const isMobile = window.innerWidth < 768;
 			const cfg = isMobile ? FRAME.mobile : FRAME.desktop;
 			setFrame(cfg);
 			frameRef.current = cfg;
@@ -356,7 +372,7 @@ function VerifyingState({
 				height: { ideal: isMobile ? 1920 : 1080 },
 			});
 		}
-	}, []);
+	}, [isMobile]);
 
 	useEffect(() => {
 		let intervalId: ReturnType<typeof setInterval>;
@@ -487,7 +503,7 @@ function VerifyingState({
 				} finally {
 					isProcessingRef.current = false;
 				}
-			}, 700);
+			}, 300);
 		}
 
 		loadAndDetect();
@@ -511,51 +527,81 @@ function VerifyingState({
 	return (
 		<>
 			{/* Camera Preview with Face Frame */}
-			<div className="relative w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-gray-900 aspect-3/4 sm:aspect-video">
-				<Webcam
-					key={permissionGrantedTime || "webcam-default"}
-					className="absolute inset-0 w-full h-full object-cover rounded-xl"
-					audio={false}
-					ref={webcamRef}
-					screenshotFormat="image/jpeg"
-					screenshotQuality={1}
-					mirrored
-					videoConstraints={videoConstraints}
-				/>
-				{/* Human face outline frame overlay */}
-				<svg
-					className="absolute inset-0 w-full h-full pointer-events-none"
-					viewBox="0 0 1280 720"
-					preserveAspectRatio="xMidYMid slice">
-					<defs>
-						<mask id="face-cutout">
-							<rect width="1280" height="720" fill="white" />
-							<path d={getFramePath(frame, true)} fill="black" />
-						</mask>
-					</defs>
-					{/* Dark overlay with face-shaped cutout */}
-					<rect
-						width="1280"
-						height="720"
-						fill="rgba(0,0,0,0.5)"
-						mask="url(#face-cutout)"
+			<div className="relative w-full max-w-lg mb-8 rounded-xl bg-gray-900 aspect-3/4 sm:aspect-video">
+				{/* Webcam + SVG overlay wrapper (clips video to rounded corners) */}
+				<div className="absolute inset-0 rounded-xl overflow-hidden">
+					<Webcam
+						key={permissionGrantedTime || "webcam-default"}
+						className="absolute inset-0 w-full h-full object-cover"
+						audio={false}
+						ref={webcamRef}
+						screenshotFormat="image/jpeg"
+						screenshotQuality={1}
+						mirrored
+						videoConstraints={videoConstraints}
 					/>
-					{/* Head, neck, and shoulder guide */}
-					<path
-						d={getFramePath(frame)}
-						fill="none"
-						stroke={borderColor}
-						strokeWidth="6"
-						strokeLinejoin="round"
-						strokeLinecap="round"
-						style={{ transition: "stroke 0.3s ease" }}
-					/>
-				</svg>
-				{/* Status indicator */}
+					{/* Human face outline frame overlay */}
+					<svg
+						className="absolute inset-0 w-full h-full pointer-events-none"
+						viewBox="0 0 1280 720"
+						preserveAspectRatio="xMidYMid slice">
+						<defs>
+							<mask id="face-cutout">
+								<rect width="1280" height="720" fill="white" />
+								<path d={getFramePath(frame, true)} fill="black" />
+							</mask>
+						</defs>
+						{/* Dark overlay with face-shaped cutout */}
+						<rect
+							width="1280"
+							height="720"
+							fill="rgba(0,0,0,0.5)"
+							mask="url(#face-cutout)"
+						/>
+						{/* Head, neck, and shoulder guide */}
+						<path
+							d={getFramePath(frame)}
+							fill="none"
+							stroke={borderColor}
+							strokeWidth="6"
+							strokeLinejoin="round"
+							strokeLinecap="round"
+							style={{ transition: "stroke 0.3s ease" }}
+						/>
+					</svg>
+				</div>
+				{/* Liveness status badge – top-right on mobile, bottom-center on desktop */}
 				<div
-					className={`absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm ${statusMeta.className}`}>
+					className={`absolute text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm z-10 ${statusMeta.className}`}
+					style={
+						isMobile
+							? {
+									top: "0.5rem",
+									transform: "translateX(50%)",
+								}
+							: {
+									bottom: "0.75rem",
+									left: "50%",
+									transform: "translateX(-50%)",
+								}
+					}>
 					{statusMeta.label}
 				</div>
+				{/* Mobile-only capture button – centered at the bottom of the frame */}
+				{isMobile && (
+					<div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
+						<button
+							disabled={!faceInFrame}
+							onClick={onCapture}
+							className={`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/80 shadow-lg transition-all active:scale-95 ${
+								faceInFrame
+									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+									: "bg-gray-400 cursor-not-allowed"
+							}`}>
+							<Camera className="w-7 h-7 text-white" />
+						</button>
+					</div>
+				)}
 			</div>
 
 			<div className="mb-4 w-full max-w-md rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-left">
