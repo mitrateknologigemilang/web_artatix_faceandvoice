@@ -607,7 +607,7 @@ function getLivenessStatusMeta(
 			};
 		case "real":
 			return {
-				label: `Wajah terdeteksi${scoreText}`,
+				label: `Wajah lolos verifikasi${scoreText}`,
 				className: "bg-emerald-500/90",
 			};
 		case "fake":

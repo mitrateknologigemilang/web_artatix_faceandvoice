@@ -296,7 +296,7 @@ function UploadState({
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-6">
 				Kami akan memindai barcode/QR pada tiket Anda secara otomatis untuk
-				mendapatkan kode tiket. Mendukung file PDF dan gambar (JPG/PNG).
+				mendapatkan kode tiket. Mendukung file PDF dan gambar.
 			</p>
 
 			<div
