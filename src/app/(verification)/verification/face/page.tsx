@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
-import * as faceapi from "face-api.js";
 import { useRouter } from "next/navigation";
 import {
 	useVerification,
@@ -31,6 +30,11 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { TransitionLoading } from "../../components/TransitionLoading";
+import {
+	FaceLivenessDetector,
+	LIVENESS_REQUIRED_FRAMES,
+	type FaceLivenessStatus,
+} from "@/lib/face-liveness-detector";
 
 type VerificationState = "verifying" | "success" | "failed";
 
@@ -324,6 +328,10 @@ function VerifyingState({
 	faceInFrame: boolean;
 	setFaceInFrame: (val: boolean) => void;
 }) {
+	const [livenessStatus, setLivenessStatus] =
+		useState<FaceLivenessStatus>("loading");
+	const [livenessScore, setLivenessScore] = useState<number | null>(null);
+	const [stabilityScore, setStabilityScore] = useState(0);
 	const [videoConstraints, setVideoConstraints] = useState<any>({
 		facingMode: "user",
 		width: { ideal: 1920 },
@@ -331,6 +339,10 @@ function VerifyingState({
 	});
 	const [frame, setFrame] = useState<FrameCfg>(FRAME.desktop);
 	const frameRef = useRef<FrameCfg>(FRAME.desktop);
+	const detectorRef = useRef<FaceLivenessDetector | null>(null);
+	const livenessDisabledRef = useRef(false);
+	const hasLoggedLivenessErrorRef = useRef(false);
+	const isProcessingRef = useRef(false);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -347,34 +359,53 @@ function VerifyingState({
 	}, []);
 
 	useEffect(() => {
-		let intervalId: NodeJS.Timeout;
+		let intervalId: ReturnType<typeof setInterval>;
 		let mounted = true;
 
 		async function loadAndDetect() {
-			await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+			livenessDisabledRef.current = false;
+			hasLoggedLivenessErrorRef.current = false;
+
+			try {
+				setLivenessStatus("loading");
+				setFaceInFrame(false);
+				const detector = new FaceLivenessDetector();
+				await detector.loadModels();
+				detectorRef.current = detector;
+			} catch (error) {
+				console.error("Failed to load liveness models:", error);
+				if (mounted) {
+					setLivenessStatus("error");
+					setFaceInFrame(false);
+				}
+				return;
+			}
 
 			if (!mounted) return;
 
 			intervalId = setInterval(async () => {
 				const video = webcamRef.current?.video as HTMLVideoElement | undefined;
 				if (!video || video.readyState !== 4) return;
+				if (!detectorRef.current || isProcessingRef.current) return;
+				if (livenessDisabledRef.current) return;
 
-				const faceDetections = await faceapi.detectAllFaces(
-					video,
-					new faceapi.TinyFaceDetectorOptions({
-						inputSize: 416,
-						scoreThreshold: 0.5,
-					}),
-				);
+				isProcessingRef.current = true;
 
-				if (!mounted) return;
+				try {
+					const result = await detectorRef.current.processFrame(video);
 
-				if (faceDetections.length > 0) {
-					const face = faceDetections.reduce((prev, curr) =>
-						curr.box.area > prev.box.area ? curr : prev,
-					);
+					if (!mounted) return;
 
-					const { x, y, width, height } = face.box;
+					if (!result) {
+						setFaceInFrame(false);
+						setLivenessStatus("no-face");
+						setLivenessScore(null);
+						setStabilityScore(0);
+						return;
+					}
+
+					const [x1, y1, x2] = result.bbox;
+					const width = x2 - x1;
 					const vw = video.videoWidth;
 					const vh = video.videoHeight;
 					const W = video.clientWidth;
@@ -399,8 +430,10 @@ function VerifyingState({
 					const svgOffsetY = (svgScaledHeight - H) / 2;
 
 					// Physical pixels center
-					const px = (x + width / 2) * Sv - videoOffsetX;
-					const py = (y + height / 2) * Sv - videoOffsetY;
+					const faceCenterVideoX = (x1 + x2) / 2;
+					const faceCenterVideoY = (result.bbox[1] + result.bbox[3]) / 2;
+					const px = faceCenterVideoX * Sv - videoOffsetX;
+					const py = faceCenterVideoY * Sv - videoOffsetY;
 
 					// Map physical to SVG
 					const faceCenterX = (px + svgOffsetX) / Ss;
@@ -420,11 +453,41 @@ function VerifyingState({
 					const maxFaceWidth = cfg.rx * 2 * cfg.maxScale;
 					const isNotTooLarge = faceWidth <= maxFaceWidth;
 
-					setFaceInFrame(isCenterInOval && isLargeEnough && isNotTooLarge);
-				} else {
-					setFaceInFrame(false);
+					const isInFrame = isCenterInOval && isLargeEnough && isNotTooLarge;
+					const isLive = result.liveness.isReal;
+					const isReady = isInFrame && isLive;
+
+					setFaceInFrame(isReady);
+					setLivenessScore(result.liveness.probabilities.real);
+					setStabilityScore(result.liveness.stabilityScore);
+
+					if (!isInFrame) {
+						setLivenessStatus("out-of-frame");
+					} else if (isLive) {
+						setLivenessStatus("real");
+					} else if (result.liveness.isRealRaw) {
+						setLivenessStatus("verifying");
+					} else {
+						setLivenessStatus("fake");
+					}
+				} catch (error) {
+					livenessDisabledRef.current = true;
+
+					if (!hasLoggedLivenessErrorRef.current) {
+						console.error("Liveness detection error:", error);
+						hasLoggedLivenessErrorRef.current = true;
+					}
+
+					if (mounted) {
+						setFaceInFrame(false);
+						setLivenessStatus("error");
+					}
+
+					if (intervalId) clearInterval(intervalId);
+				} finally {
+					isProcessingRef.current = false;
 				}
-			}, 500);
+			}, 700);
 		}
 
 		loadAndDetect();
@@ -432,11 +495,18 @@ function VerifyingState({
 		return () => {
 			mounted = false;
 			if (intervalId) clearInterval(intervalId);
+			detectorRef.current = null;
+			setFaceInFrame(false);
 		};
-	}, [webcamRef]);
+	}, [setFaceInFrame, webcamRef]);
 
 	const { permissionGrantedTime } = useVerification();
 	const borderColor = faceInFrame ? "#16A34A" : "#DC2626";
+	const statusMeta = getLivenessStatusMeta(
+		livenessStatus,
+		livenessScore,
+		stabilityScore,
+	);
 
 	return (
 		<>
@@ -482,16 +552,76 @@ function VerifyingState({
 					/>
 				</svg>
 				{/* Status indicator */}
-				{faceInFrame && (
-					<div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500/90 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
-						✓ Wajah terdeteksi
-					</div>
-				)}
+				<div
+					className={`absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm ${statusMeta.className}`}>
+					{statusMeta.label}
+				</div>
+			</div>
+
+			<div className="mb-4 w-full max-w-md rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-left">
+				<div className=" h-2 overflow-hidden rounded-full bg-white">
+					<div
+						className="h-full rounded-full bg-[#3b5bdb] transition-all"
+						style={{
+							width: `${Math.min(
+								100,
+								(stabilityScore / LIVENESS_REQUIRED_FRAMES) * 100,
+							)}%`,
+						}}
+					/>
+				</div>
 			</div>
 
 			<FaceTipsModal />
 		</>
 	);
+}
+
+function getLivenessStatusMeta(
+	status: FaceLivenessStatus,
+	score: number | null,
+	stabilityScore: number,
+) {
+	const scoreText = score === null ? "" : ` (${Math.round(score * 100)}%)`;
+
+	switch (status) {
+		case "loading":
+			return {
+				label: "Memuat...",
+				className: "bg-blue-500/90",
+			};
+		case "no-face":
+			return {
+				label: "Posisikan wajah di frame",
+				className: "bg-red-500/90",
+			};
+		case "out-of-frame":
+			return {
+				label: "Wajah belum pas di frame",
+				className: "bg-amber-500/90",
+			};
+		case "verifying":
+			return {
+				label: `Memverifikasi wajah ${stabilityScore}/${LIVENESS_REQUIRED_FRAMES}${scoreText}`,
+				className: "bg-amber-500/90",
+			};
+		case "real":
+			return {
+				label: `Wajah terdeteksi${scoreText}`,
+				className: "bg-emerald-500/90",
+			};
+		case "fake":
+			return {
+				label: `Wajah tidak lolos verifikasi${scoreText}`,
+				className: "bg-red-500/90",
+			};
+		case "error":
+		default:
+			return {
+				label: "Terjadi error",
+				className: "bg-red-500/90",
+			};
+	}
 }
 
 function getFramePath(frame: FrameCfg, closeMask = false) {
