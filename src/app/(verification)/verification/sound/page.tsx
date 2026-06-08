@@ -37,6 +37,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Modal } from "../../components/Modal";
+import HeaderSection from "../../components/HeaderSection";
 
 type RecordingState = "idle" | "recording" | "success" | "failed";
 
@@ -192,11 +193,7 @@ export default function SoundVerificationPage() {
 				description={errorMsg}
 			/>
 
-			<div className="text-center pb-3 sm:pb-4 w-full max-w-full overflow-hidden ">
-				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Jomlo Festival 2026 Chapter Bekasi
-				</h1>
-			</div>
+			<HeaderSection />
 
 			<div className="space-y-6">
 				{/* Main Card */}

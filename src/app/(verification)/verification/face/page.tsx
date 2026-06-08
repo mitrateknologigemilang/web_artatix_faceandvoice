@@ -35,6 +35,7 @@ import {
 	LIVENESS_REQUIRED_FRAMES,
 	type FaceLivenessStatus,
 } from "@/lib/face-liveness-detector";
+import HeaderSection from "../../components/HeaderSection";
 
 type VerificationState = "verifying" | "success" | "failed";
 
@@ -130,11 +131,7 @@ export default function FaceVerificationPage() {
 
 	return (
 		<>
-			<div className="text-center pb-3 sm:pb-4 w-full max-w-full overflow-hidden ">
-				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Jomlo Festival 2026 Chapter Bekasi
-				</h1>
-			</div>
+			<HeaderSection />
 
 			<div className="space-y-6">
 				{/* Main Card */}
@@ -733,7 +730,7 @@ function FaceTipsModal() {
 						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
 							<RiSurgicalMaskLine />
 						</div>
-						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
 							Tanpa Masker
 						</p>
 					</div>
@@ -741,7 +738,7 @@ function FaceTipsModal() {
 						<div className="size-12 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-full text-[24px]">
 							<RiSunFill />
 						</div>
-						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
 							Cahaya Cukup
 						</p>
 					</div>
@@ -749,7 +746,7 @@ function FaceTipsModal() {
 						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
 							<RiEmotionFill />
 						</div>
-						<p className="text-[12px] text-[#6B7280] uppercase font-medium">
+						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
 							Wajah Jelas
 						</p>
 					</div>

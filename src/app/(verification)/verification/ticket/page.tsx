@@ -22,6 +22,7 @@ import {
 	type TicketDetail,
 } from "@/services/verification.service";
 import { TransitionLoading } from "../../components/TransitionLoading";
+import HeaderSection from "../../components/HeaderSection";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
 
@@ -175,11 +176,7 @@ export default function TicketVerificationPage() {
 
 	return (
 		<>
-			<div className="text-center w-full pb-3 sm:pb-4">
-				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Jomlo Festival 2026 Chapter Bekasi
-				</h1>
-			</div>
+			<HeaderSection />
 
 			<div className="space-y-6">
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

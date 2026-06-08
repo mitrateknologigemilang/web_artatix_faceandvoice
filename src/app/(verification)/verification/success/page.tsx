@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, Shield } from "lucide-react";
 import { useEffect } from "react";
 import { useVerification } from "../../VerificationContext";
 import { useRouter } from "next/navigation";
+import HeaderSection from "../../components/HeaderSection";
 
 export default function VerificationSuccessPage() {
 	const router = useRouter();
@@ -16,11 +17,7 @@ export default function VerificationSuccessPage() {
 
 	return (
 		<>
-			<div className="text-center pb-3 sm:pb-4 w-full max-w-full overflow-hidden">
-				<h1 className="text-xl sm:text-2xl font-bold text-[#1e2a4a] truncate">
-					Jomlo Festival 2026 Chapter Bekasi
-				</h1>
-			</div>
+			<HeaderSection />
 
 			<div className="space-y-6">
 				{/* Main Card */}
