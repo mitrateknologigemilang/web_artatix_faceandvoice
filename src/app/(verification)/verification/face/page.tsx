@@ -577,7 +577,8 @@ function VerifyingState({
 						isMobile
 							? {
 									top: "0.5rem",
-									transform: "translateX(50%)",
+									left: "50%",
+									transform: "translateX(-50%)",
 								}
 							: {
 									bottom: "0.75rem",
@@ -602,20 +603,6 @@ function VerifyingState({
 						</button>
 					</div>
 				)}
-			</div>
-
-			<div className="mb-4 w-full max-w-md rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-left">
-				<div className=" h-2 overflow-hidden rounded-full bg-white">
-					<div
-						className="h-full rounded-full bg-[#3b5bdb] transition-all"
-						style={{
-							width: `${Math.min(
-								100,
-								(stabilityScore / LIVENESS_REQUIRED_FRAMES) * 100,
-							)}%`,
-						}}
-					/>
-				</div>
 			</div>
 
 			<FaceTipsModal />
@@ -648,17 +635,17 @@ function getLivenessStatusMeta(
 			};
 		case "verifying":
 			return {
-				label: `Memverifikasi wajah ${stabilityScore}/${LIVENESS_REQUIRED_FRAMES}${scoreText}`,
+				label: `Memverifikasi wajah ${stabilityScore}/${LIVENESS_REQUIRED_FRAMES}`,
 				className: "bg-amber-500/90",
 			};
 		case "real":
 			return {
-				label: `Wajah lolos verifikasi${scoreText}`,
+				label: `Wajah lolos verifikasi`,
 				className: "bg-emerald-500/90",
 			};
 		case "fake":
 			return {
-				label: `Wajah tidak lolos verifikasi${scoreText}`,
+				label: `Wajah tidak lolos verifikasi`,
 				className: "bg-red-500/90",
 			};
 		case "error":
