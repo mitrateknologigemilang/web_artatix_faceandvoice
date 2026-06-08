@@ -1,10 +1,12 @@
 "use client";
 
-import { CheckCircle2, Shield } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Shield } from "lucide-react";
 import { useEffect } from "react";
 import { useVerification } from "../../VerificationContext";
+import { useRouter } from "next/navigation";
 
 export default function VerificationSuccessPage() {
+	const router = useRouter();
 	const { clearVerification } = useVerification();
 
 	// All steps done — drop the saved progress so a reload starts fresh.
@@ -48,11 +50,23 @@ export default function VerificationSuccessPage() {
 						<h2 className="text-2xl font-bold text-[#1e2a4a] mb-2">
 							Registrasi Selesai!
 						</h2>
-						<p className="text-gray-500 text-sm max-w-md mb-8">
+						<p className="text-gray-500 text-sm max-w-md">
 							Data biometrik Anda telah berhasil dikirim. Identitas Anda kini
 							terhubung untuk akses masuk pada hari acara. Terima kasih telah
 							melakukan registrasi.
 						</p>
+					</div>
+
+					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
+						<button
+							onClick={() => {
+								clearVerification();
+								router.push("/verification/ticket");
+							}}
+							className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors w-full justify-center">
+							<ArrowLeft className="w-4 h-4" />
+							Daftarkan Tiket Lain
+						</button>
 					</div>
 				</div>
 			</div>
