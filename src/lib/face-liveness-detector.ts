@@ -40,17 +40,17 @@ interface RawLivenessResult {
 
 const RF_CONFIG = {
 	inputSize: 640,
-	confThreshold: 0.6,
+	confThreshold: 0.45,
 	nmsThreshold: 0.4,
 	variance: [0.1, 0.2],
 };
 
 const MINIFAS_CONFIG = {
 	inputSize: 80,
-	realThreshold: 0.75,
+	realThreshold: 0.62,
 };
 
-const REQUIRED_CONSECUTIVE_REAL = 5;
+const REQUIRED_CONSECUTIVE_REAL = 4;
 
 let runtimeConfigured = false;
 

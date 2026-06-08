@@ -47,6 +47,7 @@ type FrameCfg = {
 	ry: number;
 	minFace: number; // min face width as a fraction of SVG width
 	maxScale: number; // max face width = rx * 2 * maxScale
+	centerTolerance: number; // allow natural head movement within the guide
 	shoulderWidth: number;
 };
 const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
@@ -57,16 +58,18 @@ const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
 		ry: 225,
 		minFace: 0.15,
 		maxScale: 1.8,
+		centerTolerance: 1.05,
 		shoulderWidth: 1.35,
 	},
 	mobile: {
 		cx: 640,
-		cy: 305,
-		rx: 190,
-		ry: 235,
-		minFace: 0.1,
-		maxScale: 2.4,
-		shoulderWidth: 1.65,
+		cy: 330,
+		rx: 250,
+		ry: 300,
+		minFace: 0.13,
+		maxScale: 2.75,
+		centerTolerance: 1.22,
+		shoulderWidth: 1.75,
 	},
 };
 
@@ -389,7 +392,8 @@ function VerifyingState({
 				await detector.loadModels();
 				detectorRef.current = detector;
 			} catch (error) {
-				console.error("Failed to load liveness models:", error);
+				const message = error instanceof Error ? error.message : String(error);
+				console.warn(`Failed to load liveness models: ${message}`);
 				if (mounted) {
 					setLivenessStatus("error");
 					setFaceInFrame(false);
@@ -420,8 +424,9 @@ function VerifyingState({
 						return;
 					}
 
-					const [x1, y1, x2] = result.bbox;
+					const [x1, y1, x2, y2] = result.bbox;
 					const width = x2 - x1;
+					const height = y2 - y1;
 					const vw = video.videoWidth;
 					const vh = video.videoHeight;
 					const W = video.clientWidth;
@@ -447,7 +452,7 @@ function VerifyingState({
 
 					// Physical pixels center
 					const faceCenterVideoX = (x1 + x2) / 2;
-					const faceCenterVideoY = (result.bbox[1] + result.bbox[3]) / 2;
+					const faceCenterVideoY = (y1 + y2) / 2;
 					const px = faceCenterVideoX * Sv - videoOffsetX;
 					const py = faceCenterVideoY * Sv - videoOffsetY;
 
@@ -455,21 +460,29 @@ function VerifyingState({
 					const faceCenterX = (px + svgOffsetX) / Ss;
 					const faceCenterY = (py + svgOffsetY) / Ss;
 					const faceWidth = (width * Sv) / Ss;
+					const faceHeight = (height * Sv) / Ss;
 
 					// Check if face center is inside the oval
 					const cfg = frameRef.current;
 					const dxCenter = (faceCenterX - cfg.cx) / cfg.rx;
 					const dyCenter = (faceCenterY - cfg.cy) / cfg.ry;
-					const isCenterInOval = dxCenter * dxCenter + dyCenter * dyCenter <= 1;
+					const isCenterInOval =
+						dxCenter * dxCenter + dyCenter * dyCenter <=
+						cfg.centerTolerance * cfg.centerTolerance;
 
 					// Face size checks
-					const minFaceWidth = SVG_W * cfg.minFace;
+					const guideWidth = cfg.rx * 2;
+					const guideHeight = cfg.ry * 2;
+					const minFaceWidth = Math.max(SVG_W * cfg.minFace, guideWidth * 0.5);
+					const minFaceHeight = guideHeight * 0.55;
 					const isLargeEnough = faceWidth >= minFaceWidth;
+					const isTallEnough = faceHeight >= minFaceHeight;
 
-					const maxFaceWidth = cfg.rx * 2 * cfg.maxScale;
+					const maxFaceWidth = guideWidth * cfg.maxScale;
 					const isNotTooLarge = faceWidth <= maxFaceWidth;
 
-					const isInFrame = isCenterInOval && isLargeEnough && isNotTooLarge;
+					const isInFrame =
+						isCenterInOval && isLargeEnough && isTallEnough && isNotTooLarge;
 					const isLive = result.liveness.isReal;
 					const isReady = isInFrame && isLive;
 
@@ -490,7 +503,9 @@ function VerifyingState({
 					livenessDisabledRef.current = true;
 
 					if (!hasLoggedLivenessErrorRef.current) {
-						console.error("Liveness detection error:", error);
+						const message =
+							error instanceof Error ? error.message : String(error);
+						console.warn(`Liveness detection disabled: ${message}`);
 						hasLoggedLivenessErrorRef.current = true;
 					}
 
@@ -576,7 +591,7 @@ function VerifyingState({
 					style={
 						isMobile
 							? {
-									top: "0.5rem",
+									top: "-15px",
 									left: "50%",
 									transform: "translateX(-50%)",
 								}
@@ -651,7 +666,7 @@ function getLivenessStatusMeta(
 		case "error":
 		default:
 			return {
-				label: "Terjadi error",
+				label: "Terjadi kesalahan",
 				className: "bg-red-500/90",
 			};
 	}

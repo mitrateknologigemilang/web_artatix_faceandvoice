@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-06-08 - Face Verification Mobile Tuning
+
+### Diubah
+
+- Merevisi deteksi mobile agar lebih cocok untuk jarak pegang HP normal 30-50 cm:
+  - frame panduan mobile diperbesar,
+  - toleransi posisi wajah dalam frame dilonggarkan,
+  - pengecekan ukuran wajah sekarang memakai lebar dan tinggi bounding box,
+  - threshold RetinaFace diturunkan dari `0.6` ke `0.45`,
+  - threshold MiniFASNet real diturunkan dari `0.75` ke `0.62`,
+  - frame stabil yang dibutuhkan diturunkan dari `5` ke `4`.
+- Merapikan logging error liveness agar tidak memicu spam stack-frame request di Next dev overlay.
+- Menyesuaikan UI mobile:
+  - tombol capture dibuat sebagai shutter button bulat besar di bawah frame,
+  - badge status verifikasi diposisikan di kanan atas frame,
+  - wording badge dipersingkat agar tidak menutupi area wajah.
+
+### Verifikasi
+
+- `tsc --noEmit` berhasil.
+
 ## 2026-06-07 - Face Liveness / Anti-Spoofing
 
 ### Ditambahkan
