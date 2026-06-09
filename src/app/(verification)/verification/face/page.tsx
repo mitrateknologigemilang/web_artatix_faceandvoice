@@ -384,11 +384,12 @@ function VerifyingState({
 				setLivenessStatus("loading");
 				setFaceInFrame(false);
 				const detector = new FaceLivenessDetector();
-				await detector.loadModels();
+				// await detector.loadModels();
+				await detector.loadModels({ includeLiveness: false });
 				detectorRef.current = detector;
 			} catch (error) {
 				const message = error instanceof Error ? error.message : String(error);
-				console.warn(`Failed to load liveness models: ${message}`);
+				console.warn(`Failed to load face detection model: ${message}`);
 				if (mounted) {
 					setLivenessStatus("error");
 					setFaceInFrame(false);
@@ -407,7 +408,9 @@ function VerifyingState({
 				isProcessingRef.current = true;
 
 				try {
-					const result = await detectorRef.current.processFrame(video);
+					const result = await detectorRef.current.processFaceFrame(video);
+					// Anti-spoofing & liveness are intentionally disabled.
+					// const result = await detectorRef.current.processFrame(video);
 
 					if (!mounted) return;
 
@@ -478,9 +481,12 @@ function VerifyingState({
 
 					const isInFrame =
 						isCenterInOval && isLargeEnough && isTallEnough && isNotTooLarge;
+
+					/*
+					Anti-spoofing & liveness flow preserved for future use:
+
 					const isLive = result.liveness.isReal;
 					const isReady = isInFrame && isLive;
-
 					setFaceInFrame(isReady);
 					setLivenessScore(result.liveness.probabilities.real);
 					setStabilityScore(result.liveness.stabilityScore);
@@ -494,13 +500,24 @@ function VerifyingState({
 					} else {
 						setLivenessStatus("fake");
 					}
+					*/
+
+					setFaceInFrame(isInFrame);
+					setLivenessScore(null);
+					setStabilityScore(0);
+
+					if (!isInFrame) {
+						setLivenessStatus("out-of-frame");
+					} else {
+						setLivenessStatus("real");
+					}
 				} catch (error) {
 					livenessDisabledRef.current = true;
 
 					if (!hasLoggedLivenessErrorRef.current) {
 						const message =
 							error instanceof Error ? error.message : String(error);
-						console.warn(`Liveness detection disabled: ${message}`);
+						console.warn(`Face detection disabled: ${message}`);
 						hasLoggedLivenessErrorRef.current = true;
 					}
 
@@ -650,7 +667,7 @@ function getLivenessStatusMeta(
 			};
 		case "real":
 			return {
-				label: `Wajah lolos verifikasi`,
+				label: "Posisi wajah sudah pas",
 				className: "bg-emerald-500/90",
 			};
 		case "fake":

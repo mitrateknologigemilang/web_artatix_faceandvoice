@@ -27,6 +27,10 @@ export interface FaceLivenessResult {
 	};
 }
 
+export interface FaceDetectionResult {
+	bbox: FaceBox;
+}
+
 interface RawLivenessResult {
 	isRealRaw: boolean;
 	rawLabel: "FAKE" | "REAL";
@@ -68,7 +72,7 @@ export class FaceLivenessDetector {
 	private anchors: number[][] = [];
 	private stabilityCounter = 0;
 
-	async loadModels() {
+	async loadModels({ includeLiveness = true } = {}) {
 		configureRuntime();
 		this.anchors = this.generateAnchors(RF_CONFIG.inputSize);
 
@@ -77,19 +81,34 @@ export class FaceLivenessDetector {
 			graphOptimizationLevel: "all",
 		};
 
-		const [retinaFaceSession, miniFASSession] = await Promise.all([
-			ort.InferenceSession.create(
-				"/models/liveness/Widerface-RetinaFace.onnx",
-				options,
-			),
-			ort.InferenceSession.create(
+		this.retinaFaceSession = await ort.InferenceSession.create(
+			"/models/liveness/Widerface-RetinaFace.onnx",
+			options,
+		);
+
+		if (includeLiveness) {
+			this.miniFASSession = await ort.InferenceSession.create(
 				"/models/liveness/2.7_80x80_MiniFASNetV2_Fixed.onnx",
 				options,
-			),
-		]);
+			);
+		}
+	}
 
-		this.retinaFaceSession = retinaFaceSession;
-		this.miniFASSession = miniFASSession;
+	async processFaceFrame(
+		videoElement: HTMLVideoElement,
+	): Promise<FaceDetectionResult | null> {
+		if (!this.retinaFaceSession) {
+			throw new Error("Face detection model is not loaded.");
+		}
+
+		const faces = await this.detectFaces(videoElement);
+		if (faces.length === 0) return null;
+
+		return {
+			bbox: faces.reduce((prev, curr) =>
+				this.boxArea(curr) > this.boxArea(prev) ? curr : prev,
+			),
+		};
 	}
 
 	async processFrame(
@@ -99,15 +118,13 @@ export class FaceLivenessDetector {
 			throw new Error("Face liveness models are not loaded.");
 		}
 
-		const faces = await this.detectFaces(videoElement);
-		if (faces.length === 0) {
+		const faceResult = await this.processFaceFrame(videoElement);
+		if (!faceResult) {
 			this.stabilityCounter = 0;
 			return null;
 		}
 
-		const face = faces.reduce((prev, curr) =>
-			this.boxArea(curr) > this.boxArea(prev) ? curr : prev,
-		);
+		const face = faceResult.bbox;
 		const livenessRaw = await this.checkLivenessRaw(videoElement, face);
 
 		let label: "FAKE" | "REAL" | "VERIFYING..." = "FAKE";
