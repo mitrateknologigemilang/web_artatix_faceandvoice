@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import artatixLogo from "@/assets/artatix-logo.svg";
-import jomloFestLogo from "@/assets/jomlo-fest-logo.svg";
+import jomloFestLogo from "@/assets/jomlo-fest-logo.png";
 import { useVerification } from "../VerificationContext";
 
 export function VerificationLogoLinks() {
@@ -28,7 +28,13 @@ export function VerificationLogoLinks() {
 				onClick={handleReset}
 				className="flex h-16 items-center"
 				aria-label="Kembali ke verifikasi tiket">
-				<Image width={70} height={25} src={jomloFestLogo} alt="Jomlo Fest" />
+				<Image
+					unoptimized
+					width={70}
+					height={25}
+					src={jomloFestLogo}
+					alt="Jomlo Fest"
+				/>
 			</button>
 		</>
 	);
