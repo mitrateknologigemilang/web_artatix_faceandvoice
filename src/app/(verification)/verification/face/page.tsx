@@ -351,8 +351,7 @@ function VerifyingState({
 	const [stabilityScore, setStabilityScore] = useState(0);
 	const [videoConstraints, setVideoConstraints] = useState<any>({
 		facingMode: "user",
-		width: { ideal: 1920 },
-		height: { ideal: 1080 },
+		aspectRatio: 16 / 9,
 	});
 	const [frame, setFrame] = useState<FrameCfg>(FRAME.desktop);
 	const frameRef = useRef<FrameCfg>(FRAME.desktop);
@@ -368,8 +367,7 @@ function VerifyingState({
 			frameRef.current = cfg;
 			setVideoConstraints({
 				facingMode: "user",
-				width: { ideal: isMobile ? 1080 : 1920 },
-				height: { ideal: isMobile ? 1920 : 1080 },
+				aspectRatio: 16 / 9,
 			});
 		}
 	}, [isMobile]);
