@@ -1,9 +1,9 @@
 1:"$Sreact.fragment"
 2:I[47257,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/24f454f576d233d4.js"],"ClientPageRoot"]
-3:I[11559,["/_next/static/chunks/2a6e84680efbe44b.js","/_next/static/chunks/306d49aa933ab070.js","/_next/static/chunks/aec70c8401d22269.js","/_next/static/chunks/7a9533988c48aa9b.js","/_next/static/chunks/c4e10f1ec83fd13d.js"],"default"]
+3:I[11559,["/_next/static/chunks/2a6e84680efbe44b.js","/_next/static/chunks/306d49aa933ab070.js","/_next/static/chunks/b885663f9a1389d1.js","/_next/static/chunks/05120db02bb1fcc9.js","/_next/static/chunks/6b5e538e32580e28.js","/_next/static/chunks/3329b63441948360.js"],"default"]
 6:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/24f454f576d233d4.js"],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"RvXP-SOKTR1QtYGInMUdb","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/aec70c8401d22269.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/7a9533988c48aa9b.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/c4e10f1ec83fd13d.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"0ZLddBYQs2cwHTa6A5QXp","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/b885663f9a1389d1.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/05120db02bb1fcc9.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/6b5e538e32580e28.js","async":true}],["$","script","script-3",{"src":"/_next/static/chunks/3329b63441948360.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:{}
 8:null
