@@ -14,6 +14,7 @@ import {
 	ScanFace,
 	XCircle,
 	Info,
+	Save,
 } from "lucide-react";
 import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
@@ -36,7 +37,12 @@ import {
 	type FaceLivenessStatus,
 } from "@/lib/face-liveness-detector";
 import HeaderSection from "../../components/HeaderSection";
-
+import {
+	getApiErrorMessage,
+	submitBiometricData,
+} from "@/services/verification.service";
+import { Modal } from "../../components/Modal";
+import { useHandleSubmit } from "@/hooks/use-handle-submit";
 type VerificationState = "verifying" | "success" | "failed";
 
 // Face frame config (SVG viewBox 1280x720). The detection area stays forgiving,
@@ -89,6 +95,8 @@ export default function FaceVerificationPage() {
 	const [faceInFrame, setFaceInFrame] = useState(false);
 	const [isNavigating, setIsNavigating] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
+	const [errorMsg, setErrorMsg] = useState<string | null>(null);
+	const [submitting, setSubmitting] = useState(false);
 
 	useEffect(() => {
 		const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -99,7 +107,8 @@ export default function FaceVerificationPage() {
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
-	const { clearVerification, setFaceBlob, setStep } = useVerification();
+	const { faceBlob, kodeTiket, clearVerification, setFaceBlob, setStep } =
+		useVerification();
 	const allowed = useVerificationGuard("face");
 
 	const capture = useCallback(() => {
@@ -110,6 +119,7 @@ export default function FaceVerificationPage() {
 		const imgSrc = webcamRef.current.getScreenshot({ width: w, height: h });
 		if (imgSrc) {
 			faceBlobRef.current = dataURLtoBlob(imgSrc);
+			setFaceBlob(faceBlobRef.current);
 			setState("success");
 		}
 	}, [webcamRef]);
@@ -123,6 +133,16 @@ export default function FaceVerificationPage() {
 		}
 	}, [isNavigating, setFaceBlob, setStep, router]);
 
+	const { handleSubmit, handleErrorClose } = useHandleSubmit({
+		faceBlob,
+		kodeTiket,
+		errorMsg,
+		setErrorMsg,
+		setSubmitting,
+		submitBiometricData,
+		getApiErrorMessage,
+	});
+
 	if (isNavigating) {
 		return <TransitionLoading message="Menyiapkan verifikasi suara..." />;
 	}
@@ -132,6 +152,13 @@ export default function FaceVerificationPage() {
 	return (
 		<>
 			<HeaderSection />
+
+			<Modal
+				open={!!errorMsg}
+				onClose={handleErrorClose}
+				title="Registrasi Gagal"
+				description={errorMsg}
+			/>
 
 			<div className="space-y-6">
 				{/* Main Card */}
@@ -219,11 +246,11 @@ export default function FaceVerificationPage() {
 									Ulangi Foto
 								</button>
 								<button
-									onClick={handleContinue}
+									onClick={handleSubmit}
 									disabled={isNavigating}
 									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-									<ArrowRight className="w-4 h-4" />
-									Lanjutkan
+									<Save className="w-4 h-4" />
+									{submitting ? "Menyimpan..." : "Simpan"}
 								</button>
 							</div>
 						)}
@@ -325,8 +352,8 @@ function SuccessState() {
 				Verifikasi Berhasil!
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Data wajah Anda telah berhasil didaftarkan. Anda sekarang dapat
-				melanjutkan ke tahap berikutnya yaitu pendaftaran suara.
+				Data wajah Anda berhasil didaftarkan. Klik Simpan untuk menyelesaikan
+				proses.
 			</p>
 		</>
 	);

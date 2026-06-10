@@ -76,7 +76,7 @@ export async function getTicketDetail(
 	}
 }
 
-interface SubmitBiometricPayload {
+export interface SubmitBiometricPayload {
 	ticketCode: string;
 	file_wajah: Blob;
 	file_suara?: Blob;

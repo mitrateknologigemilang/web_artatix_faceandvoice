@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { Modal } from "../../components/Modal";
 import HeaderSection from "../../components/HeaderSection";
-
+import { useHandleSubmit } from "@/hooks/use-handle-submit";
 type RecordingState = "idle" | "recording" | "success" | "failed";
 
 const MIN_RECORDING_SECONDS = 15;
@@ -138,41 +138,18 @@ export default function SoundVerificationPage() {
 		setState("idle");
 	}, []);
 
-	const handleSubmit = useCallback(async () => {
-		if (!faceBlob) {
-			setErrorMsg("Data wajah belum tersedia.");
-			return;
-		}
-		if (!kodeTiket) {
-			setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
-			return;
-		}
-		setSubmitting(true);
-		try {
+	const { handleSubmit, handleErrorClose } = useHandleSubmit({
+		faceBlob,
+		kodeTiket,
+		errorMsg,
+		setErrorMsg,
+		setSubmitting,
+		submitBiometricData: async (payload) => {
 			const wavBlob = audioBlob ? await convertToWav(audioBlob) : undefined;
-
-			await submitBiometricData({
-				ticketCode: kodeTiket,
-				file_wajah: faceBlob,
-				file_suara: wavBlob,
-			});
-			router.replace("/verification/success");
-		} catch (error) {
-			console.error("Submit error:", error);
-			setErrorMsg(
-				getApiErrorMessage(error, "Gagal mengirim data. Silakan coba lagi."),
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	}, [audioBlob, faceBlob, kodeTiket, router]);
-
-	const handleErrorClose = useCallback(() => {
-		const wasMissingTicket =
-			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1.";
-		setErrorMsg(null);
-		if (wasMissingTicket) router.push("/verification/ticket");
-	}, [errorMsg, router]);
+			return submitBiometricData({ ...payload, file_suara: wavBlob });
+		},
+		getApiErrorMessage,
+	});
 
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60)
