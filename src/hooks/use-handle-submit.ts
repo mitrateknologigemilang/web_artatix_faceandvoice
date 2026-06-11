@@ -22,7 +22,7 @@ export function useHandleSubmit({
 }) {
 	const router = useRouter();
 
-	const handleSubmit = useCallback(
+	const submit = useCallback(
 		async (face: Blob | null) => {
 			if (!face) {
 				setErrorMsg("Data wajah belum tersedia.");
@@ -65,6 +65,13 @@ export function useHandleSubmit({
 		],
 	);
 
+	const handleSubmit = useCallback(() => submit(faceBlob), [faceBlob, submit]);
+
+	const handleSubmitWithFaceBlob = useCallback(
+		(face: Blob) => submit(face),
+		[submit],
+	);
+
 	const handleErrorClose = useCallback(() => {
 		const wasMissingTicket =
 			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1.";
@@ -78,6 +85,7 @@ export function useHandleSubmit({
 
 	return {
 		handleSubmit,
+		handleSubmitWithFaceBlob,
 		handleErrorClose,
 	};
 }

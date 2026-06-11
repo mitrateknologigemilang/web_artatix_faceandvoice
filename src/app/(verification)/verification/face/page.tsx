@@ -111,7 +111,7 @@ export default function FaceVerificationPage() {
 		useVerification();
 	const allowed = useVerificationGuard("face");
 
-	const { handleSubmit, handleErrorClose } = useHandleSubmit({
+	const { handleSubmitWithFaceBlob, handleErrorClose } = useHandleSubmit({
 		faceBlob,
 		kodeTiket,
 		errorMsg,
@@ -131,9 +131,9 @@ export default function FaceVerificationPage() {
 			const capturedFaceBlob = dataURLtoBlob(imgSrc);
 			faceBlobRef.current = capturedFaceBlob;
 			setFaceBlob(capturedFaceBlob);
-			const submitted = await handleSubmit(capturedFaceBlob);
+			await handleSubmitWithFaceBlob(capturedFaceBlob);
 		}
-	}, [handleSubmit, setFaceBlob, submitting]);
+	}, [handleSubmitWithFaceBlob, setFaceBlob, submitting]);
 
 	if (isNavigating) {
 		return <TransitionLoading message="Menyiapkan verifikasi suara..." />;
