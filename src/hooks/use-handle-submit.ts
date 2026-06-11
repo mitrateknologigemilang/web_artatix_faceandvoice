@@ -22,44 +22,48 @@ export function useHandleSubmit({
 }) {
 	const router = useRouter();
 
-	const handleSubmit = useCallback(async () => {
-		if (!faceBlob) {
-			setErrorMsg("Data wajah belum tersedia.");
-			return;
-		}
+	const handleSubmit = useCallback(
+		async (face: Blob | null) => {
+			if (!face) {
+				setErrorMsg("Data wajah belum tersedia.");
+				return false;
+			}
 
-		if (!kodeTiket) {
-			setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
-			return;
-		}
+			if (!kodeTiket) {
+				setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
+				return false;
+			}
 
-		setSubmitting(true);
+			setSubmitting(true);
 
-		try {
-			await submitBiometricData({
-				ticketCode: kodeTiket,
-				file_wajah: faceBlob,
-			});
+			try {
+				await submitBiometricData({
+					ticketCode: kodeTiket,
+					file_wajah: face,
+				});
 
-			router.replace("/verification/success");
-		} catch (error) {
-			console.error("Submit error:", error);
+				router.replace("/verification/success");
+				return true;
+			} catch (error) {
+				console.error("Submit error:", error);
 
-			setErrorMsg(
-				getApiErrorMessage(error, "Gagal mengirim data. Silakan coba lagi."),
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	}, [
-		faceBlob,
-		kodeTiket,
-		setErrorMsg,
-		setSubmitting,
-		submitBiometricData,
-		getApiErrorMessage,
-		router,
-	]);
+				setErrorMsg(
+					getApiErrorMessage(error, "Gagal mengirim data. Silakan coba lagi."),
+				);
+				return false;
+			} finally {
+				setSubmitting(false);
+			}
+		},
+		[
+			kodeTiket,
+			setErrorMsg,
+			setSubmitting,
+			submitBiometricData,
+			getApiErrorMessage,
+			router,
+		],
+	);
 
 	const handleErrorClose = useCallback(() => {
 		const wasMissingTicket =

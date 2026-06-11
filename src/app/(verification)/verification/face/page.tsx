@@ -111,28 +111,6 @@ export default function FaceVerificationPage() {
 		useVerification();
 	const allowed = useVerificationGuard("face");
 
-	const capture = useCallback(() => {
-		if (!webcamRef.current) return;
-		const video = webcamRef.current.video as HTMLVideoElement | undefined;
-		const w = video?.videoWidth || 1920;
-		const h = video?.videoHeight || 1080;
-		const imgSrc = webcamRef.current.getScreenshot({ width: w, height: h });
-		if (imgSrc) {
-			faceBlobRef.current = dataURLtoBlob(imgSrc);
-			setFaceBlob(faceBlobRef.current);
-			setState("success");
-		}
-	}, [webcamRef]);
-
-	const handleContinue = useCallback(() => {
-		if (faceBlobRef.current && !isNavigating) {
-			setIsNavigating(true);
-			setFaceBlob(faceBlobRef.current);
-			setStep("sound");
-			router.push("/verification/sound");
-		}
-	}, [isNavigating, setFaceBlob, setStep, router]);
-
 	const { handleSubmit, handleErrorClose } = useHandleSubmit({
 		faceBlob,
 		kodeTiket,
@@ -142,6 +120,20 @@ export default function FaceVerificationPage() {
 		submitBiometricData,
 		getApiErrorMessage,
 	});
+
+	const capture = useCallback(async () => {
+		if (!webcamRef.current || submitting) return;
+		const video = webcamRef.current.video as HTMLVideoElement | undefined;
+		const w = video?.videoWidth || 1920;
+		const h = video?.videoHeight || 1080;
+		const imgSrc = webcamRef.current.getScreenshot({ width: w, height: h });
+		if (imgSrc) {
+			const capturedFaceBlob = dataURLtoBlob(imgSrc);
+			faceBlobRef.current = capturedFaceBlob;
+			setFaceBlob(capturedFaceBlob);
+			const submitted = await handleSubmit(capturedFaceBlob);
+		}
+	}, [handleSubmit, setFaceBlob, submitting]);
 
 	if (isNavigating) {
 		return <TransitionLoading message="Menyiapkan verifikasi suara..." />;
@@ -172,19 +164,15 @@ export default function FaceVerificationPage() {
 							</span>
 						</div>
 						<span
-							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-								state === "success"
-									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 text-[#3b5bdb] bg-blue-50 border-blue-200
 							}`}>
-							{state === "success" ? "Selesai" : "Langkah 2 dari 3"}
+							Langkah 2 dari 2
 						</span>
 					</div>
 
 					{/* Card Body */}
 					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
 						{state === "failed" && <FailedState />}
-						{state === "success" && <SuccessState />}
 						{state === "verifying" && (
 							<VerifyingState
 								webcamRef={webcamRef}
@@ -192,6 +180,7 @@ export default function FaceVerificationPage() {
 								setFaceInFrame={setFaceInFrame}
 								onCapture={capture}
 								isMobile={isMobile}
+								submitting={submitting}
 							/>
 						)}
 					</div>
@@ -220,39 +209,18 @@ export default function FaceVerificationPage() {
 								{/* Desktop-only capture button in footer */}
 								{!isMobile && (
 									<button
-										disabled={!faceInFrame}
+										disabled={!faceInFrame || submitting}
 										onClick={capture}
 										className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-											faceInFrame
+											faceInFrame && !submitting
 												? "bg-[#3b5bdb] hover:bg-[#3451c5]"
 												: "bg-gray-300 cursor-not-allowed"
 										}`}>
 										<Camera className="w-4 h-4" />
-										Ambil Foto
+										{submitting ? "Mengirim..." : "Ambil Foto"}
 									</button>
 								)}
 							</>
-						)}
-						{state === "success" && (
-							<div className="flex w-full justify-between">
-								<button
-									onClick={() => {
-										faceBlobRef.current = null;
-										setFaceBlob(null);
-										setState("verifying");
-									}}
-									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-									<ArrowLeft className="w-4 h-4" />
-									Ulangi Foto
-								</button>
-								<button
-									onClick={handleSubmit}
-									disabled={isNavigating}
-									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-									<Save className="w-4 h-4" />
-									{submitting ? "Menyimpan..." : "Simpan"}
-								</button>
-							</div>
 						)}
 					</div>
 				</div>
@@ -365,12 +333,14 @@ function VerifyingState({
 	setFaceInFrame,
 	onCapture,
 	isMobile,
+	submitting,
 }: {
 	webcamRef: React.RefObject<Webcam | null>;
 	faceInFrame: boolean;
 	setFaceInFrame: (val: boolean) => void;
 	onCapture: () => void;
 	isMobile: boolean;
+	submitting: boolean;
 }) {
 	const [livenessStatus, setLivenessStatus] =
 		useState<FaceLivenessStatus>("loading");
@@ -646,10 +616,10 @@ function VerifyingState({
 				{isMobile && (
 					<div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
 						<button
-							disabled={!faceInFrame}
+							disabled={!faceInFrame || submitting}
 							onClick={onCapture}
 							className={`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/80 shadow-lg transition-all active:scale-95 ${
-								faceInFrame
+								faceInFrame && !submitting
 									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
 									: "bg-gray-400 cursor-not-allowed"
 							}`}>
