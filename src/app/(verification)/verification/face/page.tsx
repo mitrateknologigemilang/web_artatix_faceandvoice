@@ -3,18 +3,19 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
 	AlertCircle,
-	CheckCircle2,
 	Camera,
 	Shield,
 	RefreshCw,
-	ArrowRight,
 	ArrowLeft,
-	CalendarDays,
-	MapPin,
 	ScanFace,
 	XCircle,
 	Info,
 	Save,
+	Loader2,
+	TicketX,
+	Send,
+	Maximize2,
+	X,
 } from "lucide-react";
 import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
@@ -29,8 +30,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogClose,
 } from "@/components/ui/dialog";
-import { TransitionLoading } from "../../components/TransitionLoading";
 import {
 	FaceLivenessDetector,
 	LIVENESS_REQUIRED_FRAMES,
@@ -80,6 +81,17 @@ const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
 	},
 };
 
+const CAMERA_READY_CHECK_DELAY_MS = 1200;
+const CAMERA_RESTART_DELAY_MS = 900;
+const MAX_CAMERA_RESTART_ATTEMPTS = 4;
+const FACE_DETECTION_INTERVAL_DESKTOP_MS = 400;
+const FACE_DETECTION_INTERVAL_MOBILE_MS = 1200;
+const CAMERA_VIDEO_CONSTRAINTS: MediaTrackConstraints[] = [
+	{ facingMode: { ideal: "user" } },
+	{ facingMode: "user" },
+	{},
+];
+
 /** Helper: base64 data-url → Blob */
 function dataURLtoBlob(dataURL: string): Blob {
 	const arr = dataURL.split(",");
@@ -90,13 +102,51 @@ function dataURLtoBlob(dataURL: string): Blob {
 	return new Blob([u8], { type: mime });
 }
 
+function isWebcamStreamReady(webcam: Webcam | null): boolean {
+	const video = webcam?.video;
+	const track = webcam?.stream?.getVideoTracks()[0];
+
+	return Boolean(
+		video &&
+		video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+		video.videoWidth > 0 &&
+		video.videoHeight > 0 &&
+		track &&
+		track.readyState === "live" &&
+		track.enabled &&
+		!track.muted,
+	);
+}
+
+function hasVisibleVideoFrame(video: HTMLVideoElement): boolean {
+	try {
+		const canvas = document.createElement("canvas");
+		canvas.width = 32;
+		canvas.height = 32;
+		const ctx = canvas.getContext("2d", { willReadFrequently: true });
+		if (!ctx) return false;
+
+		ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+		const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+		let visiblePixels = 0;
+
+		for (let i = 0; i < pixels.length; i += 4) {
+			if (pixels[i] + pixels[i + 1] + pixels[i + 2] > 24) visiblePixels++;
+		}
+
+		return visiblePixels / (pixels.length / 4) > 0.02;
+	} catch {
+		return false;
+	}
+}
+
 export default function FaceVerificationPage() {
 	const [state, setState] = useState<VerificationState>("verifying");
 	const [faceInFrame, setFaceInFrame] = useState(false);
-	const [isNavigating, setIsNavigating] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
+	const [tncAccepted, setTncAccepted] = useState(false);
 
 	useEffect(() => {
 		const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -107,7 +157,7 @@ export default function FaceVerificationPage() {
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
-	const { faceBlob, kodeTiket, clearVerification, setFaceBlob, setStep } =
+	const { faceBlob, kodeTiket, clearVerification, setFaceBlob } =
 		useVerification();
 	const allowed = useVerificationGuard("face");
 
@@ -121,23 +171,56 @@ export default function FaceVerificationPage() {
 		getApiErrorMessage,
 	});
 
-	const capture = useCallback(async () => {
-		if (!webcamRef.current || submitting) return;
-		const video = webcamRef.current.video as HTMLVideoElement | undefined;
-		const w = video?.videoWidth || 1920;
-		const h = video?.videoHeight || 1080;
-		const imgSrc = webcamRef.current.getScreenshot({ width: w, height: h });
-		if (imgSrc) {
-			const capturedFaceBlob = dataURLtoBlob(imgSrc);
-			faceBlobRef.current = capturedFaceBlob;
-			setFaceBlob(capturedFaceBlob);
-			await handleSubmitWithFaceBlob(capturedFaceBlob);
-		}
-	}, [handleSubmitWithFaceBlob, setFaceBlob, submitting]);
+	const returnToTicket = useCallback(() => {
+		webcamRef.current?.stream?.getTracks().forEach((track) => track.stop());
+		clearVerification();
+		router.push("/verification/ticket");
+	}, [clearVerification, router]);
 
-	if (isNavigating) {
-		return <TransitionLoading message="Menyiapkan verifikasi suara..." />;
-	}
+	const capture = useCallback(() => {
+		if (!webcamRef.current || submitting) return;
+		if (!faceInFrame || !isWebcamStreamReady(webcamRef.current)) {
+			setFaceInFrame(false);
+			setErrorMsg(
+				"Kamera tidak aktif. Pastikan wajah terlihat lalu coba lagi.",
+			);
+			return;
+		}
+
+		const video = webcamRef.current.video as HTMLVideoElement | undefined;
+		if (!video || !hasVisibleVideoFrame(video)) {
+			setFaceInFrame(false);
+			setErrorMsg("Tampilan kamera tidak terlihat. Silakan coba lagi.");
+			return;
+		}
+
+		const w = video.videoWidth;
+		const h = video.videoHeight;
+		const imgSrc = webcamRef.current.getScreenshot({ width: w, height: h });
+		if (!imgSrc) {
+			setFaceInFrame(false);
+			setErrorMsg(
+				"Foto wajah gagal diambil. Pastikan kamera aktif lalu coba lagi.",
+			);
+			return;
+		}
+
+		const capturedFaceBlob = dataURLtoBlob(imgSrc);
+		faceBlobRef.current = capturedFaceBlob;
+		setFaceBlob(capturedFaceBlob);
+		webcamRef.current.stream?.getTracks().forEach((track) => track.stop());
+		setState("success");
+	}, [faceInFrame, setErrorMsg, setFaceBlob, submitting]);
+
+	const confirmSubmit = useCallback(async () => {
+		const capturedFaceBlob = faceBlobRef.current ?? faceBlob;
+		if (!capturedFaceBlob) {
+			setErrorMsg("Data wajah belum tersedia. Silakan ambil foto kembali.");
+			return;
+		}
+
+		await handleSubmitWithFaceBlob(capturedFaceBlob);
+	}, [faceBlob, handleSubmitWithFaceBlob, setErrorMsg]);
 
 	if (!allowed) return null;
 
@@ -147,7 +230,7 @@ export default function FaceVerificationPage() {
 
 			<Modal
 				open={!!errorMsg}
-				onClose={handleErrorClose}
+				onClose={returnToTicket}
 				title="Registrasi Gagal"
 				description={errorMsg}
 			/>
@@ -164,21 +247,33 @@ export default function FaceVerificationPage() {
 							</span>
 						</div>
 						<span
-							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 text-[#3b5bdb] bg-blue-50 border-blue-200
+							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
+								state === "success"
+									? "text-emerald-600 bg-emerald-50 border-emerald-200"
+									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
 							}`}>
-							Langkah 2 dari 2
+							{state === "success" ? "Konfirmasi" : "Langkah 2 dari 2"}
 						</span>
 					</div>
 
 					{/* Card Body */}
 					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
 						{state === "failed" && <FailedState />}
+						{state === "success" && (
+							<SuccessState
+								faceBlob={faceBlobRef.current ?? faceBlob}
+								isMobile={isMobile}
+								tncAccepted={tncAccepted}
+								setTncAccepted={setTncAccepted}
+							/>
+						)}
 						{state === "verifying" && (
 							<VerifyingState
 								webcamRef={webcamRef}
 								faceInFrame={faceInFrame}
 								setFaceInFrame={setFaceInFrame}
 								onCapture={capture}
+								onBackToTicket={returnToTicket}
 								isMobile={isMobile}
 								submitting={submitting}
 							/>
@@ -198,11 +293,11 @@ export default function FaceVerificationPage() {
 						{state === "verifying" && (
 							<>
 								<button
-									onClick={() => {
-										clearVerification();
-										router.push("/verification/ticket");
-									}}
-									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									disabled={submitting}
+									onClick={returnToTicket}
+									className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
+										submitting ? "opacity-60 cursor-not-allowed" : ""
+									}`}>
 									<ArrowLeft className="w-4 h-4" />
 									Kembali
 								</button>
@@ -216,11 +311,45 @@ export default function FaceVerificationPage() {
 												? "bg-[#3b5bdb] hover:bg-[#3451c5]"
 												: "bg-gray-300 cursor-not-allowed"
 										}`}>
-										<Camera className="w-4 h-4" />
+										{submitting ? (
+											<Loader2 className="w-4 h-4 animate-spin" />
+										) : (
+											<Camera className="w-4 h-4" />
+										)}
 										{submitting ? "Mengirim..." : "Ambil Foto"}
 									</button>
 								)}
 							</>
+						)}
+						{state === "success" && (
+							<div className="flex w-full flex-wrap items-center justify-between gap-3">
+								<button
+									type="button"
+									disabled={submitting}
+									onClick={returnToTicket}
+									className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+										submitting ? "cursor-not-allowed opacity-60" : ""
+									}`}>
+									<TicketX className="h-4 w-4" />
+									Batal
+								</button>
+								<button
+									type="button"
+									disabled={submitting || !tncAccepted}
+									onClick={confirmSubmit}
+									className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
+										submitting || !tncAccepted
+											? "cursor-not-allowed opacity-70"
+											: ""
+									}`}>
+									{submitting ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<Send className="h-4 w-4" />
+									)}
+									{submitting ? "Mengirim..." : "Kirim"}
+								</button>
+							</div>
 						)}
 					</div>
 				</div>
@@ -291,39 +420,116 @@ function FailedState() {
 	);
 }
 
-function SuccessState() {
+function SuccessState({
+	faceBlob,
+	isMobile,
+	tncAccepted,
+	setTncAccepted,
+}: {
+	faceBlob: Blob | null;
+	isMobile: boolean;
+	tncAccepted: boolean;
+	setTncAccepted: (val: boolean) => void;
+}) {
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!faceBlob) {
+			setPreviewUrl(null);
+			return;
+		}
+
+		const url = URL.createObjectURL(faceBlob);
+		setPreviewUrl(url);
+
+		return () => URL.revokeObjectURL(url);
+	}, [faceBlob]);
+
+	const frame = isMobile ? FRAME.mobile : FRAME.desktop;
+
 	return (
-		<>
-			{/* Success Icon */}
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center relative">
-					<div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
-						<CheckCircle2 className="w-10 h-10 text-emerald-500" />
-					</div>
-					{/* Sparkles */}
-					<svg
-						className="absolute -top-1 -right-1 w-5 h-5 text-emerald-400"
-						viewBox="0 0 24 24"
-						fill="currentColor">
-						<path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
-					</svg>
-					<svg
-						className="absolute bottom-0 -left-2 w-4 h-4 text-emerald-300"
-						viewBox="0 0 24 24"
-						fill="currentColor">
-						<path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
-					</svg>
+		<div className="flex w-full flex-col items-center mx-auto">
+			{/* Compact Text-only T&C */}
+			<div className="w-full mb-6 text-left">
+				<div className="flex items-center gap-2 mb-3">
+					<Shield className="h-5 w-5 text-[#3b5bdb]" />
+					<h2 className="text-base font-bold text-[#1e2a4a]">
+						Syarat & Ketentuan Pendaftaran Face ID
+					</h2>
+				</div>
+				<p className="mb-4 text-sm leading-relaxed text-gray-600 font-medium">
+					Dengan melakukan registrasi Face ID, saya menyatakan telah membaca,
+					memahami, dan menyetujui ketentuan berikut:
+				</p>
+				<div className="flex flex-col space-y-3 text-sm leading-relaxed text-gray-600">
+					{[
+						"Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.",
+						"Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.",
+						"Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Jomlo Fest.",
+						"Tiket dengan Face ID yang telah terdaftar tidak dapat digunakan oleh orang lain.",
+						"Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku.",
+					].map((text, i) => (
+						<div key={i} className="flex items-start gap-2">
+							<span className="font-semibold w-4 shrink-0 text-right">
+								{i + 1}.
+							</span>
+							<p>{text}</p>
+						</div>
+					))}
+				</div>
+				<div className="mt-4 flex items-center gap-2">
+					<input
+						type="checkbox"
+						id="tnc"
+						className="peer size-4 shrink-0 cursor-pointer rounded-lg border border-gray-900 shadow-xs transition-shadow outline-none focus-visible:ring-[3px] focus-visible:ring-[#3b5bdb]/50 disabled:cursor-not-allowed disabled:opacity-50 accent-[#3b5bdb]"
+						checked={tncAccepted}
+						onChange={(e) => setTncAccepted(e.target.checked)}
+					/>
+
+					<label
+						htmlFor="tnc"
+						className="text-sm font-bold leading-relaxed text-[#1e2a4a] cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Saya telah membaca dan menyetujui syarat & ketentuan di atas.
+					</label>
 				</div>
 			</div>
 
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Verifikasi Berhasil!
-			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Data wajah Anda berhasil didaftarkan. Klik Simpan untuk menyelesaikan
-				proses.
-			</p>
-		</>
+			{previewUrl ? (
+				<Dialog>
+					<DialogTrigger asChild>
+						<button
+							type="button"
+							className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3b5bdb] px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#3451c5] active:scale-95">
+							<Maximize2 className="h-4 w-4" />
+							<span>Lihat Hasil Capture Wajah</span>
+						</button>
+					</DialogTrigger>
+					<DialogContent
+						className="border-0 bg-transparent p-0 shadow-none"
+						showCloseButton={false}>
+						<DialogHeader className="sr-only">
+							<DialogTitle>Preview Foto Wajah</DialogTitle>
+						</DialogHeader>
+						{/* Matching aspect ratio to camera */}
+						<div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl bg-gray-950 aspect-3/4 sm:aspect-video ring-1 ring-white/10 shadow-2xl animate-in zoom-in-95 duration-300">
+							<img
+								src={previewUrl}
+								alt="Preview"
+								className="absolute inset-0 block h-full w-full object-cover scale-x-[-1]"
+							/>
+							<DialogClose className="absolute right-4 top-4 z-50 flex aspect-square h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 p-0 text-white backdrop-blur-md transition-all hover:bg-black/70 focus:outline-none active:scale-95">
+								<X className="h-5 w-5" />
+								<span className="sr-only">Tutup preview</span>
+							</DialogClose>
+						</div>
+					</DialogContent>
+				</Dialog>
+			) : (
+				<div className="flex w-full items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-8 text-xs text-gray-500">
+					Preview tidak tersedia.
+				</div>
+			)}
+		</div>
 	);
 }
 
@@ -332,6 +538,7 @@ function VerifyingState({
 	faceInFrame,
 	setFaceInFrame,
 	onCapture,
+	onBackToTicket,
 	isMobile,
 	submitting,
 }: {
@@ -339,6 +546,7 @@ function VerifyingState({
 	faceInFrame: boolean;
 	setFaceInFrame: (val: boolean) => void;
 	onCapture: () => void;
+	onBackToTicket: () => void;
 	isMobile: boolean;
 	submitting: boolean;
 }) {
@@ -346,28 +554,167 @@ function VerifyingState({
 		useState<FaceLivenessStatus>("loading");
 	const [livenessScore, setLivenessScore] = useState<number | null>(null);
 	const [stabilityScore, setStabilityScore] = useState(0);
-	const [videoConstraints, setVideoConstraints] = useState<any>({
-		facingMode: "user",
-		aspectRatio: 16 / 9,
-	});
+	const [cameraConstraintIndex, setCameraConstraintIndex] = useState(0);
+	const [cameraMounted, setCameraMounted] = useState(true);
 	const [frame, setFrame] = useState<FrameCfg>(FRAME.desktop);
 	const frameRef = useRef<FrameCfg>(FRAME.desktop);
 	const detectorRef = useRef<FaceLivenessDetector | null>(null);
 	const livenessDisabledRef = useRef(false);
 	const hasLoggedLivenessErrorRef = useRef(false);
 	const isProcessingRef = useRef(false);
+	const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+	const [cameraFailed, setCameraFailed] = useState(false);
+	const [cameraInstanceKey, setCameraInstanceKey] = useState(0);
+	const cameraRestartAttemptsRef = useRef(0);
+	const cameraRestartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
+	const cameraReadyCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
+	const intentionalCameraRestartRef = useRef(false);
+
+	const resetDetection = useCallback(
+		(status: FaceLivenessStatus = "loading") => {
+			setFaceInFrame(false);
+			setLivenessStatus(status);
+			setLivenessScore(null);
+			setStabilityScore(0);
+		},
+		[setFaceInFrame],
+	);
+
+	const restartCamera = useCallback(() => {
+		if (submitting || cameraRestartTimerRef.current) return;
+
+		if (cameraRestartAttemptsRef.current >= MAX_CAMERA_RESTART_ATTEMPTS) {
+			setCameraFailed(true);
+			resetDetection("error");
+			return;
+		}
+
+		setCameraFailed(false);
+		resetDetection();
+		intentionalCameraRestartRef.current = true;
+
+		if (cameraReadyCheckTimerRef.current) {
+			clearTimeout(cameraReadyCheckTimerRef.current);
+			cameraReadyCheckTimerRef.current = null;
+		}
+
+		webcamRef.current?.stream?.getTracks().forEach((track) => track.stop());
+		setCameraStream(null);
+		setCameraMounted(false);
+
+		cameraRestartTimerRef.current = setTimeout(() => {
+			cameraRestartTimerRef.current = null;
+			cameraRestartAttemptsRef.current++;
+			setCameraConstraintIndex(
+				(current) => (current + 1) % CAMERA_VIDEO_CONSTRAINTS.length,
+			);
+			setCameraInstanceKey((current) => current + 1);
+			setCameraMounted(true);
+		}, CAMERA_RESTART_DELAY_MS);
+	}, [resetDetection, submitting, webcamRef]);
+
+	const retryCamera = useCallback(() => {
+		cameraRestartAttemptsRef.current = 0;
+		setCameraFailed(false);
+		restartCamera();
+	}, [restartCamera]);
+
+	const handleVideoInterrupted = useCallback(() => {
+		if (!intentionalCameraRestartRef.current) restartCamera();
+	}, [restartCamera]);
+
+	const verifyCameraPlayback = useCallback(() => {
+		if (intentionalCameraRestartRef.current) return;
+
+		if (cameraReadyCheckTimerRef.current) {
+			clearTimeout(cameraReadyCheckTimerRef.current);
+		}
+
+		cameraReadyCheckTimerRef.current = setTimeout(() => {
+			cameraReadyCheckTimerRef.current = null;
+			const webcam = webcamRef.current;
+			const video = webcam?.video;
+
+			if (
+				!video ||
+				video.paused ||
+				!isWebcamStreamReady(webcam) ||
+				!hasVisibleVideoFrame(video)
+			) {
+				restartCamera();
+				return;
+			}
+
+			if (cameraRestartTimerRef.current) {
+				clearTimeout(cameraRestartTimerRef.current);
+				cameraRestartTimerRef.current = null;
+			}
+			cameraRestartAttemptsRef.current = 0;
+		}, CAMERA_READY_CHECK_DELAY_MS);
+	}, [restartCamera, webcamRef]);
+
+	const handleUserMedia = useCallback(
+		(stream: MediaStream) => {
+			intentionalCameraRestartRef.current = false;
+			setCameraFailed(false);
+			setCameraStream(stream);
+			resetDetection();
+			void webcamRef.current?.video?.play().catch(() => restartCamera());
+			verifyCameraPlayback();
+		},
+		[resetDetection, restartCamera, verifyCameraPlayback, webcamRef],
+	);
+
+	const handleUserMediaError = useCallback(
+		(error: string | DOMException) => {
+			console.warn("Failed to access camera:", error);
+			intentionalCameraRestartRef.current = false;
+			setCameraStream(null);
+			restartCamera();
+		},
+		[restartCamera],
+	);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			const cfg = isMobile ? FRAME.mobile : FRAME.desktop;
 			setFrame(cfg);
 			frameRef.current = cfg;
-			setVideoConstraints({
-				facingMode: "user",
-				aspectRatio: 16 / 9,
-			});
 		}
 	}, [isMobile]);
+
+	useEffect(() => {
+		const track = cameraStream?.getVideoTracks()[0];
+		if (!track) return;
+
+		const handleMuted = () => verifyCameraPlayback();
+		const handleEnded = () => handleVideoInterrupted();
+
+		track.addEventListener("mute", handleMuted);
+		track.addEventListener("unmute", verifyCameraPlayback);
+		track.addEventListener("ended", handleEnded);
+
+		return () => {
+			track.removeEventListener("mute", handleMuted);
+			track.removeEventListener("unmute", verifyCameraPlayback);
+			track.removeEventListener("ended", handleEnded);
+		};
+	}, [cameraStream, handleVideoInterrupted, verifyCameraPlayback]);
+
+	useEffect(() => {
+		return () => {
+			if (cameraRestartTimerRef.current) {
+				clearTimeout(cameraRestartTimerRef.current);
+			}
+			if (cameraReadyCheckTimerRef.current) {
+				clearTimeout(cameraReadyCheckTimerRef.current);
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		let intervalId: ReturnType<typeof setInterval>;
@@ -396,90 +743,102 @@ function VerifyingState({
 
 			if (!mounted) return;
 
-			intervalId = setInterval(async () => {
-				const video = webcamRef.current?.video as HTMLVideoElement | undefined;
-				if (!video || video.readyState !== 4) return;
-				if (!detectorRef.current || isProcessingRef.current) return;
-				if (livenessDisabledRef.current) return;
-
-				isProcessingRef.current = true;
-
-				try {
-					const result = await detectorRef.current.processFaceFrame(video);
-					// Anti-spoofing & liveness are intentionally disabled.
-					// const result = await detectorRef.current.processFrame(video);
-
-					if (!mounted) return;
-
-					if (!result) {
-						setFaceInFrame(false);
-						setLivenessStatus("no-face");
-						setLivenessScore(null);
-						setStabilityScore(0);
+			intervalId = setInterval(
+				async () => {
+					const webcam = webcamRef.current;
+					const video = webcam?.video as HTMLVideoElement | undefined;
+					if (!video || !isWebcamStreamReady(webcam)) {
+						resetDetection();
 						return;
 					}
+					if (!detectorRef.current || isProcessingRef.current) return;
+					if (livenessDisabledRef.current) return;
 
-					const [x1, y1, x2, y2] = result.bbox;
-					const width = x2 - x1;
-					const height = y2 - y1;
-					const vw = video.videoWidth;
-					const vh = video.videoHeight;
-					const W = video.clientWidth;
-					const H = video.clientHeight;
+					isProcessingRef.current = true;
 
-					if (vw === 0 || vh === 0 || W === 0 || H === 0) return;
+					try {
+						const result = await detectorRef.current.processFaceFrame(video);
+						// Anti-spoofing & liveness are intentionally disabled.
+						// const result = await detectorRef.current.processFrame(video);
 
-					// Calculate Display Scale for Video
-					const Sv = Math.max(W / vw, H / vh);
-					const videoScaledWidth = vw * Sv;
-					const videoScaledHeight = vh * Sv;
-					const videoOffsetX = (videoScaledWidth - W) / 2;
-					const videoOffsetY = (videoScaledHeight - H) / 2;
+						if (!mounted) return;
+						if (!isWebcamStreamReady(webcamRef.current)) {
+							resetDetection();
+							return;
+						}
 
-					// Calculate Display Scale for SVG
-					const SVG_W = 1280;
-					const SVG_H = 720;
-					const Ss = Math.max(W / SVG_W, H / SVG_H);
-					const svgScaledWidth = SVG_W * Ss;
-					const svgScaledHeight = SVG_H * Ss;
-					const svgOffsetX = (svgScaledWidth - W) / 2;
-					const svgOffsetY = (svgScaledHeight - H) / 2;
+						if (!result) {
+							resetDetection("no-face");
+							return;
+						}
 
-					// Physical pixels center
-					const faceCenterVideoX = (x1 + x2) / 2;
-					const faceCenterVideoY = (y1 + y2) / 2;
-					const px = faceCenterVideoX * Sv - videoOffsetX;
-					const py = faceCenterVideoY * Sv - videoOffsetY;
+						const [x1, y1, x2, y2] = result.bbox;
+						const width = x2 - x1;
+						const height = y2 - y1;
+						const vw = video.videoWidth;
+						const vh = video.videoHeight;
+						const W = video.clientWidth;
+						const H = video.clientHeight;
 
-					// Map physical to SVG
-					const faceCenterX = (px + svgOffsetX) / Ss;
-					const faceCenterY = (py + svgOffsetY) / Ss;
-					const faceWidth = (width * Sv) / Ss;
-					const faceHeight = (height * Sv) / Ss;
+						if (vw === 0 || vh === 0 || W === 0 || H === 0) {
+							resetDetection();
+							return;
+						}
 
-					// Check if face center is inside the oval
-					const cfg = frameRef.current;
-					const dxCenter = (faceCenterX - cfg.cx) / cfg.rx;
-					const dyCenter = (faceCenterY - cfg.cy) / cfg.ry;
-					const isCenterInOval =
-						dxCenter * dxCenter + dyCenter * dyCenter <=
-						cfg.centerTolerance * cfg.centerTolerance;
+						// Calculate Display Scale for Video
+						const Sv = Math.max(W / vw, H / vh);
+						const videoScaledWidth = vw * Sv;
+						const videoScaledHeight = vh * Sv;
+						const videoOffsetX = (videoScaledWidth - W) / 2;
+						const videoOffsetY = (videoScaledHeight - H) / 2;
 
-					// Face size checks
-					const guideWidth = cfg.rx * 2;
-					const guideHeight = cfg.ry * 2;
-					const minFaceWidth = Math.max(SVG_W * cfg.minFace, guideWidth * 0.5);
-					const minFaceHeight = guideHeight * 0.55;
-					const isLargeEnough = faceWidth >= minFaceWidth;
-					const isTallEnough = faceHeight >= minFaceHeight;
+						// Calculate Display Scale for SVG
+						const SVG_W = 1280;
+						const SVG_H = 720;
+						const Ss = Math.max(W / SVG_W, H / SVG_H);
+						const svgScaledWidth = SVG_W * Ss;
+						const svgScaledHeight = SVG_H * Ss;
+						const svgOffsetX = (svgScaledWidth - W) / 2;
+						const svgOffsetY = (svgScaledHeight - H) / 2;
 
-					const maxFaceWidth = guideWidth * cfg.maxScale;
-					const isNotTooLarge = faceWidth <= maxFaceWidth;
+						// Physical pixels center
+						const faceCenterVideoX = (x1 + x2) / 2;
+						const faceCenterVideoY = (y1 + y2) / 2;
+						const px = faceCenterVideoX * Sv - videoOffsetX;
+						const py = faceCenterVideoY * Sv - videoOffsetY;
 
-					const isInFrame =
-						isCenterInOval && isLargeEnough && isTallEnough && isNotTooLarge;
+						// Map physical to SVG
+						const faceCenterX = (px + svgOffsetX) / Ss;
+						const faceCenterY = (py + svgOffsetY) / Ss;
+						const faceWidth = (width * Sv) / Ss;
+						const faceHeight = (height * Sv) / Ss;
 
-					/*
+						// Check if face center is inside the oval
+						const cfg = frameRef.current;
+						const dxCenter = (faceCenterX - cfg.cx) / cfg.rx;
+						const dyCenter = (faceCenterY - cfg.cy) / cfg.ry;
+						const isCenterInOval =
+							dxCenter * dxCenter + dyCenter * dyCenter <=
+							cfg.centerTolerance * cfg.centerTolerance;
+
+						// Face size checks
+						const guideWidth = cfg.rx * 2;
+						const guideHeight = cfg.ry * 2;
+						const minFaceWidth = Math.max(
+							SVG_W * cfg.minFace,
+							guideWidth * 0.5,
+						);
+						const minFaceHeight = guideHeight * 0.55;
+						const isLargeEnough = faceWidth >= minFaceWidth;
+						const isTallEnough = faceHeight >= minFaceHeight;
+
+						const maxFaceWidth = guideWidth * cfg.maxScale;
+						const isNotTooLarge = faceWidth <= maxFaceWidth;
+
+						const isInFrame =
+							isCenterInOval && isLargeEnough && isTallEnough && isNotTooLarge;
+
+						/*
 					Anti-spoofing & liveness flow preserved for future use:
 
 					const isLive = result.liveness.isReal;
@@ -499,35 +858,39 @@ function VerifyingState({
 					}
 					*/
 
-					setFaceInFrame(isInFrame);
-					setLivenessScore(null);
-					setStabilityScore(0);
+						setFaceInFrame(isInFrame);
+						setLivenessScore(null);
+						setStabilityScore(0);
 
-					if (!isInFrame) {
-						setLivenessStatus("out-of-frame");
-					} else {
-						setLivenessStatus("real");
+						if (!isInFrame) {
+							setLivenessStatus("out-of-frame");
+						} else {
+							setLivenessStatus("real");
+						}
+					} catch (error) {
+						livenessDisabledRef.current = true;
+
+						if (!hasLoggedLivenessErrorRef.current) {
+							const message =
+								error instanceof Error ? error.message : String(error);
+							console.warn(`Face detection disabled: ${message}`);
+							hasLoggedLivenessErrorRef.current = true;
+						}
+
+						if (mounted) {
+							setFaceInFrame(false);
+							setLivenessStatus("error");
+						}
+
+						if (intervalId) clearInterval(intervalId);
+					} finally {
+						isProcessingRef.current = false;
 					}
-				} catch (error) {
-					livenessDisabledRef.current = true;
-
-					if (!hasLoggedLivenessErrorRef.current) {
-						const message =
-							error instanceof Error ? error.message : String(error);
-						console.warn(`Face detection disabled: ${message}`);
-						hasLoggedLivenessErrorRef.current = true;
-					}
-
-					if (mounted) {
-						setFaceInFrame(false);
-						setLivenessStatus("error");
-					}
-
-					if (intervalId) clearInterval(intervalId);
-				} finally {
-					isProcessingRef.current = false;
-				}
-			}, 300);
+				},
+				isMobile
+					? FACE_DETECTION_INTERVAL_MOBILE_MS
+					: FACE_DETECTION_INTERVAL_DESKTOP_MS,
+			);
 		}
 
 		loadAndDetect();
@@ -538,9 +901,8 @@ function VerifyingState({
 			detectorRef.current = null;
 			setFaceInFrame(false);
 		};
-	}, [setFaceInFrame, webcamRef]);
+	}, [isMobile, resetDetection, webcamRef]);
 
-	const { permissionGrantedTime } = useVerification();
 	const borderColor = faceInFrame ? "#16A34A" : "#DC2626";
 	const statusMeta = getLivenessStatusMeta(
 		livenessStatus,
@@ -554,16 +916,32 @@ function VerifyingState({
 			<div className="relative w-full max-w-lg mb-8 rounded-xl bg-gray-900 aspect-3/4 sm:aspect-video">
 				{/* Webcam + SVG overlay wrapper (clips video to rounded corners) */}
 				<div className="absolute inset-0 rounded-xl overflow-hidden">
-					<Webcam
-						key={permissionGrantedTime || "webcam-default"}
-						className="absolute inset-0 w-full h-full object-cover"
-						audio={false}
-						ref={webcamRef}
-						screenshotFormat="image/jpeg"
-						screenshotQuality={1}
-						mirrored
-						videoConstraints={videoConstraints}
-					/>
+					{cameraMounted && (
+						<Webcam
+							key={`face-camera-${cameraInstanceKey}`}
+							className="absolute inset-0 w-full h-full object-cover"
+							audio={false}
+							ref={webcamRef}
+							screenshotFormat="image/jpeg"
+							screenshotQuality={1}
+							mirrored
+							style={{
+								transform: "translateZ(0)",
+								backfaceVisibility: "hidden",
+								WebkitBackfaceVisibility: "hidden",
+								willChange: "transform",
+							}}
+							videoConstraints={CAMERA_VIDEO_CONSTRAINTS[cameraConstraintIndex]}
+							onUserMedia={handleUserMedia}
+							onUserMediaError={handleUserMediaError}
+							onLoadedMetadata={verifyCameraPlayback}
+							onPlaying={verifyCameraPlayback}
+							onPause={verifyCameraPlayback}
+							onEnded={handleVideoInterrupted}
+							onStalled={verifyCameraPlayback}
+							onWaiting={verifyCameraPlayback}
+						/>
+					)}
 					{/* Human face outline frame overlay */}
 					<svg
 						className="absolute inset-0 w-full h-full pointer-events-none"
@@ -594,6 +972,64 @@ function VerifyingState({
 						/>
 					</svg>
 				</div>
+				{!submitting && (!cameraStream || cameraFailed) && (
+					<div
+						className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-xl bg-gray-950/70 px-6 text-white"
+						role={cameraFailed ? "alert" : "status"}>
+						{cameraFailed ? (
+							<>
+								<p className="text-sm font-semibold">
+									Kamera tidak dapat diakses. Tutup tab verifikasi lain atau
+									aplikasi yang sedang menggunakan kamera, lalu coba kembali.
+								</p>
+								<div className="flex flex-wrap items-center justify-center gap-2">
+									<button
+										type="button"
+										onClick={retryCamera}
+										className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#101828]">
+										<RefreshCw className="h-4 w-4" />
+										Coba lagi
+									</button>
+									<button
+										type="button"
+										onClick={onBackToTicket}
+										className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-white/10">
+										<ArrowLeft className="h-4 w-4" />
+										Kembali ke tiket
+									</button>
+								</div>
+							</>
+						) : (
+							<>
+								<Loader2 className="h-8 w-8 animate-spin" />
+								<p className="text-sm font-medium">Menyiapkan kamera...</p>
+							</>
+						)}
+					</div>
+				)}
+				{submitting && (
+					<div
+						className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 rounded-xl bg-gray-950/70 text-white backdrop-blur-sm"
+						role="status"
+						aria-live="polite">
+						<Loader2 className="h-10 w-10 animate-spin" />
+						<div>
+							<p className="text-sm font-semibold">Mengirim data wajah...</p>
+							<p className="mt-1 text-xs text-white/75">
+								Mohon tunggu dan jangan tutup halaman.
+							</p>
+						</div>
+					</div>
+				)}
+				{!submitting && cameraStream && !cameraFailed && (
+					<button
+						type="button"
+						onClick={retryCamera}
+						aria-label="Muat ulang kamera"
+						className="absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
+						<RefreshCw className="h-4 w-4" />
+					</button>
+				)}
 				{/* Liveness status badge – top-right on mobile, bottom-center on desktop */}
 				<div
 					className={`absolute text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm z-10 ${statusMeta.className}`}

@@ -11,8 +11,8 @@ import { Modal } from "./Modal";
  */
 async function tryGetUserMedia(): Promise<MediaStream> {
 	const constraints: MediaStreamConstraints[] = [
-		{ video: { facingMode: { ideal: "user" } }, audio: true },
-		{ video: true, audio: true },
+		{ video: { facingMode: { ideal: "user" } } },
+		{ video: true },
 	];
 
 	let lastError: unknown;
@@ -32,6 +32,13 @@ async function tryGetUserMedia(): Promise<MediaStream> {
 		}
 	}
 	throw lastError;
+}
+
+async function releaseMediaStream(stream: MediaStream) {
+	stream.getTracks().forEach((track) => track.stop());
+	// Some mobile camera drivers need a moment before another page can acquire
+	// the camera without returning a live-but-black stream.
+	await new Promise((resolve) => setTimeout(resolve, 900));
 }
 
 export function PermissionPopup() {
@@ -63,23 +70,18 @@ export function PermissionPopup() {
 			// Try the Permissions API first (Chrome, Edge)
 			if (navigator.permissions?.query) {
 				try {
-					const [camResult, micResult] = await Promise.all([
-						navigator.permissions.query({
-							name: "camera" as PermissionName,
-						}),
-						navigator.permissions.query({
-							name: "microphone" as PermissionName,
-						}),
-					]);
+					const camResult = await navigator.permissions.query({
+						name: "camera" as PermissionName,
+					});
 
-					if (camResult.state === "granted" && micResult.state === "granted") {
+					if (camResult.state === "granted") {
 						// Already granted — skip popup
 						setPermissionGrantedTime(Date.now());
 						setIsChecking(false);
 						return;
 					}
 
-					if (camResult.state === "denied" || micResult.state === "denied") {
+					if (camResult.state === "denied") {
 						setDenied(true);
 						setShow(true);
 						setIsChecking(false);
@@ -99,7 +101,7 @@ export function PermissionPopup() {
 			// Fallback for Safari: do a quick getUserMedia probe
 			try {
 				const stream = await tryGetUserMedia();
-				stream.getTracks().forEach((t) => t.stop());
+				await releaseMediaStream(stream);
 				// Permission was already granted (or user just granted it)
 				setPermissionGrantedTime(Date.now());
 				setIsChecking(false);
@@ -137,7 +139,7 @@ export function PermissionPopup() {
 			const stream = await tryGetUserMedia();
 
 			// Stop tracks — we only needed to trigger the permission prompt
-			stream.getTracks().forEach((t) => t.stop());
+			await releaseMediaStream(stream);
 
 			setShow(false);
 			setDenied(false);
@@ -149,11 +151,11 @@ export function PermissionPopup() {
 				setDenied(true);
 				setShow(true);
 			} else if (e.name === "NotFoundError" || e.name === "NotReadableError") {
-				// No camera/mic hardware found, or device is in use
+				// No camera hardware found, or device is in use
 				setDenied(true);
 				setShow(true);
 			} else {
-				setErrorMsg("Gagal mengakses kamera/mikrofon.");
+				setErrorMsg("Gagal mengakses kamera.");
 			}
 		}
 	};
@@ -182,8 +184,7 @@ export function PermissionPopup() {
 				style={{ zIndex: 9999 }}>
 				<div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200">
 					<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
-						<Camera className="w-6 h-6 text-[#3b5bdb] absolute -ml-4 -mt-2" />
-						<Mic className="w-6 h-6 text-[#3b5bdb] absolute ml-4 mt-2" />
+						<Camera className="w-6 h-6 text-[#3b5bdb]" />
 					</div>
 
 					<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
@@ -192,8 +193,8 @@ export function PermissionPopup() {
 
 					<p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
 						{denied
-							? "Anda telah menolak akses kamera atau mikrofon. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
-							: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera dan mikrofon Anda."}
+							? "Anda telah menolak akses kamera. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
+							: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera Anda."}
 					</p>
 
 					{denied ? (
@@ -202,7 +203,7 @@ export function PermissionPopup() {
 								<ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
 								<p>
 									Silakan buka pengaturan situs (ikon gembok di URL bar) dan
-									izinkan Kamera & Mikrofon.
+									izinkan Kamera.
 								</p>
 							</div>
 							<button
