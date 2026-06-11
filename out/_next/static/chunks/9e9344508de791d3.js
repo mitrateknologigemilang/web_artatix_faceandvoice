@@ -1,0 +1,2790 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,66698,(e,r,i)=>{var a;e.e,a=e.r(71645),r.exports=function(e){var r={};function i(a){if(r[a])return r[a].exports;var n=r[a]={i:a,l:!1,exports:{}};return e[a].call(n.exports,n,n.exports,i),n.l=!0,n.exports}return i.m=e,i.c=r,i.d=function(e,r,a){i.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:a})},i.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},i.t=function(e,r){if(1&r&&(e=i(e)),8&r||4&r&&"object"==typeof e&&e&&e.__esModule)return e;var a=Object.create(null);if(i.r(a),Object.defineProperty(a,"default",{enumerable:!0,value:e}),2&r&&"string"!=typeof e)for(var n in e)i.d(a,n,(function(r){return e[r]}).bind(null,n));return a},i.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return i.d(r,"a",r),r},i.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},i.p="",i(i.s="./src/react-webcam.tsx")}({"./src/react-webcam.tsx":function(e,r,i){"use strict";i.r(r);var a,n=i("react"),s=(a=function(e,r){return(a=Object.setPrototypeOf||({__proto__:[]})instanceof Array&&function(e,r){e.__proto__=r}||function(e,r){for(var i in r)r.hasOwnProperty(i)&&(e[i]=r[i])})(e,r)},function(e,r){function i(){this.constructor=e}a(e,r),e.prototype=null===r?Object.create(r):(i.prototype=r.prototype,new i)}),o=function(){return(o=Object.assign||function(e){for(var r,i=1,a=arguments.length;i<a;i++)for(var n in r=arguments[i])Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n]);return e}).apply(this,arguments)},u=function(e,r){var i={};for(var a in e)Object.prototype.hasOwnProperty.call(e,a)&&0>r.indexOf(a)&&(i[a]=e[a]);if(null!=e&&"function"==typeof Object.getOwnPropertySymbols)for(var n=0,a=Object.getOwnPropertySymbols(e);n<a.length;n++)0>r.indexOf(a[n])&&Object.prototype.propertyIsEnumerable.call(e,a[n])&&(i[a[n]]=e[a[n]]);return i};function l(){return!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)}"undefined"!=typeof window&&(void 0===navigator.mediaDevices&&(navigator.mediaDevices={}),void 0===navigator.mediaDevices.getUserMedia&&(navigator.mediaDevices.getUserMedia=function(e){var r=navigator.getUserMedia||navigator.webkitGetUserMedia||navigator.mozGetUserMedia||navigator.msGetUserMedia;return r?new Promise(function(i,a){r.call(navigator,e,i,a)}):Promise.reject(Error("getUserMedia is not implemented in this browser"))})),r.default=function(e){function r(r){var i=e.call(this,r)||this;return i.canvas=null,i.ctx=null,i.requestUserMediaId=0,i.unmounted=!1,i.state={hasUserMedia:!1},i}return s(r,e),r.prototype.componentDidMount=function(){var e=this.state,r=this.props;(this.unmounted=!1,l())?(e.hasUserMedia||this.requestUserMedia(),r.children&&"function"!=typeof r.children&&console.warn("children must be a function")):r.onUserMediaError("getUserMedia not supported")},r.prototype.componentDidUpdate=function(e){var r=this.props;if(!l())return void r.onUserMediaError("getUserMedia not supported");var i=JSON.stringify(e.audioConstraints)!==JSON.stringify(r.audioConstraints),a=JSON.stringify(e.videoConstraints)!==JSON.stringify(r.videoConstraints),n=e.minScreenshotWidth!==r.minScreenshotWidth,s=e.minScreenshotHeight!==r.minScreenshotHeight;(a||n||s)&&(this.canvas=null,this.ctx=null),(i||a)&&(this.stopAndCleanup(),this.requestUserMedia())},r.prototype.componentWillUnmount=function(){this.unmounted=!0,this.stopAndCleanup()},r.stopMediaStream=function(e){e&&(e.getVideoTracks&&e.getAudioTracks?(e.getVideoTracks().map(function(r){e.removeTrack(r),r.stop()}),e.getAudioTracks().map(function(r){e.removeTrack(r),r.stop()})):e.stop())},r.prototype.stopAndCleanup=function(){var e=this.state;e.hasUserMedia&&(r.stopMediaStream(this.stream),e.src&&window.URL.revokeObjectURL(e.src))},r.prototype.getScreenshot=function(e){var r=this.state,i=this.props;if(!r.hasUserMedia)return null;var a=this.getCanvas(e);return a&&a.toDataURL(i.screenshotFormat,i.screenshotQuality)},r.prototype.getCanvas=function(e){var r=this.state,i=this.props;if(!this.video||!r.hasUserMedia||!this.video.videoHeight)return null;if(!this.ctx){var a=this.video.videoWidth,n=this.video.videoHeight;if(!this.props.forceScreenshotSourceSize){var s=a/n;n=(a=i.minScreenshotWidth||this.video.clientWidth)/s,i.minScreenshotHeight&&n<i.minScreenshotHeight&&(a=(n=i.minScreenshotHeight)*s)}this.canvas=document.createElement("canvas"),this.canvas.width=(null==e?void 0:e.width)||a,this.canvas.height=(null==e?void 0:e.height)||n,this.ctx=this.canvas.getContext("2d")}var o=this.ctx,u=this.canvas;return o&&u&&(u.width=(null==e?void 0:e.width)||u.width,u.height=(null==e?void 0:e.height)||u.height,i.mirrored&&(o.translate(u.width,0),o.scale(-1,1)),o.imageSmoothingEnabled=i.imageSmoothing,o.drawImage(this.video,0,0,(null==e?void 0:e.width)||u.width,(null==e?void 0:e.height)||u.height),i.mirrored&&(o.scale(-1,1),o.translate(-u.width,0))),u},r.prototype.requestUserMedia=function(){var e=this,i=this.props,a=function(a,n){var s={video:void 0===n||n};i.audio&&(s.audio=void 0===a||a),e.requestUserMediaId++;var o=e.requestUserMediaId;navigator.mediaDevices.getUserMedia(s).then(function(i){e.unmounted||o!==e.requestUserMediaId?r.stopMediaStream(i):e.handleUserMedia(null,i)}).catch(function(r){e.handleUserMedia(r)})};if("mediaDevices"in navigator)a(i.audioConstraints,i.videoConstraints);else{var n=function(e){return{optional:[{sourceId:e}]}},s=function(e){var r=e.deviceId;return"string"==typeof r?r:Array.isArray(r)&&r.length>0?r[0]:"object"==typeof r&&r.ideal?r.ideal:null};MediaStreamTrack.getSources(function(e){var r=null,o=null;e.forEach(function(e){"audio"===e.kind?r=e.id:"video"===e.kind&&(o=e.id)});var u=s(i.audioConstraints);u&&(r=u);var l=s(i.videoConstraints);l&&(o=l),a(n(r),n(o))})}},r.prototype.handleUserMedia=function(e,r){var i=this.props;if(e||!r){this.setState({hasUserMedia:!1}),i.onUserMediaError(e);return}this.stream=r;try{this.video&&(this.video.srcObject=r),this.setState({hasUserMedia:!0})}catch(e){this.setState({hasUserMedia:!0,src:window.URL.createObjectURL(r)})}i.onUserMedia(r)},r.prototype.render=function(){var e=this,r=this.state,i=this.props,a=i.audio,s=(i.forceScreenshotSourceSize,i.disablePictureInPicture),l=(i.onUserMedia,i.onUserMediaError,i.screenshotFormat,i.screenshotQuality,i.minScreenshotWidth,i.minScreenshotHeight,i.audioConstraints,i.videoConstraints,i.imageSmoothing,i.mirrored),d=i.style,p=void 0===d?{}:d,c=i.children,h=u(i,["audio","forceScreenshotSourceSize","disablePictureInPicture","onUserMedia","onUserMediaError","screenshotFormat","screenshotQuality","minScreenshotWidth","minScreenshotHeight","audioConstraints","videoConstraints","imageSmoothing","mirrored","style","children"]),f=l?o(o({},p),{transform:(p.transform||"")+" scaleX(-1)"}):p,m={getScreenshot:this.getScreenshot.bind(this)};return n.createElement(n.Fragment,null,n.createElement("video",o({autoPlay:!0,disablePictureInPicture:s,src:r.src,muted:!a,playsInline:!0,ref:function(r){e.video=r},style:f},h)),c&&c(m))},r.defaultProps={audio:!1,disablePictureInPicture:!1,forceScreenshotSourceSize:!1,imageSmoothing:!0,mirrored:!1,onUserMedia:function(){},onUserMediaError:function(){},screenshotFormat:"image/webp",screenshotQuality:.92},r}(n.Component)},react:function(e,r){e.exports=a}}).default},19489,e=>{e.v("/_next/static/media/ort.bundle.min.853d3079.mjs")},3789,e=>{e.v("/_next/static/media/ort-wasm-simd-threaded.jsep.da6634e6.wasm")},11559,e=>{"use strict";var r=e.i(43476),i=e.i(71645),a=e.i(63209),n=e.i(68553),s=e.i(75254);let o=(0,s.default)("shield",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}]]);var u=e.i(16715),l=e.i(71689);let d=(0,s.default)("scan-face",[["path",{d:"M3 7V5a2 2 0 0 1 2-2h2",key:"aa7l1z"}],["path",{d:"M17 3h2a2 2 0 0 1 2 2v2",key:"4qcy5o"}],["path",{d:"M21 17v2a2 2 0 0 1-2 2h-2",key:"6vwrx8"}],["path",{d:"M7 21H5a2 2 0 0 1-2-2v-2",key:"ioqczr"}],["path",{d:"M8 14s1.5 2 4 2 4-2 4-2",key:"1y1vjs"}],["path",{d:"M9 9h.01",key:"1q5me6"}],["path",{d:"M15 9h.01",key:"x1ddxp"}]]);var p=e.i(73884),c=e.i(52571),h=e.i(31278);let f=(0,s.default)("ticket-x",[["path",{d:"M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z",key:"qn84l0"}],["path",{d:"m9.5 14.5 5-5",key:"qviqfa"}],["path",{d:"m9.5 9.5 5 5",key:"18nt4w"}]]),m=(0,s.default)("send",[["path",{d:"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",key:"1ffxy3"}],["path",{d:"m21.854 2.147-10.94 10.939",key:"12cjpa"}]]),g=(0,s.default)("maximize-2",[["path",{d:"M15 3h6v6",key:"1q9fwt"}],["path",{d:"m21 3-7 7",key:"1l2asr"}],["path",{d:"m3 21 7-7",key:"tjx5ai"}],["path",{d:"M9 21H3v-6",key:"wtvkvv"}]]);var y=e.i(37727);let b=({color:e="currentColor",size:r=24,className:a,...n})=>i.default.createElement("svg",{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg",width:r,height:r,fill:e,...n,className:"remixicon "+(a||"")},i.default.createElement("path",{d:"M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM8 13C8 15.2091 9.79086 17 12 17C14.2091 17 16 15.2091 16 13H8ZM8 11C8.82843 11 9.5 10.3284 9.5 9.5C9.5 8.67157 8.82843 8 8 8C7.17157 8 6.5 8.67157 6.5 9.5C6.5 10.3284 7.17157 11 8 11ZM16 11C16.8284 11 17.5 10.3284 17.5 9.5C17.5 8.67157 16.8284 8 16 8C15.1716 8 14.5 8.67157 14.5 9.5C14.5 10.3284 15.1716 11 16 11Z"})),_=({color:e="currentColor",size:r=24,className:a,...n})=>i.default.createElement("svg",{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg",width:r,height:r,fill:e,...n,className:"remixicon "+(a||"")},i.default.createElement("path",{d:"M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"})),$=({color:e="currentColor",size:r=24,className:a,...n})=>i.default.createElement("svg",{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg",width:r,height:r,fill:e,...n,className:"remixicon "+(a||"")},i.default.createElement("path",{d:"M12.4851 3.12124L20.2425 5.0606C20.6877 5.1719 21 5.57188 21 6.03075V6.99952L22 6.99997C23.1 6.99997 24 7.89997 24 8.99997V12C24 13.6568 22.6569 15 21 15L20.5789 15.0003C20.0443 16.3501 19.0275 17.4862 17.6833 18.1583L12.8944 20.5528C12.3314 20.8343 11.6686 20.8343 11.1056 20.5528L6.31672 18.1583C4.97252 17.4862 3.95573 16.3501 3.42113 15.0003L3 15C1.34315 15 0 13.6568 0 12V8.99997C0 7.8954 0.89543 6.99997 2 6.99997L3 6.99952V6.03075C3 5.57188 3.3123 5.1719 3.75746 5.0606L11.5149 3.12124C11.8334 3.04162 12.1666 3.04162 12.4851 3.12124ZM12 5.06152L5 6.81152V12.7918C5 14.3069 5.85601 15.6919 7.21115 16.3695L12 18.7639L16.7889 16.3695C18.144 15.6919 19 14.3069 19 12.7918V6.81152L12 5.06152ZM3 8.99997H2V12C2 12.5523 2.44772 13 3 13V8.99997ZM22 8.99997H21V13C21.5523 13 22 12.5523 22 12V8.99997Z"}));var v=e.i(66698),w=e.i(18566),x=e.i(28988),k=e.i(76639);let S={get url(){return`file://${e.P("node_modules/onnxruntime-web/dist/ort.bundle.min.mjs")}`}};var T,I,C,E,z,A,O,M,R,N,B,D,U,P,L,q,W,j,V,G,F,H,K,Z,X,Q,Y,J,ee,et,er,ei,ea,en=Object.defineProperty,es=Object.getOwnPropertyDescriptor,eo=Object.getOwnPropertyNames,eu=Object.prototype.hasOwnProperty,el=e.z,ed=(e,r)=>()=>(e&&(r=e(e=0)),r),ep=(e,r)=>{for(var i in r)en(e,i,{get:r[i],enumerable:!0})},ec=e=>((e,r,i,a)=>{if(r&&"object"==typeof r||"function"==typeof r)for(let n of eo(r))eu.call(e,n)||n===i||en(e,n,{get:()=>r[n],enumerable:!(a=es(r,n))||a.enumerable});return e})(en({},"__esModule",{value:!0}),e),eh=ed(()=>{T=new Map,I=[],C=(e,r,i)=>{if(r&&"function"==typeof r.init&&"function"==typeof r.createInferenceSessionHandler){let a=T.get(e);if(void 0===a)T.set(e,{backend:r,priority:i});else{if(a.priority>i)return;if(a.priority===i&&a.backend!==r)throw Error(`cannot register backend "${e}" using priority ${i}`)}if(i>=0){let r=I.indexOf(e);-1!==r&&I.splice(r,1);for(let r=0;r<I.length;r++)if(T.get(I[r]).priority<=i)return void I.splice(r,0,e);I.push(e)}return}throw TypeError("not a valid backend")},E=async e=>{let r=T.get(e);if(!r)return"backend not found.";if(r.initialized)return r.backend;if(r.aborted)return r.error;{let i=!!r.initPromise;try{return i||(r.initPromise=r.backend.init(e)),await r.initPromise,r.initialized=!0,r.backend}catch(e){return i||(r.error=`${e}`,r.aborted=!0),r.error}finally{delete r.initPromise}}},z=async e=>{let r=e.executionProviders||[],i=r.map(e=>"string"==typeof e?e:e.name),a=0===i.length?I:i,n,s=[],o=new Set;for(let e of a){let r=await E(e);"string"==typeof r?s.push({name:e,err:r}):(n||(n=r),n===r&&o.add(e))}if(!n)throw Error(`no available backend found. ERR: ${s.map(e=>`[${e.name}] ${e.err}`).join(", ")}`);for(let{name:e,err:r}of s)i.includes(e)&&console.warn(`removing requested execution provider "${e}" from session options because it is not available: ${r}`);let u=r.filter(e=>o.has("string"==typeof e?e:e.name));return[n,new Proxy(e,{get:(e,r)=>"executionProviders"===r?u:Reflect.get(e,r)})]}}),ef=ed(()=>{eh()}),em=ed(()=>{A="1.26.0"}),eg=ed(()=>{em(),O="warning",Object.defineProperty(M={wasm:{},webgl:{},webgpu:{},versions:{common:A},set logLevel(t){if(void 0!==t){if("string"!=typeof t||-1===["verbose","info","warning","error","fatal"].indexOf(t))throw Error(`Unsupported logging level: ${t}`);O=t}},get logLevel(){return O}},"logLevel",{enumerable:!0})}),ey=ed(()=>{eg(),R=M}),eb=ed(()=>{N=(e,r)=>{let i="u">typeof document?document.createElement("canvas"):new OffscreenCanvas(1,1);i.width=e.dims[3],i.height=e.dims[2];let a=i.getContext("2d");if(null!=a){let n,s;r?.tensorLayout!==void 0&&"NHWC"===r.tensorLayout?(n=e.dims[2],s=e.dims[3]):(n=e.dims[3],s=e.dims[2]);let o=r?.format!==void 0?r.format:"RGB",u=r?.norm,l,d;void 0===u||void 0===u.mean?l=[255,255,255,255]:"number"==typeof u.mean?l=[u.mean,u.mean,u.mean,u.mean]:(l=[u.mean[0],u.mean[1],u.mean[2],0],void 0!==u.mean[3]&&(l[3]=u.mean[3])),void 0===u||void 0===u.bias?d=[0,0,0,0]:"number"==typeof u.bias?d=[u.bias,u.bias,u.bias,u.bias]:(d=[u.bias[0],u.bias[1],u.bias[2],0],void 0!==u.bias[3]&&(d[3]=u.bias[3]));let p=s*n,c=0,h=p,f=2*p,m=-1;"RGBA"===o?(c=0,h=p,f=2*p,m=3*p):"RGB"===o?(c=0,h=p,f=2*p):"RBG"===o&&(c=0,f=p,h=2*p);for(let r=0;r<s;r++)for(let i=0;i<n;i++)a.fillStyle="rgba("+(e.data[c++]-d[0])*l[0]+","+(e.data[h++]-d[1])*l[1]+","+(e.data[f++]-d[2])*l[2]+","+(-1===m?255:(e.data[m++]-d[3])*l[3])+")",a.fillRect(i,r,1,1);if("toDataURL"in i)return i.toDataURL();throw Error("toDataURL is not supported")}throw Error("Can not access image data")},B=(e,r)=>{let i="u">typeof document?document.createElement("canvas").getContext("2d"):new OffscreenCanvas(1,1).getContext("2d"),a;if(null!=i){let n,s,o;r?.tensorLayout!==void 0&&"NHWC"===r.tensorLayout?(n=e.dims[2],s=e.dims[1],o=e.dims[3]):(n=e.dims[3],s=e.dims[2],o=e.dims[1]);let u=void 0!==r&&void 0!==r.format?r.format:"RGB",l=r?.norm,d,p;void 0===l||void 0===l.mean?d=[255,255,255,255]:"number"==typeof l.mean?d=[l.mean,l.mean,l.mean,l.mean]:(d=[l.mean[0],l.mean[1],l.mean[2],255],void 0!==l.mean[3]&&(d[3]=l.mean[3])),void 0===l||void 0===l.bias?p=[0,0,0,0]:"number"==typeof l.bias?p=[l.bias,l.bias,l.bias,l.bias]:(p=[l.bias[0],l.bias[1],l.bias[2],0],void 0!==l.bias[3]&&(p[3]=l.bias[3]));let c=s*n;if(void 0!==r&&(void 0!==r.format&&4===o&&"RGBA"!==r.format||3===o&&"RGB"!==r.format&&"BGR"!==r.format))throw Error("Tensor format doesn't match input tensor dims");let h=0,f=1,m=2,g=3,y=0,b=c,_=2*c,$=-1;"RGBA"===u?(y=0,b=c,_=2*c,$=3*c):"RGB"===u?(y=0,b=c,_=2*c):"RBG"===u&&(y=0,_=c,b=2*c),a=i.createImageData(n,s);for(let r=0;r<s*n;h+=4,f+=4,m+=4,g+=4,r++)a.data[h]=(e.data[y++]-p[0])*d[0],a.data[f]=(e.data[b++]-p[1])*d[1],a.data[m]=(e.data[_++]-p[2])*d[2],a.data[g]=-1===$?255:(e.data[$++]-p[3])*d[3]}else throw Error("Can not access image data");return a}}),e_=ed(()=>{ew(),D=(e,r)=>{if(void 0===e)throw Error("Image buffer must be defined");if(void 0===r.height||void 0===r.width)throw Error("Image height and width must be defined");if("NHWC"===r.tensorLayout)throw Error("NHWC Tensor layout is not supported yet");let{height:i,width:a}=r,n=r.norm??{mean:255,bias:0},s,o;s="number"==typeof n.mean?[n.mean,n.mean,n.mean,n.mean]:[n.mean[0],n.mean[1],n.mean[2],n.mean[3]??255],o="number"==typeof n.bias?[n.bias,n.bias,n.bias,n.bias]:[n.bias[0],n.bias[1],n.bias[2],n.bias[3]??0];let u=void 0!==r.format?r.format:"RGBA",l=void 0!==r.tensorFormat&&void 0!==r.tensorFormat?r.tensorFormat:"RGB",d=i*a,p=new Float32Array("RGBA"===l?4*d:3*d),c=4,h=0,f=1,m=2,g=3,y=0,b=d,_=2*d,$=-1;"RGB"===u&&(c=3,h=0,f=1,m=2,g=-1),"RGBA"===l?$=3*d:"RBG"===l?(y=0,_=d,b=2*d):"BGR"===l&&(_=0,b=d,y=2*d);for(let r=0;r<d;r++,h+=c,m+=c,f+=c,g+=c)p[y++]=(e[h]+o[0])/s[0],p[b++]=(e[f]+o[1])/s[1],p[_++]=(e[m]+o[2])/s[2],-1!==$&&-1!==g&&(p[$++]=(e[g]+o[3])/s[3]);return"RGBA"===l?new Z("float32",p,[1,4,i,a]):new Z("float32",p,[1,3,i,a])},U=async(e,r)=>{let i="u">typeof HTMLImageElement&&e instanceof HTMLImageElement,a="u">typeof ImageData&&e instanceof ImageData,n="u">typeof ImageBitmap&&e instanceof ImageBitmap,s="string"==typeof e,o,u=r??{},l=()=>{if("u">typeof document)return document.createElement("canvas");if("u">typeof OffscreenCanvas)return new OffscreenCanvas(1,1);throw Error("Canvas is not supported")},d=e=>"u">typeof HTMLCanvasElement&&e instanceof HTMLCanvasElement||e instanceof OffscreenCanvas?e.getContext("2d"):null;if(i){let i=l();i.width=e.width,i.height=e.height;let a=d(i);if(null!=a){let i=e.height,n=e.width;if(void 0!==r&&void 0!==r.resizedHeight&&void 0!==r.resizedWidth&&(i=r.resizedHeight,n=r.resizedWidth),void 0!==r){if(u=r,void 0!==r.tensorFormat)throw Error("Image input config format must be RGBA for HTMLImageElement");u.tensorFormat="RGBA",u.height=i,u.width=n}else u.tensorFormat="RGBA",u.height=i,u.width=n;a.drawImage(e,0,0),o=a.getImageData(0,0,n,i).data}else throw Error("Can not access image data")}else if(a){let i,a;if(void 0!==r&&void 0!==r.resizedWidth&&void 0!==r.resizedHeight?(i=r.resizedHeight,a=r.resizedWidth):(i=e.height,a=e.width),void 0!==r&&(u=r),u.format="RGBA",u.height=i,u.width=a,void 0!==r){let r=l();r.width=a,r.height=i;let n=d(r);if(null!=n)n.putImageData(e,0,0),o=n.getImageData(0,0,a,i).data;else throw Error("Can not access image data")}else o=e.data}else if(n){if(void 0===r)throw Error("Please provide image config with format for Imagebitmap");let i=l();i.width=e.width,i.height=e.height;let a=d(i);if(null!=a){let r=e.height,i=e.width;return a.drawImage(e,0,0,i,r),o=a.getImageData(0,0,i,r).data,u.height=r,u.width=i,D(o,u)}throw Error("Can not access image data")}else{if(s)return new Promise((r,i)=>{let a=l(),n=d(a);if(!e||!n)return i();let s=new Image;s.crossOrigin="Anonymous",s.src=e,s.onload=()=>{a.width=s.width,a.height=s.height,n.drawImage(s,0,0,a.width,a.height);let e=n.getImageData(0,0,a.width,a.height);u.height=a.height,u.width=a.width,r(D(e.data,u))}});throw Error("Input data provided is not supported - aborted tensor creation")}if(void 0!==o)return D(o,u);throw Error("Input data provided is not supported - aborted tensor creation")},P=(e,r)=>{let{width:i,height:a,download:n,dispose:s}=r;return new Z({location:"texture",type:"float32",texture:e,dims:[1,a,i,4],download:n,dispose:s})},L=(e,r)=>{let{dataType:i,dims:a,download:n,dispose:s}=r;return new Z({location:"gpu-buffer",type:i??"float32",gpuBuffer:e,dims:a,download:n,dispose:s})},q=(e,r)=>{let{dataType:i,dims:a,download:n,dispose:s}=r;return new Z({location:"ml-tensor",type:i??"float32",mlTensor:e,dims:a,download:n,dispose:s})},W=(e,r,i)=>new Z({location:"cpu-pinned",type:e,data:r,dims:i??[r.length]})}),e$=ed(()=>{j=new Map([["float32",Float32Array],["uint8",Uint8Array],["int8",Int8Array],["uint16",Uint16Array],["int16",Int16Array],["int32",Int32Array],["bool",Uint8Array],["float64",Float64Array],["uint32",Uint32Array],["int4",Uint8Array],["uint4",Uint8Array]]),V=new Map([[Float32Array,"float32"],[Uint8Array,"uint8"],[Int8Array,"int8"],[Uint16Array,"uint16"],[Int16Array,"int16"],[Int32Array,"int32"],[Float64Array,"float64"],[Uint32Array,"uint32"]]),G=!1,F=()=>{if(!G){G=!0;let e="u">typeof BigInt64Array&&BigInt64Array.from,r="u">typeof BigUint64Array&&BigUint64Array.from,i=globalThis.Float16Array,a="u">typeof i&&i.from;e&&(j.set("int64",BigInt64Array),V.set(BigInt64Array,"int64")),r&&(j.set("uint64",BigUint64Array),V.set(BigUint64Array,"uint64")),a?(j.set("float16",i),V.set(i,"float16")):j.set("float16",Uint16Array)}}}),ev=ed(()=>{ew(),H=e=>{let r=1;for(let i=0;i<e.length;i++){let a=e[i];if("number"!=typeof a||!Number.isSafeInteger(a))throw TypeError(`dims[${i}] must be an integer, got: ${a}`);if(a<0)throw RangeError(`dims[${i}] must be a non-negative integer, got: ${a}`);r*=a}return r},K=(e,r)=>{switch(e.location){case"cpu":return new Z(e.type,e.data,r);case"cpu-pinned":return new Z({location:"cpu-pinned",data:e.data,type:e.type,dims:r});case"texture":return new Z({location:"texture",texture:e.texture,type:e.type,dims:r});case"gpu-buffer":return new Z({location:"gpu-buffer",gpuBuffer:e.gpuBuffer,type:e.type,dims:r});case"ml-tensor":return new Z({location:"ml-tensor",mlTensor:e.mlTensor,type:e.type,dims:r});default:throw Error(`tensorReshape: tensor location ${e.location} is not supported`)}}}),ew=ed(()=>{eb(),e_(),e$(),ev(),Z=class{constructor(e,r,i){let a,n;if(F(),"object"==typeof e&&"location"in e)switch(this.dataLocation=e.location,a=e.type,n=e.dims,e.location){case"cpu-pinned":{let r=j.get(a);if(!r)throw TypeError(`unsupported type "${a}" to create tensor from pinned buffer`);if(!(e.data instanceof r))throw TypeError(`buffer should be of type ${r.name}`);this.cpuData=e.data;break}case"texture":if("float32"!==a)throw TypeError(`unsupported type "${a}" to create tensor from texture`);this.gpuTextureData=e.texture,this.downloader=e.download,this.disposer=e.dispose;break;case"gpu-buffer":if("float32"!==a&&"float16"!==a&&"int32"!==a&&"int64"!==a&&"uint32"!==a&&"uint8"!==a&&"bool"!==a&&"uint4"!==a&&"int4"!==a)throw TypeError(`unsupported type "${a}" to create tensor from gpu buffer`);this.gpuBufferData=e.gpuBuffer,this.downloader=e.download,this.disposer=e.dispose;break;case"ml-tensor":if("float32"!==a&&"float16"!==a&&"int32"!==a&&"int64"!==a&&"uint32"!==a&&"uint64"!==a&&"int8"!==a&&"uint8"!==a&&"bool"!==a&&"uint4"!==a&&"int4"!==a)throw TypeError(`unsupported type "${a}" to create tensor from MLTensor`);this.mlTensorData=e.mlTensor,this.downloader=e.download,this.disposer=e.dispose;break;default:throw Error(`Tensor constructor: unsupported location '${this.dataLocation}'`)}else{let s,o;if("string"==typeof e)if(a=e,o=i,"string"===e){if(!Array.isArray(r))throw TypeError("A string tensor's data must be a string array.");s=r}else{let i=j.get(e);if(void 0===i)throw TypeError(`Unsupported tensor type: ${e}.`);if(Array.isArray(r)){if("float16"===e&&i===Uint16Array||"uint4"===e||"int4"===e)throw TypeError(`Creating a ${e} tensor from number array is not supported. Please use ${i.name} as data.`);s="uint64"===e||"int64"===e?i.from(r,BigInt):i.from(r)}else if(r instanceof i)s=r;else if(r instanceof Uint8ClampedArray)if("uint8"===e)s=Uint8Array.from(r);else throw TypeError("A Uint8ClampedArray tensor's data must be type of uint8");else if("float16"===e&&r instanceof Uint16Array&&i!==Uint16Array)s=new globalThis.Float16Array(r.buffer,r.byteOffset,r.length);else throw TypeError(`A ${a} tensor's data must be type of ${i}`)}else if(o=r,Array.isArray(e)){if(0===e.length)throw TypeError("Tensor type cannot be inferred from an empty array.");let r=typeof e[0];if("string"===r)a="string",s=e;else if("boolean"===r)a="bool",s=Uint8Array.from(e);else throw TypeError(`Invalid element type of data array: ${r}.`)}else if(e instanceof Uint8ClampedArray)a="uint8",s=Uint8Array.from(e);else{let r=V.get(e.constructor);if(void 0===r)throw TypeError(`Unsupported type for tensor data: ${e.constructor}.`);a=r,s=e}if(void 0===o)o=[s.length];else if(!Array.isArray(o))throw TypeError("A tensor's dims must be a number array");n=o,this.cpuData=s,this.dataLocation="cpu"}let s=H(n);if(this.cpuData&&s!==this.cpuData.length&&("uint4"!==a&&"int4"!==a||Math.ceil(s/2)!==this.cpuData.length))throw Error(`Tensor's size(${s}) does not match data length(${this.cpuData.length}).`);this.type=a,this.dims=n,this.size=s}static async fromImage(e,r){return U(e,r)}static fromTexture(e,r){return P(e,r)}static fromGpuBuffer(e,r){return L(e,r)}static fromMLTensor(e,r){return q(e,r)}static fromPinnedBuffer(e,r,i){return W(e,r,i)}toDataURL(e){return N(this,e)}toImageData(e){return B(this,e)}get data(){if(this.ensureValid(),!this.cpuData)throw Error("The data is not on CPU. Use `getData()` to download GPU data to CPU, or use `texture` or `gpuBuffer` property to access the GPU data directly.");return this.cpuData}get location(){return this.dataLocation}get texture(){if(this.ensureValid(),!this.gpuTextureData)throw Error("The data is not stored as a WebGL texture.");return this.gpuTextureData}get gpuBuffer(){if(this.ensureValid(),!this.gpuBufferData)throw Error("The data is not stored as a WebGPU buffer.");return this.gpuBufferData}get mlTensor(){if(this.ensureValid(),!this.mlTensorData)throw Error("The data is not stored as a WebNN MLTensor.");return this.mlTensorData}async getData(e){switch(this.ensureValid(),this.dataLocation){case"cpu":case"cpu-pinned":return this.data;case"texture":case"gpu-buffer":case"ml-tensor":if(!this.downloader)throw Error("The current tensor is not created with a specified data downloader.");if(this.isDownloading)throw Error("The current tensor is being downloaded.");try{this.isDownloading=!0;let r=await this.downloader();return this.downloader=void 0,this.dataLocation="cpu",this.cpuData=r,e&&this.disposer&&(this.disposer(),this.disposer=void 0),r}finally{this.isDownloading=!1}default:throw Error(`cannot get data from location: ${this.dataLocation}`)}}dispose(){if(this.isDownloading)throw Error("The current tensor is being downloaded.");this.disposer&&(this.disposer(),this.disposer=void 0),this.cpuData=void 0,this.gpuTextureData=void 0,this.gpuBufferData=void 0,this.mlTensorData=void 0,this.downloader=void 0,this.isDownloading=void 0,this.dataLocation="none"}ensureValid(){if("none"===this.dataLocation)throw Error("The tensor is disposed.")}reshape(e){if(this.ensureValid(),this.downloader||this.disposer)throw Error("Cannot reshape a tensor that owns GPU resource.");return K(this,e)}}}),ex=ed(()=>{ew(),X=Z}),ek=ed(()=>{eg(),Q=(e,r)=>{(typeof M.trace>"u"?M.wasm.trace:M.trace)&&console.timeStamp(`${e}::ORT::${r}`)},Y=(e,r)=>{let i=Error().stack?.split(/\r\n|\r|\n/g)||[],a=!1;for(let n=0;n<i.length;n++){if(a&&!i[n].includes("TRACE_FUNC")){let a=`FUNC_${e}::${i[n].trim().split(" ")[1]}`;r&&(a+=`::${r}`),Q("CPU",a);return}i[n].includes("TRACE_FUNC")&&(a=!0)}},J=e=>{(typeof M.trace>"u"?M.wasm.trace:M.trace)&&Y("BEGIN",e)},ee=e=>{(typeof M.trace>"u"?M.wasm.trace:M.trace)&&Y("END",e)},et=e=>{(typeof M.trace>"u"?M.wasm.trace:M.trace)&&console.time(`ORT::${e}`)},er=e=>{(typeof M.trace>"u"?M.wasm.trace:M.trace)&&console.timeEnd(`ORT::${e}`)}}),eS=ed(()=>{eh(),ex(),ek(),ei=class e{constructor(e){this.handler=e}async run(e,r,i){J(),et("InferenceSession.run");let a={},n={};if("object"!=typeof e||null===e||e instanceof X||Array.isArray(e))throw TypeError("'feeds' must be an object that use input names as keys and OnnxValue as corresponding values.");let s=!0;if("object"==typeof r){if(null===r)throw TypeError("Unexpected argument[1]: cannot be null.");if(r instanceof X)throw TypeError("'fetches' cannot be a Tensor");if(Array.isArray(r)){if(0===r.length)throw TypeError("'fetches' cannot be an empty array.");for(let e of(s=!1,r)){if("string"!=typeof e)throw TypeError("'fetches' must be a string array or an object.");if(-1===this.outputNames.indexOf(e))throw RangeError(`'fetches' contains invalid output name: ${e}.`);a[e]=null}if("object"==typeof i&&null!==i)n=i;else if("u">typeof i)throw TypeError("'options' must be an object.")}else{let e=!1,o=Object.getOwnPropertyNames(r);for(let i of this.outputNames)if(-1!==o.indexOf(i)){let n=r[i];(null===n||n instanceof X)&&(e=!0,s=!1,a[i]=n)}if(e){if("object"==typeof i&&null!==i)n=i;else if("u">typeof i)throw TypeError("'options' must be an object.")}else n=r}}else if("u">typeof r)throw TypeError("Unexpected argument[1]: must be 'fetches' or 'options'.");for(let r of this.inputNames)if(typeof e[r]>"u")throw Error(`input '${r}' is missing in 'feeds'.`);if(s)for(let e of this.outputNames)a[e]=null;let o=await this.handler.run(e,a,n),u={};for(let e in o)if(Object.hasOwnProperty.call(o,e)){let r=o[e];r instanceof X?u[e]=r:u[e]=new X(r.type,r.data,r.dims)}return er("InferenceSession.run"),ee(),u}async release(){return this.handler.dispose()}static async create(r,i,a,n){J(),et("InferenceSession.create");let s,o={};if("string"==typeof r){if(s=r,"object"==typeof i&&null!==i)o=i;else if("u">typeof i)throw TypeError("'options' must be an object.")}else if(r instanceof Uint8Array){if(s=r,"object"==typeof i&&null!==i)o=i;else if("u">typeof i)throw TypeError("'options' must be an object.")}else if(r instanceof ArrayBuffer||"u">typeof SharedArrayBuffer&&r instanceof SharedArrayBuffer){let e=0,u=r.byteLength;if("object"==typeof i&&null!==i)o=i;else if("number"==typeof i){if(!Number.isSafeInteger(e=i))throw RangeError("'byteOffset' must be an integer.");if(e<0||e>=r.byteLength)throw RangeError(`'byteOffset' is out of range [0, ${r.byteLength}).`);if(u=r.byteLength-e,"number"==typeof a){if(!Number.isSafeInteger(u=a))throw RangeError("'byteLength' must be an integer.");if(u<=0||e+u>r.byteLength)throw RangeError(`'byteLength' is out of range (0, ${r.byteLength-e}].`);if("object"==typeof n&&null!==n)o=n;else if("u">typeof n)throw TypeError("'options' must be an object.")}else if("u">typeof a)throw TypeError("'byteLength' must be a number.")}else if("u">typeof i)throw TypeError("'options' must be an object.");s=new Uint8Array(r,e,u)}else throw TypeError("Unexpected argument[0]: must be 'path' or 'buffer'.");let[u,l]=await z(o),d=await u.createInferenceSessionHandler(s,l);return er("InferenceSession.create"),ee(),new e(d)}startProfiling(){this.handler.startProfiling()}endProfiling(){this.handler.endProfiling()}get inputNames(){return this.handler.inputNames}get outputNames(){return this.handler.outputNames}get inputMetadata(){return this.handler.inputMetadata}get outputMetadata(){return this.handler.outputMetadata}}}),eT=ed(()=>{eS(),ea=ei}),eI=ed(()=>{}),eC=ed(()=>{}),eE=ed(()=>{}),ez=ed(()=>{});ep({},{InferenceSession:()=>ea,TRACE:()=>Q,TRACE_EVENT_BEGIN:()=>et,TRACE_EVENT_END:()=>er,TRACE_FUNC_BEGIN:()=>J,TRACE_FUNC_END:()=>ee,Tensor:()=>X,env:()=>R,registerBackend:()=>C});var eA=ed(()=>{ef(),ey(),eT(),ex(),eI(),eC(),ek(),eE(),ez()}),eO=ed(()=>{}),eM={};ep(eM,{default:()=>eN});var eR,eN,eB=ed(()=>{om(),nM(),nO(),(eR=globalThis.self?.name==="ort-wasm-proxy-worker")&&(self.onmessage=e=>{let{type:r,in:i}=e.data;try{switch(r){case"init-wasm":e1(i.wasm).then(()=>{sF(i).then(()=>{postMessage({type:r})},e=>{postMessage({type:r,err:e})})},e=>{postMessage({type:r,err:e})});break;case"init-ep":{let{epName:e,env:a}=i;sH(a,e).then(()=>{postMessage({type:r})},e=>{postMessage({type:r,err:e})});break}case"copy-from":{let{buffer:e}=i,a=sX(e);postMessage({type:r,out:a});break}case"create":{let{model:e,options:a}=i;sQ(e,a).then(e=>{postMessage({type:r,out:e})},e=>{postMessage({type:r,err:e})});break}case"release":sY(i),postMessage({type:r});break;case"run":{let{sessionId:e,inputIndices:a,inputs:n,outputIndices:s,options:o}=i;s0(e,a,n,s,Array(s.length).fill(null),o).then(e=>{e.some(e=>"cpu"!==e[3])?postMessage({type:r,err:"Proxy does not support non-cpu tensor location."}):postMessage({type:r,out:e},s2([...n,...e]))},e=>{postMessage({type:r,err:e})});break}case"end-profiling":s1(i),postMessage({type:r})}}catch(e){postMessage({type:r,err:e})}}),eN=eR?null:e=>new Worker(e??eW,{type:"module",name:"ort-wasm-proxy-worker"})}),eD={};async function eU(r={}){var i=!!globalThis.window,a=!!globalThis.WorkerGlobalScope,n=a&&self.name?.startsWith("em-pthread");r.mountExternalData=(e,i)=>{e.startsWith("./")&&(e=e.substring(2)),(r.Xc||(r.Xc=new Map)).set(e,i)},r.unmountExternalData=()=>{delete r.Xc},globalThis.SharedArrayBuffer??new WebAssembly.Memory({initial:0,maximum:0,shared:!0}).buffer.constructor;let s=e=>async(...i)=>{try{if(r.Yc)throw Error("Session already started");let a=r.Yc={Kd:i[0],errors:[]},n=await e(...i);if(r.Yc!==a)throw Error("Session mismatch");r.dd?.flush();let s=a.errors;if(0<s.length){let e=await Promise.all(s);if(e=e.filter(e=>e),0<e.length)throw Error(e.join(`
+`))}return n}finally{r.Yc=null}};r.jsepInit=(e,i)=>{if("webgpu"===e){[r.dd,r.Ad,r.Ed,r.ed,r.Dd,r.$b,r.Fd,r.Hd,r.Bd,r.Cd,r.Gd]=i;let e=r.dd;r.jsepRegisterBuffer=(r,i,a,n)=>e.registerBuffer(r,i,a,n),r.jsepGetBuffer=r=>e.getBuffer(r),r.jsepCreateDownloader=(r,i,a)=>e.createDownloader(r,i,a),r.jsepOnCreateSession=r=>{e.onCreateSession(r)},r.jsepOnReleaseSession=r=>{e.onReleaseSession(r)},r.jsepOnRunStart=r=>e.onRunStart(r),r.Id=(r,i)=>{e.upload(r,i)}}else if("webnn"===e){let e=i[0];[r.Wd,r.sd,r.webnnEnsureTensor,r.td,r.webnnDownloadTensor,r.Rd,r.webnnEnableTraceEvent]=i.slice(1),r.webnnReleaseTensorId=r.sd,r.webnnUploadTensor=r.td,r.webnnRegisterMLContext=r.Rd,r.webnnOnRunStart=r=>e.onRunStart(r),r.webnnOnRunEnd=e.onRunEnd.bind(e),r.webnnOnReleaseSession=r=>{e.onReleaseSession(r)},r.webnnCreateMLTensorDownloader=(r,i)=>e.createMLTensorDownloader(r,i),r.webnnRegisterMLTensor=(r,i,a,n)=>e.registerMLTensor(r,i,a,n),r.webnnCreateMLContext=r=>e.createMLContext(r),r.webnnRegisterMLConstant=(i,a,n,s,o,u)=>e.registerMLConstant(i,a,n,s,o,r.Xc,u),r.webnnRegisterGraphInput=e.registerGraphInput.bind(e),r.webnnIsGraphInput=e.isGraphInput.bind(e),r.webnnRegisterGraphOutput=e.registerGraphOutput.bind(e),r.webnnIsGraphOutput=e.isGraphOutput.bind(e),r.webnnCreateTemporaryTensor=e.createTemporaryTensor.bind(e),r.webnnIsGraphInputOutputTypeSupported=e.isGraphInputOutputTypeSupported.bind(e)}};let o=()=>{let e=e=>(...r)=>{let i=tz;return r=e(...r),tz!=i?new Promise((e,r)=>{tD={resolve:e,reject:r}}):r};(()=>{for(let i of["_OrtAppendExecutionProvider","_OrtCreateSession","_OrtRun","_OrtRunWithBinding","_OrtBindInput"])r[i]=e(r[i])})(),void 0!==s&&(r._OrtRun=s(r._OrtRun),r._OrtRunWithBinding=s(r._OrtRunWithBinding)),o=void 0};r.asyncInit=()=>{o?.()};var u,l,d=(e,r)=>{throw r},p=S.url,c="";if(i||a){try{c=new URL(".",p).href}catch{}a&&(l=e=>{var r=new XMLHttpRequest;return r.open("GET",e,!1),r.responseType="arraybuffer",r.send(null),new Uint8Array(r.response)}),u=async e=>{if(k(e))return new Promise((r,i)=>{var a=new XMLHttpRequest;a.open("GET",e,!0),a.responseType="arraybuffer",a.onload=()=>{200==a.status||0==a.status&&a.response?r(a.response):i(a.status)},a.onerror=i,a.send(null)});var r=await fetch(e,{credentials:"same-origin"});if(r.ok)return r.arrayBuffer();throw Error(r.status+" : "+r.url)}}var h,f,m,g,y,b,_=console.log.bind(console),$=console.error.bind(console),v=_,w=$,x=!1,k=e=>e.startsWith("file://");function T(){ed.buffer!=C.buffer&&L()}if(n){let e=function(i){try{var a,n,s=i.data,o=s.Sc;if("load"===o){let i=[];for(let a of(self.onmessage=e=>i.push(e),b=()=>{for(let r of(postMessage({Sc:"loaded"}),i))e(r);self.onmessage=e},s.xd))r[a]&&!r[a].proxy||(r[a]=(...e)=>{postMessage({Sc:"callHandler",wd:a,args:e})},"print"==a&&(v=r[a]),"printErr"==a&&(w=r[a]));ed=s.Od,L(),f=s.Pd,V(),am()}else if("run"===o){a=s.Rc,n=(T(),M)[a+52>>>2>>>0],a=(T(),M)[a+56>>>2>>>0],rX(n,n-a),rQ(n),rq(s.Rc,0,0,1,0,0),eo(),t$(s.Rc),I||(rD(),I=!0);try{ep(s.Md,s.bd)}catch(e){if("unwind"!=e)throw e}}else"setimmediate"!==s.target&&("checkMailbox"===o?I&&tv():o&&(w(`worker: received unknown command ${o}`),w(s)))}catch(e){throw rW(),e}};var I=!1;self.onunhandledrejection=e=>{throw e.reason||e},self.onmessage=e}var C,E,z,A,O,M,R,N,B,D,U,P=!1;function L(){var e=ed.buffer;r.HEAP8=C=new Int8Array(e),z=new Int16Array(e),r.HEAPU8=E=new Uint8Array(e),A=new Uint16Array(e),r.HEAP32=O=new Int32Array(e),r.HEAPU32=M=new Uint32Array(e),R=new Float32Array(e),N=new Float64Array(e),B=new BigInt64Array(e),D=new BigUint64Array(e)}function q(){P=!0,n?b():iD.sb()}function W(e){throw w(e="Aborted("+e+")"),x=!0,e=new WebAssembly.RuntimeError(e+". Build with -sASSERTIONS for more info."),y?.(e),e}function j(){return{a:{ma:iq,gb:iL,g:ef,J:eg,f:ev,o:ew,h:ex,ha:ek,b:eS,T:eT,Ha:eC,n:eE,$:eR,Xa:eN,Da:eB,Fa:eD,Ya:eP,Va:eL,Oa:eq,Ua:eW,ka:ej,Ea:eV,Ba:eG,Wa:eF,Ca:eH,bb:eK,ea:e2,wa:e3,ua:tt,da:tr,O:ti,H:ta,va:to,_:tm,xa:tg,Ra:ty,za:tw,Ia:tk,sa:tS,fa:tT,Qa:t$,_a:tI,R:tL,r:tG,c:e8,hb:tF,y:tH,M:tK,D:tZ,l:tX,s:tQ,ib:tY,I:tJ,S:t0,j:t1,u:t2,q:t3,k:t4,La:t6,Ma:t7,Na:re,Ja:rt,Ka:rr,ta:rn,db:rs,ab:ru,v:rp,aa:rc,ga:rh,$a:ro,W:rf,Za:rm,Aa:rg,F:ra,U:ry,la:rw,ya:rx,fb:rv,eb:rk,Sa:rC,Ta:rE,Ga:et,V:rz,ja:rA,Pa:rO,ia:rR,kb:ah,na:au,lb:ac,oa:ao,G:i9,d:iG,t:ij,w:iW,A:i1,mb:aa,K:i6,x:iK,pa:an,Y:al,ba:ai,nb:ar,ob:at,P:i2,qa:ae,pb:i7,N:i8,Z:as,e:iV,B:iH,m:iF,jb:af,p:iX,z:iQ,C:iZ,E:iY,L:i3,qb:i5,Q:ad,ca:i4,X:ap,rb:i0,ra:iJ,i:rN,a:ed,cb:J}}}async function V(){function i(e,i){var a,n,s,o=iD=e.exports;for(let[r,i]of(e={},Object.entries(o)))"function"==typeof i?(o=function(e){var r=(...r)=>{tO.push(e);try{return e(...r)}finally{x||(tO.pop(),tz&&1===tE&&0===tO.length&&(tE=0,Q+=1,tC(iR),"u">typeof Fibers&&Fibers.Zd()))}};return tN.set(e,r),r}(i),e[r]=o):e[r]=i;return a=iD=e,n=e=>r=>e(r)>>>0,s=e=>()=>e()>>>0,(a=Object.assign({},a)).tb=n(a.tb),a.Xb=s(a.Xb),a.Zb=n(a.Zb),a.lc=n(a.lc),a.mc=s(a.mc),a.qc=n(a.qc),iD=a,ea.push(iD._b),rB=(e=iD).tb,rD=e.ub,r._OrtInit=e.vb,r._OrtGetLastError=e.wb,r._OrtCreateSessionOptions=e.xb,r._OrtAppendExecutionProvider=e.yb,r._OrtAddFreeDimensionOverride=e.zb,r._OrtAddSessionConfigEntry=e.Ab,r._OrtReleaseSessionOptions=e.Bb,r._OrtCreateSession=e.Cb,r._OrtReleaseSession=e.Db,r._OrtGetInputOutputCount=e.Eb,r._OrtGetInputOutputMetadata=e.Fb,r._OrtFree=e.Gb,r._OrtCreateTensor=e.Hb,r._OrtGetTensorData=e.Ib,r._OrtReleaseTensor=e.Jb,r._OrtCreateRunOptions=e.Kb,r._OrtAddRunConfigEntry=e.Lb,r._OrtReleaseRunOptions=e.Mb,r._OrtCreateBinding=e.Nb,r._OrtBindInput=e.Ob,r._OrtBindOutput=e.Pb,r._OrtClearBoundOutputs=e.Qb,r._OrtReleaseBinding=e.Rb,r._OrtRunWithBinding=e.Sb,r._OrtRun=e.Tb,r._OrtEndProfiling=e.Ub,r._JsepOutput=e.Vb,r._JsepGetNodeName=e.Wb,rU=e.Xb,rP=r._free=e.Yb,rL=r._malloc=e.Zb,rq=e.ac,rW=e.bc,rj=e.cc,rV=e.dc,rG=e.ec,rF=e.fc,rH=e.gc,rK=e.hc,rZ=e.ic,rX=e.jc,rQ=e.kc,rY=e.lc,rJ=e.mc,r0=e.nc,r1=e.oc,r2=e.pc,r3=e.qc,r4=e.rc,r6=e.sc,r8=e.tc,r5=e.uc,r9=e.vc,r7=e.wc,ie=e.xc,it=e.yc,ir=e.zc,ii=e.Ac,ia=e.Bc,is=e.Cc,io=e.Dc,iu=e.Ec,il=e.Fc,id=e.Gc,ip=e.Hc,ic=e.Ic,ih=e.Jc,im=e.Kc,ig=e.Lc,iy=e.Mc,ib=e.Nc,i_=e.Pc,i$=e.Qc,iv=e.$c,iw=e.ad,ix=e.fd,ik=e.jd,iS=e.kd,iT=e.ld,iI=e.md,iC=e.nd,iE=e.od,iz=e.pd,iA=e.qd,iO=e.vd,iM=e.Sd,iR=e.Td,iN=e.Ud,iB=e.Vd,f=i,iD}var a,s=j();return r.instantiateWasm?new Promise(e=>{r.instantiateWasm(s,(r,a)=>{e(i(r,a))})}):n?i(new WebAssembly.Instance(f,j()),f):(U??=r.locateFile?r.locateFile?r.locateFile("ort-wasm-simd-threaded.jsep.wasm",c):c+"ort-wasm-simd-threaded.jsep.wasm":new e.U(e.r(3789)).href,a=await async function(e){if(!h&&!k(U))try{var r=fetch(U,{credentials:"same-origin"});return await WebAssembly.instantiateStreaming(r,e)}catch(e){w(`wasm streaming compile failed: ${e}`),w("falling back to ArrayBuffer instantiation")}return async function(e,r){try{var i=await async function(e){if(!h)try{var r=await u(e);return new Uint8Array(r)}catch{}if(e==U&&h)e=new Uint8Array(h);else{if(!l)throw"both async and sync fetching of the wasm failed";e=l(e)}return e}(e);return await WebAssembly.instantiate(i,r)}catch(e){w(`failed to asynchronously prepare wasm: ${e}`),W(e)}}(U,e)}(s),i(a.instance,a.module))}class G{name="ExitStatus";constructor(e){this.message=`Program terminated with exit(${e})`,this.status=e}}var F=e=>{e.terminate(),e.onmessage=()=>{}},H=[],K=0,Z=null,X=e=>{0==er.length&&(el(),eu(er[0]));var r=er.pop();if(!r)return 6;ei.push(r),en[e.Rc]=r,r.Rc=e.Rc;var i={Sc:"run",Md:e.Ld,bd:e.bd,Rc:e.Rc};return r.postMessage(i,e.rd),0},Q=0,Y=(e,r,...i)=>{var a,n=16*i.length,s=rJ(),o=rY(n),u=o>>>3;for(a of i)"bigint"==typeof a?((T(),B)[u++>>>0]=1n,(T(),B)[u++>>>0]=a):((T(),B)[u++>>>0]=0n,(T(),N)[u++>>>0]=a);return e=rj(e,0,n,o,r),rQ(s),e};function J(e){if(n)return Y(0,1,e);if(m=e,!(0<Q)){for(var r of ei)F(r);for(r of er)F(r);er=[],ei=[],en={},x=!0}d(0,new G(e))}function ee(e){if(n)return Y(1,0,e);et(e)}var et=e=>{if(m=e,n)throw ee(e),"unwind";J(e)},er=[],ei=[],ea=[],en={},es=e=>{var r=e.Rc;delete en[r],er.push(e),ei.splice(ei.indexOf(e),1),e.Rc=0,rV(r)};function eo(){ea.forEach(e=>e())}var eu=e=>new Promise(i=>{e.onmessage=a=>{var n=a.data;if(a=n.Sc,n.Zc&&n.Zc!=rU()){var s=en[n.Zc];s?s.postMessage(n,n.rd):w(`Internal error! Worker sent a message "${a}" to target pthread ${n.Zc}, but that thread no longer exists!`)}else"checkMailbox"===a?tv():"spawnThread"===a?X(n):"cleanupThread"===a?tb(()=>{es(en[n.Nd])}):"loaded"===a?(e.loaded=!0,i(e)):"setimmediate"===n.target?e.postMessage(n):"uncaughtException"===a?e.onerror(n.error):"callHandler"===a?r[n.wd](...n.args):a&&w(`worker sent an unknown command ${a}`)},e.onerror=e=>{throw w(`worker sent an error! ${e.filename}:${e.lineno}: ${e.message}`),e};var a,n=[];for(a of[])r.propertyIsEnumerable(a)&&n.push(a);e.postMessage({Sc:"load",xd:n,Od:ed,Pd:f})});function el(){var r=new Worker((URL,S.url>"file:"&&S.url<"file;"?new e.U(e.r(19489)):new URL(S.url)),{type:"module",workerData:"em-pthread",name:"em-pthread"});er.push(r)}var ed,ep=(e,r)=>{Q=0,e=r6(e,r),0<Q?m=e:rG(e)},ec=[],eh=0;function ef(e){var r=new e_(e>>>=0);return 0==(T(),C)[r.Tc+12>>>0]&&(ey(r,!0),eh--),eb(r,!1),ec.push(r),r3(e)}var em=0,eg=()=>{rK(0,0);var e=ec.pop();r0(e.cd),em=0};function ey(e,r){r=+!!r,(T(),C)[e.Tc+12>>>0]=r}function eb(e,r){r=+!!r,(T(),C)[e.Tc+13>>>0]=r}class e_{constructor(e){this.cd=e,this.Tc=e-24}}var e$=e=>{var r=em;if(!r)return rZ(0),0;var i=new e_(r);(T(),M)[i.Tc+16>>>2>>>0]=r;var a=(T(),M)[i.Tc+4>>>2>>>0];if(!a)return rZ(0),r;for(var n of e){if(0===n||n===a)break;if(r2(n,a,i.Tc+16))return rZ(n),r}return rZ(a),r};function ev(){return e$([])}function ew(e){return e$([e>>>0])}function ex(e,r,i,a){return e$([e>>>0,r>>>0,i>>>0,a>>>0])}var ek=()=>{var e=ec.pop();e||W("no exception to throw");var r=e.cd;throw 0==(T(),C)[e.Tc+13>>>0]&&(ec.push(e),eb(e,!0),ey(e,!1),eh++),r1(r),em=r};function eS(e,r,i){var a=new e_(e>>>=0);throw r>>>=0,i>>>=0,(T(),M)[a.Tc+16>>>2>>>0]=0,(T(),M)[a.Tc+4>>>2>>>0]=r,(T(),M)[a.Tc+8>>>2>>>0]=i,r1(e),eh++,em=e}var eT=()=>eh;function eI(e,r,i,a){return n?Y(2,1,e,r,i,a):eC(e,r,i,a)}function eC(e,r,i,a){if(e>>>=0,r>>>=0,i>>>=0,a>>>=0,!globalThis.SharedArrayBuffer)return 6;var s=[];return n&&0===s.length?eI(e,r,i,a):(e={Ld:i,Rc:e,bd:a,rd:s},n?(e.Sc="spawnThread",postMessage(e,s),0):X(e))}function eE(e){throw em||=e>>>0}var ez=globalThis.TextDecoder&&new TextDecoder,eA=(e,r,i,a)=>{if(i=r+i,a)return i;for(;e[r]&&!(r>=i);)++r;return r},eO=(e,r=0,i,a)=>{if(16<(i=eA(e,r>>>=0,i,a))-r&&e.buffer&&ez)return ez.decode(e.buffer instanceof ArrayBuffer?e.subarray(r,i):e.slice(r,i));for(a="";r<i;){var n=e[r++];if(128&n){var s=63&e[r++];if((224&n)==192)a+=String.fromCharCode((31&n)<<6|s);else{var o=63&e[r++];65536>(n=(240&n)==224?(15&n)<<12|s<<6|o:(7&n)<<18|s<<12|o<<6|63&e[r++])?a+=String.fromCharCode(n):(n-=65536,a+=String.fromCharCode(55296|n>>10,56320|1023&n))}}else a+=String.fromCharCode(n)}return a},eM=(e,r,i)=>(e>>>=0)?eO((T(),E),e,r,i):"";function eR(e,r,i){return n?Y(3,1,e,r,i):0}function eN(e,r){if(n)return Y(4,1,e,r)}function eB(e,r){if(n)return Y(5,1,e,r)}function eD(e,r,i){if(n)return Y(6,1,e,r,i)}function eP(e,r,i){return n?Y(7,1,e,r,i):0}function eL(e,r){if(n)return Y(8,1,e,r)}function eq(e,r,i){if(n)return Y(9,1,e,r,i)}function eW(e,r,i,a){if(n)return Y(10,1,e,r,i,a)}function ej(e,r,i,a){if(n)return Y(11,1,e,r,i,a)}function eV(e,r,i,a){if(n)return Y(12,1,e,r,i,a)}function eG(e){if(n)return Y(13,1,e)}function eF(e,r){if(n)return Y(14,1,e,r)}function eH(e,r,i){if(n)return Y(15,1,e,r,i)}var eK=()=>W(""),eZ=e=>{e>>>=0;for(var r="";;){var i=(T(),E)[e++>>>0];if(!i)return r;r+=String.fromCharCode(i)}},eX={},eQ={},eY={},eJ=class extends Error{constructor(e){super(e),this.name="BindingError"}};function e0(e,r,i={}){return function(e,r,i={}){var a=r.name;if(!e)throw new eJ(`type "${a}" must have a positive integer typeid pointer`);if(eQ.hasOwnProperty(e)){if(i.yd)return;throw new eJ(`Cannot register type '${a}' twice`)}eQ[e]=r,delete eY[e],eX.hasOwnProperty(e)&&(r=eX[e],delete eX[e],r.forEach(e=>e()))}(e,r,i)}var e1=(e,r,i)=>{switch(r){case 1:return i?e=>(T(),C)[e>>>0]:e=>(T(),E)[e>>>0];case 2:return i?e=>(T(),z)[e>>>1>>>0]:e=>(T(),A)[e>>>1>>>0];case 4:return i?e=>(T(),O)[e>>>2>>>0]:e=>(T(),M)[e>>>2>>>0];case 8:return i?e=>(T(),B)[e>>>3>>>0]:e=>(T(),D)[e>>>3>>>0];default:throw TypeError(`invalid integer width (${r}): ${e}`)}};function e2(e,r,i,a,n){e>>>=0,i>>>=0,r=eZ(r>>>0);let s=e=>e;if(a=0n===a){let e=8*i;n=(s=r=>BigInt.asUintN(e,r))(n)}e0(e,{name:r,Oc:s,Vc:(e,r)=>("number"==typeof r&&(r=BigInt(r)),r),Uc:e1(r,i,!a),Wc:null})}function e3(e,r,i,a){e0(e>>>=0,{name:r=eZ(r>>>0),Oc:function(e){return!!e},Vc:function(e,r){return r?i:a},Uc:function(e){return this.Oc((T(),E)[e>>>0])},Wc:null})}var e4=[],e6=[0,1,,1,null,1,!0,1,!1,1];function e8(e){9<(e>>>=0)&&0==--e6[e+1]&&(e6[e]=void 0,e4.push(e))}var e5=e=>{if(!e)throw new eJ(`Cannot use deleted val. handle = ${e}`);return e6[e]},e9=e=>{switch(e){case void 0:return 2;case null:return 4;case!0:return 6;case!1:return 8;default:let r=e4.pop()||e6.length;return e6[r]=e,e6[r+1]=1,r}};function e7(e){return this.Oc((T(),M)[e>>>2>>>0])}var te={name:"emscripten::val",Oc:e=>{var r=e5(e);return e8(e),r},Vc:(e,r)=>e9(r),Uc:e7,Wc:null};function tt(e){return e0(e>>>0,te)}function tr(e,r,i){i>>>=0,e0(e>>>=0,{name:r=eZ(r>>>0),Oc:e=>e,Vc:(e,r)=>r,Uc:((e,r)=>{switch(r){case 4:return function(e){return this.Oc((T(),R)[e>>>2>>>0])};case 8:return function(e){return this.Oc((T(),N)[e>>>3>>>0])};default:throw TypeError(`invalid float width (${r}): ${e}`)}})(r,i),Wc:null})}function ti(e,r,i,a,n){e>>>=0,i>>>=0,r=eZ(r>>>0);let s=e=>e;if(0===a){var o=32-8*i;n=(s=e=>e<<o>>>o)(n)}e0(e,{name:r,Oc:s,Vc:(e,r)=>r,Uc:e1(r,i,0!==a),Wc:null})}function ta(e,r,i){function a(e){var r=(T(),M)[e>>>2>>>0];return e=(T(),M)[e+4>>>2>>>0],new n((T(),C).buffer,e,r)}var n=[Int8Array,Uint8Array,Int16Array,Uint16Array,Int32Array,Uint32Array,Float32Array,Float64Array,BigInt64Array,BigUint64Array][r];e0(e>>>=0,{name:i=eZ(i>>>0),Oc:a,Uc:a},{yd:!0})}var tn=(e,r,i)=>{var a=(T(),E);if(r>>>=0,0<i){var n=r;i=r+i-1;for(var s=0;s<e.length;++s){var o=e.codePointAt(s);if(127>=o){if(r>=i)break;a[r++>>>0]=o}else if(2047>=o){if(r+1>=i)break;a[r++>>>0]=192|o>>6,a[r++>>>0]=128|63&o}else if(65535>=o){if(r+2>=i)break;a[r++>>>0]=224|o>>12,a[r++>>>0]=128|o>>6&63,a[r++>>>0]=128|63&o}else{if(r+3>=i)break;a[r++>>>0]=240|o>>18,a[r++>>>0]=128|o>>12&63,a[r++>>>0]=128|o>>6&63,a[r++>>>0]=128|63&o,s++}}a[r>>>0]=0,e=r-n}else e=0;return e},ts=e=>{for(var r=0,i=0;i<e.length;++i){var a=e.charCodeAt(i);127>=a?r++:2047>=a?r+=2:55296<=a&&57343>=a?(r+=4,++i):r+=3}return r};function to(e,r){e0(e>>>=0,{name:r=eZ(r>>>0),Oc(e){var r=(T(),M)[e>>>2>>>0];return r=eM(e+4,r,!0),rP(e),r},Vc(e,r){r instanceof ArrayBuffer&&(r=new Uint8Array(r));var i="string"==typeof r;if(!(i||ArrayBuffer.isView(r)&&1==r.BYTES_PER_ELEMENT))throw new eJ("Cannot pass non-string to std::string");var a=i?ts(r):r.length,n=rL(4+a+1),s=n+4;return(T(),M)[n>>>2>>>0]=a,i?tn(r,s,a+1):(T(),E).set(r,s>>>0),null!==e&&e.push(rP,n),n},Uc:e7,Wc(e){rP(e)}})}var tu=globalThis.TextDecoder?new TextDecoder("utf-16le"):void 0,tl=(e,r,i)=>{if(e>>>=1,16<(r=eA((T(),A),e,r/2,i))-e&&tu)return tu.decode((T(),A).slice(e,r));for(i="";e<r;++e)i+=String.fromCharCode((T(),A)[e>>>0]);return i},td=(e,r,i)=>{if(2>(i??=0x7fffffff))return 0;var a=r;i=(i-=2)<2*e.length?i/2:e.length;for(var n=0;n<i;++n){var s=e.charCodeAt(n);(T(),z)[r>>>1>>>0]=s,r+=2}return(T(),z)[r>>>1>>>0]=0,r-a},tp=e=>2*e.length,tc=(e,r,i)=>{var a="";e>>>=2;for(var n=0;!(n>=r/4);n++){var s=(T(),M)[e+n>>>0];if(!s&&!i)break;a+=String.fromCodePoint(s)}return a},th=(e,r,i)=>{if(r>>>=0,4>(i??=0x7fffffff))return 0;var a=r;i=a+i-4;for(var n=0;n<e.length;++n){var s=e.codePointAt(n);if(65535<s&&n++,(T(),O)[r>>>2>>>0]=s,(r+=4)+4>i)break}return(T(),O)[r>>>2>>>0]=0,r-a},tf=e=>{for(var r=0,i=0;i<e.length;++i)65535<e.codePointAt(i)&&i++,r+=4;return r};function tm(e,r,i){if(e>>>=0,r>>>=0,i=eZ(i>>>=0),2===r)var a=tl,n=td,s=tp;else a=tc,n=th,s=tf;e0(e,{name:i,Oc:e=>{var i=(T(),M)[e>>>2>>>0];return i=a(e+4,i*r,!0),rP(e),i},Vc:(e,a)=>{if("string"!=typeof a)throw new eJ(`Cannot pass non-string to C++ string type ${i}`);var o=s(a),u=rL(4+o+r);return(T(),M)[u>>>2>>>0]=o/r,n(a,u+4,o+r),null!==e&&e.push(rP,u),u},Uc:e7,Wc(e){rP(e)}})}function tg(e,r){e0(e>>>=0,{zd:!0,name:r=eZ(r>>>0),Oc:()=>{},Vc:()=>{}})}function ty(e){rq(e>>>0,!a,1,!i,131072,!1),eo()}var tb=e=>{if(!x)try{if(e(),!(0<Q))try{n?rU()&&rG(m):et(m)}catch(e){e instanceof G||"unwind"==e||d(0,e)}}catch(e){e instanceof G||"unwind"==e||d(0,e)}},t_=!Atomics.waitAsync||globalThis.navigator?.userAgent&&91>Number((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)||[])[2]);function t$(e){e>>>=0,t_||(Atomics.waitAsync((T(),O),e>>>2,e).value.then(tv),e+=128,Atomics.store((T(),O),e>>>2,1))}var tv=()=>tb(()=>{var e=rU();e&&(t$(e),rH())});function tw(e,r){(e>>>=0)==r>>>0?setTimeout(tv):n?postMessage({Zc:e,Sc:"checkMailbox"}):(e=en[e])&&e.postMessage({Sc:"checkMailbox"})}var tx=[];function tk(e,r,i,a,n){for(r>>>=0,n>>>=0,tx.length=0,i=n>>>3,a=n+a>>>3;i<a;){var s;s=(T(),B)[i++>>>0]?(T(),B)[i++>>>0]:(T(),N)[i++>>>0],tx.push(s)}return(r?iP[r]:iU[e])(...tx)}var tS=()=>{Q=0};function tT(e){e>>>=0,n?postMessage({Sc:"cleanupThread",Nd:e}):es(en[e])}function tI(e){}var tC=e=>{try{e()}catch(e){W(e)}},tE=0,tz=null,tA=0,tO=[],tM=new Map,tR=new Map,tN=new Map,tB=0,tD=null,tU=[],tP=e=>(function(e){if(!x){if(0===tE){var r=!1,i=!1;e((e=0)=>{if(!x&&(tA=e,r=!0,i)){tE=2,tC(()=>iN(tz)),"u">typeof MainLoop&&MainLoop.ud&&MainLoop.resume(),e=!1;try{var a,n=(a=(T(),O)[tz+8>>>2>>>0],a=tR.get(a),a=tN.get(a),--Q,a())}catch(r){n=r,e=!0}var s=!1;if(!tz){var o=tD;o&&(tD=null,(e?o.reject:o.resolve)(n),s=!0)}if(e&&!s)throw n}}),i=!0,r||(tE=1,tz=function(){var e=rL(65548),r=e+12;if((T(),M)[e>>>2>>>0]=r,(T(),M)[e+4>>>2>>>0]=r+65536,r=tO[0],!tM.has(r)){var i=tB++;tM.set(r,i),tR.set(i,r)}return r=tM.get(r),(T(),O)[e+8>>>2>>>0]=r,e}(),"u">typeof MainLoop&&MainLoop.ud&&MainLoop.pause(),tC(()=>iM(tz)))}else 2===tE?(tE=0,tC(iB),rP(tz),tz=null,tU.forEach(tb)):W(`invalid state: ${tE}`);return tA}})(r=>{e().then(r)});function tL(e){return e>>>=0,tP(async()=>e9(await e5(e)))}var tq=[],tW=(e,r,i)=>{var a=[];return e=e(a,i),a.length&&((T(),M)[r>>>2>>>0]=e9(a)),e},tj={},tV=e=>{var r=tj[e];return void 0===r?eZ(e):r};function tG(e,r,i){var a,n,[s,...o]=((e,r)=>{for(var i=Array(e),a=0;a<e;++a){var n=a,s=(T(),M)[r+4*a>>>2>>>0],o=eQ[s];if(void 0===o)throw e=`parameter ${a}`,r=eZ(s=rB(s)),rP(s),new eJ(`${e} has unknown type ${r}`);i[n]=o}return i})(e,r>>>0);r=s.Vc.bind(s);var u=o.map(e=>e.Uc.bind(e));e--;var l={toValue:e5};switch(e=u.map((e,r)=>{var i=`argFromPtr${r}`;return l[i]=e,`${i}(args${r?"+"+8*r:""})`}),i){case 0:var d="toValue(handle)";break;case 2:d="new (toValue(handle))";break;case 3:d="";break;case 1:l.getStringOrSymbol=tV,d="toValue(handle)[getStringOrSymbol(methodName)]"}return d+=`(${e})`,s.zd||(l.toReturnWire=r,l.emval_returnValue=tW,d=`return emval_returnValue(toReturnWire, destructorsRef, ${d})`),d=`return function (handle, methodName, destructorsRef, args) {
+  ${d}
+  }`,a=Object.defineProperty(i=Function(Object.keys(l),d)(...Object.values(l)),"name",{value:d=`methodCaller<(${o.map(e=>e.name)}) => ${s.name}>`}),n=tq.length,tq.push(a),n}function tF(e,r){return r>>>=0,(e=e5(e>>>0))==e5(r)}function tH(e){return(e>>>=0)?(e=tV(e),e9(globalThis[e])):e9(globalThis)}function tK(e){return e9(r[e=tV(e>>>0)])}function tZ(e,r){return r>>>=0,e9((e=e5(e>>>0))[r=e5(r)])}function tX(e){9<(e>>>=0)&&(e6[e+1]+=1)}function tQ(e,r,i,a,n){return tq[e>>>0](r>>>0,i>>>0,a>>>0,n>>>0)}function tY(e,r,i,a,n){return tQ(e>>>0,r>>>0,i>>>0,a>>>0,n>>>0)}function tJ(){return e9([])}function t0(e){e=e5(e>>>0);for(var r=Array(e.length),i=0;i<e.length;i++)r[i]=e[i];return e9(r)}function t1(e){return e9(tV(e>>>0))}function t2(){return e9({})}function t3(e){for(var r=e5(e>>>=0);r.length;){var i=r.pop();r.pop()(i)}e8(e)}function t4(e,r,i){r>>>=0,i>>>=0,e=e5(e>>>0),r=e5(r),i=e5(i),e[r]=i}function t6(e,r){e=-0x20000000000000>e||0x20000000000000<e?NaN:Number(e),r>>>=0,e=new Date(1e3*e),(T(),O)[r>>>2>>>0]=e.getUTCSeconds(),(T(),O)[r+4>>>2>>>0]=e.getUTCMinutes(),(T(),O)[r+8>>>2>>>0]=e.getUTCHours(),(T(),O)[r+12>>>2>>>0]=e.getUTCDate(),(T(),O)[r+16>>>2>>>0]=e.getUTCMonth(),(T(),O)[r+20>>>2>>>0]=e.getUTCFullYear()-1900,(T(),O)[r+24>>>2>>>0]=e.getUTCDay(),e=(e.getTime()-Date.UTC(e.getUTCFullYear(),0,1,0,0,0,0))/864e5|0,(T(),O)[r+28>>>2>>>0]=e}var t8=e=>e%4==0&&(e%100!=0||e%400==0),t5=[0,31,60,91,121,152,182,213,244,274,305,335],t9=[0,31,59,90,120,151,181,212,243,273,304,334];function t7(e,r){e=-0x20000000000000>e||0x20000000000000<e?NaN:Number(e),r>>>=0,e=new Date(1e3*e),(T(),O)[r>>>2>>>0]=e.getSeconds(),(T(),O)[r+4>>>2>>>0]=e.getMinutes(),(T(),O)[r+8>>>2>>>0]=e.getHours(),(T(),O)[r+12>>>2>>>0]=e.getDate(),(T(),O)[r+16>>>2>>>0]=e.getMonth(),(T(),O)[r+20>>>2>>>0]=e.getFullYear()-1900,(T(),O)[r+24>>>2>>>0]=e.getDay();var i=(t8(e.getFullYear())?t5:t9)[e.getMonth()]+e.getDate()-1|0;(T(),O)[r+28>>>2>>>0]=i,(T(),O)[r+36>>>2>>>0]=-60*e.getTimezoneOffset(),i=new Date(e.getFullYear(),6,1).getTimezoneOffset();var a=new Date(e.getFullYear(),0,1).getTimezoneOffset();e=0|(i!=a&&e.getTimezoneOffset()==Math.min(a,i)),(T(),O)[r+32>>>2>>>0]=e}function re(e){e>>>=0;var r=new Date((T(),O)[e+20>>>2>>>0]+1900,(T(),O)[e+16>>>2>>>0],(T(),O)[e+12>>>2>>>0],(T(),O)[e+8>>>2>>>0],(T(),O)[e+4>>>2>>>0],(T(),O)[e>>>2>>>0],0),i=(T(),O)[e+32>>>2>>>0],a=r.getTimezoneOffset(),n=new Date(r.getFullYear(),6,1).getTimezoneOffset(),s=new Date(r.getFullYear(),0,1).getTimezoneOffset(),o=Math.min(s,n);return 0>i?(T(),O)[e+32>>>2>>>0]=+(n!=s&&o==a):0<i!=(o==a)&&(n=Math.max(s,n),r.setTime(r.getTime()+6e4*((0<i?o:n)-a))),(T(),O)[e+24>>>2>>>0]=r.getDay(),i=(t8(r.getFullYear())?t5:t9)[r.getMonth()]+r.getDate()-1|0,(T(),O)[e+28>>>2>>>0]=i,(T(),O)[e>>>2>>>0]=r.getSeconds(),(T(),O)[e+4>>>2>>>0]=r.getMinutes(),(T(),O)[e+8>>>2>>>0]=r.getHours(),(T(),O)[e+12>>>2>>>0]=r.getDate(),(T(),O)[e+16>>>2>>>0]=r.getMonth(),(T(),O)[e+20>>>2>>>0]=r.getYear(),BigInt(isNaN(e=r.getTime())?-1:e/1e3)}function rt(e,r,i,a,s,o,u){return n?Y(16,1,e,r,i,a,s,o,u):-52}function rr(e,r,i,a,s,o){if(n)return Y(17,1,e,r,i,a,s,o)}var ri={},ra=()=>performance.timeOrigin+performance.now();function rn(e,r){if(n)return Y(18,1,e,r);if(ri[e]&&(clearTimeout(ri[e].id),delete ri[e]),!r)return 0;var i=setTimeout(()=>{delete ri[e],tb(()=>rF(e,performance.timeOrigin+performance.now()))},r);return ri[e]={id:i,Yd:r},0}function rs(e,r,i,a){e>>>=0,r>>>=0,i>>>=0,a>>>=0;var n=new Date().getFullYear(),s=new Date(n,0,1).getTimezoneOffset(),o=Math.max(s,n=new Date(n,6,1).getTimezoneOffset());(T(),M)[e>>>2>>>0]=60*o,(T(),O)[r>>>2>>>0]=+(s!=n),e=(r=e=>{var r=Math.abs(e);return`UTC${0<=e?"-":"+"}${String(Math.floor(r/60)).padStart(2,"0")}${String(r%60).padStart(2,"0")}`})(s),r=r(n),n<s?(tn(e,i,17),tn(r,a,17)):(tn(e,a,17),tn(r,i,17))}var ro=()=>Date.now();function ru(e,r,i){return(i>>>=0,0<=e&&3>=e)?(e=Math.round(1e6*(e=0===e?Date.now():performance.timeOrigin+performance.now())),(T(),B)[i>>>3>>>0]=BigInt(e),0):28}var rl=[],rd=(e,r)=>{rl.length=0;for(var i;i=(T(),E)[e++>>>0];){var a=105!=i;r+=(a&=112!=i)&&r%8?4:0,rl.push(112==i?(T(),M)[r>>>2>>>0]:106==i?(T(),B)[r>>>3>>>0]:105==i?(T(),O)[r>>>2>>>0]:(T(),N)[r>>>3>>>0]),r+=a?8:4}return rl};function rp(e,r,i){return e>>>=0,r=rd(r>>>0,i>>>0),iP[e](...r)}function rc(e,r,i){return e>>>=0,r=rd(r>>>0,i>>>0),iP[e](...r)}var rh=()=>{};function rf(e,r){return w(eM(e>>>0,r>>>0))}var rm=()=>{throw Q+=1,"unwind"};function rg(){return 0xffff0000}var ry=()=>navigator.hardwareConcurrency,rb={},r_=e=>{var r;return(r=/\bwasm-function\[\d+\]:(0x[0-9a-f]+)/.exec(e))?+r[1]:(r=/:(\d+):\d+(?:\)|$)/.exec(e))?0x80000000|r[1]:0},r$=e=>{for(var r of e)(e=r_(r))&&(rb[e]=r)};function rv(){var e=Error().stack.toString().split(`
+`);return"Error"==e[0]&&e.shift(),r$(e),rb.gd=r_(e[3]),rb.Jd=e,rb.gd}function rw(e){if(!(e=rb[e>>>0]))return 0;if(r=/^\s+at .*\.wasm\.(.*) \(.*\)$/.exec(e))e=r[1];else if(r=/^\s+at (.*) \(.*\)$/.exec(e))e=r[1];else{if(!(r=/^(.+?)@/.exec(e)))return 0;e=r[1]}rP(rw.hd??0),r=ts(e)+1;var r,i=rL(r);return i&&tn(e,i,r),rw.hd=i,rw.hd}function rx(e){e>>>=0;var r=(T(),E).length;if(e<=r||0xffff0000<e)return!1;for(var i=1;4>=i;i*=2){var a=r*(1+.2/i);a=Math.min(a,e+0x6000000);e:{a=(Math.min(0xffff0000,65536*Math.ceil(Math.max(e,a)/65536))-ed.buffer.byteLength+65535)/65536|0;try{ed.grow(a),L();var n=1;break e}catch{}n=void 0}if(n)return!0}return!1}function rk(e,r,i){if(e>>>=0,r>>>=0,rb.gd==e)var a=rb.Jd;else"Error"==(a=Error().stack.toString().split(`
+`))[0]&&a.shift(),r$(a);for(var n=3;a[n]&&r_(a[n])!=e;)++n;for(e=0;e<i&&a[e+n];++e)(T(),O)[r+4*e>>>2>>>0]=r_(a[e+n]);return e}var rS,rT={},rI=()=>{if(!rS){var e,r={USER:"web_user",LOGNAME:"web_user",PATH:"/",PWD:"/",HOME:"/home/web_user",LANG:(globalThis.navigator?.language??"C").replace("-","_")+".UTF-8",_:"./this.program"};for(e in rT)void 0===rT[e]?delete r[e]:r[e]=rT[e];var i=[];for(e in r)i.push(`${e}=${r[e]}`);rS=i}return rS};function rC(e,r){if(n)return Y(19,1,e,r);e>>>=0,r>>>=0;var i,a=0,s=0;for(i of rI()){var o=r+a;(T(),M)[e+s>>>2>>>0]=o,a+=tn(i,o,1/0)+1,s+=4}return 0}function rE(e,r){if(n)return Y(20,1,e,r);e>>>=0,r>>>=0;var i=rI();for(var a of((T(),M)[e>>>2>>>0]=i.length,e=0,i))e+=ts(a)+1;return(T(),M)[r>>>2>>>0]=e,0}function rz(e){return n?Y(21,1,e):52}function rA(e,r,i,a){return n?Y(22,1,e,r,i,a):52}function rO(e,r,i,a){return n?Y(23,1,e,r,i,a):70}var rM=[null,[],[]];function rR(e,r,i,a){if(n)return Y(24,1,e,r,i,a);r>>>=0,i>>>=0,a>>>=0;for(var s=0,o=0;o<i;o++){var u=(T(),M)[r>>>2>>>0],l=(T(),M)[r+4>>>2>>>0];r+=8;for(var d=0;d<l;d++){var p=(T(),E)[u+d>>>0],c=rM[e];0===p||10===p?((1===e?v:w)(eO(c)),c.length=0):c.push(p)}s+=l}return(T(),M)[a>>>2>>>0]=s,0}function rN(e){return e>>>0}n||function(){for(var e=r.numThreads-1;e--;)el();H.push(async()=>{var e=async function(){if(!n)return Promise.all(er.map(eu))}();K++,await e,0==--K&&Z&&(e=Z,Z=null,e())})}(),n||(ed=new WebAssembly.Memory({initial:256,maximum:65536,shared:!0}),L()),r.wasmBinary&&(h=r.wasmBinary),r.stackSave=()=>rJ(),r.stackRestore=e=>rQ(e),r.stackAlloc=e=>rY(e),r.setValue=function(e,r,i="i8"){switch(i.endsWith("*")&&(i="*"),i){case"i1":case"i8":(T(),C)[e>>>0]=r;break;case"i16":(T(),z)[e>>>1>>>0]=r;break;case"i32":(T(),O)[e>>>2>>>0]=r;break;case"i64":(T(),B)[e>>>3>>>0]=BigInt(r);break;case"float":(T(),R)[e>>>2>>>0]=r;break;case"double":(T(),N)[e>>>3>>>0]=r;break;case"*":(T(),M)[e>>>2>>>0]=r;break;default:W(`invalid type for setValue: ${i}`)}},r.getValue=function(e,r="i8"){switch(r.endsWith("*")&&(r="*"),r){case"i1":case"i8":return(T(),C)[e>>>0];case"i16":return(T(),z)[e>>>1>>>0];case"i32":return(T(),O)[e>>>2>>>0];case"i64":return(T(),B)[e>>>3>>>0];case"float":return(T(),R)[e>>>2>>>0];case"double":return(T(),N)[e>>>3>>>0];case"*":return(T(),M)[e>>>2>>>0];default:W(`invalid type for getValue: ${r}`)}},r.UTF8ToString=eM,r.stringToUTF8=tn,r.lengthBytesUTF8=ts;var rB,rD,rU,rP,rL,rq,rW,rj,rV,rG,rF,rH,rK,rZ,rX,rQ,rY,rJ,r0,r1,r2,r3,r4,r6,r8,r5,r9,r7,ie,it,ir,ii,ia,is,io,iu,il,id,ip,ic,ih,im,ig,iy,ib,i_,i$,iv,iw,ix,ik,iS,iT,iI,iC,iE,iz,iA,iO,iM,iR,iN,iB,iD,iU=[J,ee,eI,eR,eN,eB,eD,eP,eL,eq,eW,ej,eV,eG,eF,eH,rt,rr,rn,rC,rE,rz,rA,rO,rR],iP={973212:(e,i,a,n,s)=>{if(void 0===r||!r.Xc)return 1;if((e=eM(Number(e>>>0))).startsWith("./")&&(e=e.substring(2)),!(e=r.Xc.get(e)))return 2;if(i=Number(i>>>0),a=Number(a>>>0),n=Number(n>>>0),i+a>e.byteLength)return 3;try{let o=e.subarray(i,i+a);switch(s){case 0:(T(),E).set(o,n>>>0);break;case 1:r.Qd?r.Qd(n,o):r.Id(n,o);break;default:return 4}return 0}catch{return 4}},974036:(e,i,a)=>{r.td(e,(T(),E).subarray(i>>>0,i+a>>>0))},974100:()=>r.Wd(),974142:e=>{r.sd(e)},974179:()=>{r.Bd()},974210:()=>{r.Cd()},974239:()=>{r.Gd()},974264:e=>r.Ad(e),974297:e=>r.Ed(e),974329:(e,i,a)=>{r.ed(Number(e),Number(i),Number(a),!0)},974392:(e,i,a)=>{r.ed(Number(e),Number(i),Number(a))},974449:()=>"u">typeof wasmOffsetConverter,974506:e=>{r.$b("Abs",e,void 0)},974557:e=>{r.$b("Neg",e,void 0)},974608:e=>{r.$b("Floor",e,void 0)},974661:e=>{r.$b("Ceil",e,void 0)},974713:e=>{r.$b("Reciprocal",e,void 0)},974771:e=>{r.$b("Sqrt",e,void 0)},974823:e=>{r.$b("Exp",e,void 0)},974874:e=>{r.$b("Erf",e,void 0)},974925:e=>{r.$b("Sigmoid",e,void 0)},974980:(e,i,a)=>{r.$b("HardSigmoid",e,{alpha:i,beta:a})},975059:e=>{r.$b("Log",e,void 0)},975110:e=>{r.$b("Sin",e,void 0)},975161:e=>{r.$b("Cos",e,void 0)},975212:e=>{r.$b("Tan",e,void 0)},975263:e=>{r.$b("Asin",e,void 0)},975315:e=>{r.$b("Acos",e,void 0)},975367:e=>{r.$b("Atan",e,void 0)},975419:e=>{r.$b("Sinh",e,void 0)},975471:e=>{r.$b("Cosh",e,void 0)},975523:e=>{r.$b("Asinh",e,void 0)},975576:e=>{r.$b("Acosh",e,void 0)},975629:e=>{r.$b("Atanh",e,void 0)},975682:e=>{r.$b("Tanh",e,void 0)},975734:e=>{r.$b("Not",e,void 0)},975785:(e,i,a)=>{r.$b("Clip",e,{min:i,max:a})},975854:e=>{r.$b("Clip",e,void 0)},975906:(e,i)=>{r.$b("Elu",e,{alpha:i})},975964:e=>{r.$b("Gelu",e,void 0)},976016:e=>{r.$b("Relu",e,void 0)},976068:(e,i)=>{r.$b("LeakyRelu",e,{alpha:i})},976132:(e,i)=>{r.$b("ThresholdedRelu",e,{alpha:i})},976202:(e,i)=>{r.$b("Cast",e,{to:i})},976260:e=>{r.$b("Add",e,void 0)},976311:e=>{r.$b("Sub",e,void 0)},976362:e=>{r.$b("Mul",e,void 0)},976413:e=>{r.$b("Div",e,void 0)},976464:e=>{r.$b("Pow",e,void 0)},976515:e=>{r.$b("Equal",e,void 0)},976568:e=>{r.$b("Greater",e,void 0)},976623:e=>{r.$b("GreaterOrEqual",e,void 0)},976685:e=>{r.$b("Less",e,void 0)},976737:e=>{r.$b("LessOrEqual",e,void 0)},976796:(e,i,a,n,s)=>{r.$b("ReduceMean",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},976971:(e,i,a,n,s)=>{r.$b("ReduceMax",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},977145:(e,i,a,n,s)=>{r.$b("ReduceMin",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},977319:(e,i,a,n,s)=>{r.$b("ReduceProd",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},977494:(e,i,a,n,s)=>{r.$b("ReduceSum",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},977668:(e,i,a,n,s)=>{r.$b("ReduceL1",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},977841:(e,i,a,n,s)=>{r.$b("ReduceL2",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},978014:(e,i,a,n,s)=>{r.$b("ReduceLogSum",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},978191:(e,i,a,n,s)=>{r.$b("ReduceSumSquare",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},978371:(e,i,a,n,s)=>{r.$b("ReduceLogSumExp",e,{keepDims:!!i,noopWithEmptyAxes:!!a,axes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},978551:e=>{r.$b("Where",e,void 0)},978604:(e,i,a)=>{r.$b("Transpose",e,{perm:i?Array.from((T(),O).subarray(Number(i)>>>0,Number(a)>>>0)):[]})},978728:(e,i,a,n)=>{r.$b("DepthToSpace",e,{blocksize:i,mode:eM(a),format:n?"NHWC":"NCHW"})},978861:(e,i,a,n)=>{r.$b("DepthToSpace",e,{blocksize:i,mode:eM(a),format:n?"NHWC":"NCHW"})},978994:(e,i,a,n,s,o,u,l,d,p,c,h,f,m,g)=>{r.$b("ConvTranspose",e,{format:d?"NHWC":"NCHW",autoPad:i,dilations:[a],group:n,kernelShape:[s],pads:[o,u],strides:[l],wIsConst:()=>!!(T(),C)[p>>>0],outputPadding:c?Array.from((T(),O).subarray(Number(c)>>>0,Number(h)>>>0)):[],outputShape:f?Array.from((T(),O).subarray(Number(f)>>>0,Number(m)>>>0)):[],activation:eM(g)})},979427:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("ConvTranspose",e,{format:l?"NHWC":"NCHW",autoPad:i,dilations:Array.from((T(),O).subarray(Number(a)>>>0,2+(Number(a)>>>0)>>>0)),group:n,kernelShape:Array.from((T(),O).subarray(Number(s)>>>0,2+(Number(s)>>>0)>>>0)),pads:Array.from((T(),O).subarray(Number(o)>>>0,4+(Number(o)>>>0)>>>0)),strides:Array.from((T(),O).subarray(Number(u)>>>0,2+(Number(u)>>>0)>>>0)),wIsConst:()=>!!(T(),C)[d>>>0],outputPadding:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],outputShape:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[],activation:eM(m)})},980088:(e,i,a,n,s,o,u,l,d,p,c,h,f,m,g)=>{r.$b("ConvTranspose",e,{format:d?"NHWC":"NCHW",autoPad:i,dilations:[a],group:n,kernelShape:[s],pads:[o,u],strides:[l],wIsConst:()=>!!(T(),C)[p>>>0],outputPadding:c?Array.from((T(),O).subarray(Number(c)>>>0,Number(h)>>>0)):[],outputShape:f?Array.from((T(),O).subarray(Number(f)>>>0,Number(m)>>>0)):[],activation:eM(g)})},980521:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("ConvTranspose",e,{format:l?"NHWC":"NCHW",autoPad:i,dilations:Array.from((T(),O).subarray(Number(a)>>>0,2+(Number(a)>>>0)>>>0)),group:n,kernelShape:Array.from((T(),O).subarray(Number(s)>>>0,2+(Number(s)>>>0)>>>0)),pads:Array.from((T(),O).subarray(Number(o)>>>0,4+(Number(o)>>>0)>>>0)),strides:Array.from((T(),O).subarray(Number(u)>>>0,2+(Number(u)>>>0)>>>0)),wIsConst:()=>!!(T(),C)[d>>>0],outputPadding:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],outputShape:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[],activation:eM(m)})},981182:(e,i)=>{r.$b("GlobalAveragePool",e,{format:i?"NHWC":"NCHW"})},981273:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("AveragePool",e,{format:m?"NHWC":"NCHW",auto_pad:i,ceil_mode:a,count_include_pad:n,storage_order:s,dilations:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[],kernel_shape:l?Array.from((T(),O).subarray(Number(l)>>>0,Number(d)>>>0)):[],pads:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],strides:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[]})},981752:(e,i)=>{r.$b("GlobalAveragePool",e,{format:i?"NHWC":"NCHW"})},981843:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("AveragePool",e,{format:m?"NHWC":"NCHW",auto_pad:i,ceil_mode:a,count_include_pad:n,storage_order:s,dilations:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[],kernel_shape:l?Array.from((T(),O).subarray(Number(l)>>>0,Number(d)>>>0)):[],pads:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],strides:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[]})},982322:(e,i)=>{r.$b("GlobalMaxPool",e,{format:i?"NHWC":"NCHW"})},982409:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("MaxPool",e,{format:m?"NHWC":"NCHW",auto_pad:i,ceil_mode:a,count_include_pad:n,storage_order:s,dilations:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[],kernel_shape:l?Array.from((T(),O).subarray(Number(l)>>>0,Number(d)>>>0)):[],pads:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],strides:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[]})},982884:(e,i)=>{r.$b("GlobalMaxPool",e,{format:i?"NHWC":"NCHW"})},982971:(e,i,a,n,s,o,u,l,d,p,c,h,f,m)=>{r.$b("MaxPool",e,{format:m?"NHWC":"NCHW",auto_pad:i,ceil_mode:a,count_include_pad:n,storage_order:s,dilations:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[],kernel_shape:l?Array.from((T(),O).subarray(Number(l)>>>0,Number(d)>>>0)):[],pads:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],strides:h?Array.from((T(),O).subarray(Number(h)>>>0,Number(f)>>>0)):[]})},983446:(e,i,a,n,s)=>{r.$b("Gemm",e,{alpha:i,beta:a,transA:n,transB:s})},983550:e=>{r.$b("MatMul",e,void 0)},983604:(e,i,a,n)=>{r.$b("ArgMax",e,{keepDims:!!i,selectLastIndex:!!a,axis:n})},983712:(e,i,a,n)=>{r.$b("ArgMin",e,{keepDims:!!i,selectLastIndex:!!a,axis:n})},983820:(e,i)=>{r.$b("Softmax",e,{axis:i})},983883:(e,i)=>{r.$b("Concat",e,{axis:i})},983943:(e,i,a,n,s)=>{r.$b("Split",e,{axis:i,numOutputs:a,splitSizes:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},984099:e=>{r.$b("Expand",e,void 0)},984153:(e,i)=>{r.$b("Gather",e,{axis:Number(i)})},984224:(e,i)=>{r.$b("GatherElements",e,{axis:Number(i)})},984303:(e,i)=>{r.$b("GatherND",e,{batch_dims:Number(i)})},984382:(e,i,a,n,s,o,u,l,d,p,c)=>{r.$b("Resize",e,{antialias:i,axes:a?Array.from((T(),O).subarray(Number(a)>>>0,Number(n)>>>0)):[],coordinateTransformMode:eM(s),cubicCoeffA:o,excludeOutside:u,extrapolationValue:l,keepAspectRatioPolicy:eM(d),mode:eM(p),nearestMode:eM(c)})},984744:(e,i,a,n,s,o,u)=>{r.$b("Slice",e,{starts:i?Array.from((T(),O).subarray(Number(i)>>>0,Number(a)>>>0)):[],ends:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[],axes:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[]})},985008:e=>{r.$b("Tile",e,void 0)},985060:(e,i,a)=>{r.$b("InstanceNormalization",e,{epsilon:i,format:a?"NHWC":"NCHW"})},985174:(e,i,a)=>{r.$b("InstanceNormalization",e,{epsilon:i,format:a?"NHWC":"NCHW"})},985288:e=>{r.$b("Range",e,void 0)},985341:(e,i)=>{r.$b("Einsum",e,{equation:eM(i)})},985422:(e,i,a,n,s)=>{r.$b("Pad",e,{mode:i,value:a,pads:n?Array.from((T(),O).subarray(Number(n)>>>0,Number(s)>>>0)):[]})},985565:(e,i,a,n,s,o)=>{r.$b("BatchNormalization",e,{epsilon:i,momentum:a,spatial:!!s,trainingMode:!!n,format:o?"NHWC":"NCHW"})},985734:(e,i,a,n,s,o)=>{r.$b("BatchNormalization",e,{epsilon:i,momentum:a,spatial:!!s,trainingMode:!!n,format:o?"NHWC":"NCHW"})},985903:(e,i,a)=>{r.$b("CumSum",e,{exclusive:Number(i),reverse:Number(a)})},986e3:(e,i,a)=>{r.$b("DequantizeLinear",e,{axis:i,blockSize:a})},986090:(e,i,a,n,s)=>{r.$b("GridSample",e,{align_corners:i,mode:eM(a),padding_mode:eM(n),format:s?"NHWC":"NCHW"})},986260:(e,i,a,n,s)=>{r.$b("GridSample",e,{align_corners:i,mode:eM(a),padding_mode:eM(n),format:s?"NHWC":"NCHW"})},986430:(e,i)=>{r.$b("ScatterND",e,{reduction:eM(i)})},986515:(e,i,a,n,s,o,u,l,d)=>{r.$b("Attention",e,{numHeads:i,isUnidirectional:a,maskFilterValue:n,scale:s,doRotary:o,qkvHiddenSizes:u?Array.from((T(),O).subarray(Number(l)>>>0,Number(l)+u>>>0)):[],pastPresentShareBuffer:!!d})},986787:e=>{r.$b("BiasAdd",e,void 0)},986842:e=>{r.$b("BiasSplitGelu",e,void 0)},986903:e=>{r.$b("FastGelu",e,void 0)},986959:(e,i,a,n,s,o,u,l,d,p,c,h,f,m,g,y)=>{r.$b("Conv",e,{format:h?"NHWC":"NCHW",auto_pad:i,dilations:a?Array.from((T(),O).subarray(Number(a)>>>0,Number(n)>>>0)):[],group:s,kernel_shape:o?Array.from((T(),O).subarray(Number(o)>>>0,Number(u)>>>0)):[],pads:l?Array.from((T(),O).subarray(Number(l)>>>0,Number(d)>>>0)):[],strides:p?Array.from((T(),O).subarray(Number(p)>>>0,Number(c)>>>0)):[],w_is_const:()=>!!(T(),C)[Number(f)>>>0],activation:eM(m),activation_params:g?Array.from((T(),R).subarray(Number(g)>>>0,Number(y)>>>0)):[]})},987543:e=>{r.$b("Gelu",e,void 0)},987595:(e,i,a,n,s,o,u,l,d)=>{r.$b("GroupQueryAttention",e,{numHeads:i,kvNumHeads:a,scale:n,softcap:s,doRotary:o,rotaryInterleaved:u,smoothSoftmax:l,localWindowSize:d})},987812:(e,i,a,n)=>{r.$b("LayerNormalization",e,{axis:i,epsilon:a,simplified:!!n})},987923:(e,i,a,n)=>{r.$b("LayerNormalization",e,{axis:i,epsilon:a,simplified:!!n})},988034:(e,i,a,n,s,o)=>{r.$b("MatMulNBits",e,{k:i,n:a,accuracyLevel:n,bits:s,blockSize:o})},988161:(e,i,a,n,s,o)=>{r.$b("MultiHeadAttention",e,{numHeads:i,isUnidirectional:a,maskFilterValue:n,scale:s,doRotary:o})},988320:(e,i)=>{r.$b("QuickGelu",e,{alpha:i})},988384:(e,i,a,n,s)=>{r.$b("RotaryEmbedding",e,{interleaved:!!i,numHeads:a,rotaryEmbeddingDim:n,scale:s})},988523:(e,i,a)=>{r.$b("SkipLayerNormalization",e,{epsilon:i,simplified:!!a})},988625:(e,i,a)=>{r.$b("SkipLayerNormalization",e,{epsilon:i,simplified:!!a})},988727:(e,i,a,n)=>{r.$b("GatherBlockQuantized",e,{gatherAxis:i,quantizeAxis:a,blockSize:n})},988848:e=>{r.Fd(e)},988882:(e,i)=>r.Hd(Number(e),Number(i),r.Yc.Kd,r.Yc.errors)};function iL(e,i,a){return tP(async()=>{await r.Dd(Number(e),Number(i),Number(a))})}function iq(){return"u">typeof wasmOffsetConverter}function iW(e,r,i,a){var n=rJ();try{return ii(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function ij(e,r,i){var a=rJ();try{return r7(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;rK(1,0)}}function iV(e){var r=rJ();try{r8(e)}catch(e){if(rQ(r),e!==e+0)throw e;rK(1,0)}}function iG(e,r){var i=rJ();try{return r6(e,r)}catch(e){if(rQ(i),e!==e+0)throw e;rK(1,0)}}function iF(e,r,i){var a=rJ();try{r4(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;rK(1,0)}}function iH(e,r){var i=rJ();try{ia(e,r)}catch(e){if(rQ(i),e!==e+0)throw e;rK(1,0)}}function iK(e,r,i,a,n,s,o){var u=rJ();try{return it(e,r,i,a,n,s,o)}catch(e){if(rQ(u),e!==e+0)throw e;rK(1,0)}}function iZ(e,r,i,a,n,s){var o=rJ();try{r5(e,r,i,a,n,s)}catch(e){if(rQ(o),e!==e+0)throw e;rK(1,0)}}function iX(e,r,i,a){var n=rJ();try{ir(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function iQ(e,r,i,a,n){var s=rJ();try{r9(e,r,i,a,n)}catch(e){if(rQ(s),e!==e+0)throw e;rK(1,0)}}function iY(e,r,i,a,n,s,o){var u=rJ();try{io(e,r,i,a,n,s,o)}catch(e){if(rQ(u),e!==e+0)throw e;rK(1,0)}}function iJ(e,r,i,a,n,s,o){var u=rJ();try{iu(e,r,i,a,n,s,o)}catch(e){if(rQ(u),e!==e+0)throw e;rK(1,0)}}function i0(e,r,i,a,n,s,o,u){var l=rJ();try{ic(e,r,i,a,n,s,o,u)}catch(e){if(rQ(l),e!==e+0)throw e;rK(1,0)}}function i1(e,r,i,a,n){var s=rJ();try{return is(e,r,i,a,n)}catch(e){if(rQ(s),e!==e+0)throw e;rK(1,0)}}function i2(e,r,i){var a=rJ();try{return ih(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;rK(1,0)}}function i3(e,r,i,a,n,s,o,u){var l=rJ();try{im(e,r,i,a,n,s,o,u)}catch(e){if(rQ(l),e!==e+0)throw e;rK(1,0)}}function i4(e,r,i,a,n,s,o,u,l,d,p,c){var h=rJ();try{il(e,r,i,a,n,s,o,u,l,d,p,c)}catch(e){if(rQ(h),e!==e+0)throw e;rK(1,0)}}function i6(e,r,i,a,n,s){var o=rJ();try{return id(e,r,i,a,n,s)}catch(e){if(rQ(o),e!==e+0)throw e;rK(1,0)}}function i8(e,r,i){var a=rJ();try{return ig(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;return rK(1,0),0n}}function i5(e,r,i,a,n,s,o,u,l){var d=rJ();try{ie(e,r,i,a,n,s,o,u,l)}catch(e){if(rQ(d),e!==e+0)throw e;rK(1,0)}}function i9(e){var r=rJ();try{return iy(e)}catch(e){if(rQ(r),e!==e+0)throw e;rK(1,0)}}function i7(e,r){var i=rJ();try{return iO(e,r)}catch(e){if(rQ(i),e!==e+0)throw e;return rK(1,0),0n}}function ae(e){var r=rJ();try{return ib(e)}catch(e){if(rQ(r),e!==e+0)throw e;return rK(1,0),0n}}function at(e,r,i,a){var n=rJ();try{return ik(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function ar(e,r,i,a,n){var s=rJ();try{return iS(e,r,i,a,n)}catch(e){if(rQ(s),e!==e+0)throw e;rK(1,0)}}function ai(e,r,i,a,n,s){var o=rJ();try{return iT(e,r,i,a,n,s)}catch(e){if(rQ(o),e!==e+0)throw e;rK(1,0)}}function aa(e,r,i,a,n,s){var o=rJ();try{return iI(e,r,i,a,n,s)}catch(e){if(rQ(o),e!==e+0)throw e;rK(1,0)}}function an(e,r,i,a,n,s,o,u){var l=rJ();try{return ip(e,r,i,a,n,s,o,u)}catch(e){if(rQ(l),e!==e+0)throw e;rK(1,0)}}function as(e,r,i,a,n){var s=rJ();try{return iC(e,r,i,a,n)}catch(e){if(rQ(s),e!==e+0)throw e;return rK(1,0),0n}}function ao(e,r,i,a){var n=rJ();try{return iE(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function au(e,r,i,a){var n=rJ();try{return iz(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function al(e,r,i,a,n,s,o,u,l,d,p,c){var h=rJ();try{return iA(e,r,i,a,n,s,o,u,l,d,p,c)}catch(e){if(rQ(h),e!==e+0)throw e;rK(1,0)}}function ad(e,r,i,a,n,s,o,u,l,d,p){var c=rJ();try{iw(e,r,i,a,n,s,o,u,l,d,p)}catch(e){if(rQ(c),e!==e+0)throw e;rK(1,0)}}function ap(e,r,i,a,n,s,o,u,l,d,p,c,h,f,m,g){var y=rJ();try{ix(e,r,i,a,n,s,o,u,l,d,p,c,h,f,m,g)}catch(e){if(rQ(y),e!==e+0)throw e;rK(1,0)}}function ac(e,r,i){var a=rJ();try{return i_(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;rK(1,0)}}function ah(e,r,i){var a=rJ();try{return i$(e,r,i)}catch(e){if(rQ(a),e!==e+0)throw e;rK(1,0)}}function af(e,r,i,a){var n=rJ();try{iv(e,r,i,a)}catch(e){if(rQ(n),e!==e+0)throw e;rK(1,0)}}function am(){if(0<K)Z=am;else if(n)g?.(r),q();else{for(;0<H.length;)H.shift()(r);0<K?Z=am:(r.calledRun=!0,x||(q(),g?.(r)))}}return n||(iD=await V(),am()),r.PTR_SIZE=4,P?r:new Promise((e,r)=>{g=e,y=r})}ep(eD,{default:()=>eP});var eP,eL,eq,eW,ej,eV,eG,eF,eH,eK,eZ,eX,eQ,eY,eJ,e0,e1,e2,e3,e4,e6,e8,e5,e9,e7,te,tt,tr,ti,ta,tn,ts,to,tu,tl,td,tp,tc,th,tf,tm,tg,ty,tb,t_,t$,tv,tw,tx,tk,tS,tT,tI,tC,tE,tz,tA,tO,tM,tR,tN,tB,tD,tU,tP,tL,tq,tW,tj,tV,tG,tF,tH,tK,tZ,tX,tQ,tY,tJ,t0,t1,t2,t3,t4,t6,t8,t5,t9,t7,re,rt,rr,ri,ra,rn,rs,ro,ru,rl,rd,rp,rc,rh,rf,rm,rg,ry,rb,r_,r$,rv,rw,rx,rk,rS,rT,rI,rC,rE,rz,rA,rO,rM,rR,rN,rB,rD,rU,rP,rL,rq,rW,rj,rV,rG,rF,rH,rK,rZ,rX,rQ,rY,rJ,r0,r1,r2,r3,r4,r6,r8,r5,r9,r7,ie,it,ir,ii,ia,is,io,iu,il,id,ip,ic,ih,im,ig,iy,ib,i_,i$,iv,iw,ix,ik,iS,iT,iI,iC,iE,iz,iA,iO,iM,iR,iN,iB,iD,iU,iP,iL,iq,iW,ij,iV,iG,iF,iH,iK,iZ,iX,iQ,iY,iJ,i0,i1,i2,i3,i4,i6,i8,i5,i9,i7,ae,at,ar,ai,aa,an,as,ao,au,al,ad,ap,ac,ah,af,am,ag,ay,ab,a_,a$,av,aw,ax,ak,aS,aT,aI,aC,aE,az,aA,aO,aM,aR,aN,aB,aD,aU,aP,aL,aq,aW,aj,aV,aG,aF,aH,aK,aZ,aX,aQ,aY,aJ,a0,a1,a2,a3,a4,a6,a8,a5,a9,a7,ne,nt,nr,ni,na,nn,ns,no,nu,nl,nd,np,nc,nh,nf,nm,ng,ny,nb,n_,n$,nv,nw,nx,nk,nS,nT,nI,nC,nE,nz,nA=ed(()=>{eP=eU,globalThis.self?.name?.startsWith("em-pthread")&&eU()}),nO=ed(()=>{eO(),eL=typeof location>"u"?void 0:location.origin,eq=S.url>"file:"&&S.url<"file;",eW=eq?(URL,new URL(new e.U(e.r(19489)).href,eL).href):S.url,ej=()=>{if(eW&&!eW.startsWith("blob:"))return eW.substring(0,eW.lastIndexOf("/")+1)},eV=(e,r)=>{try{let i=r??eW;return(i?new URL(e,i):new URL(e)).origin===eL}catch{return!1}},eG=async e=>{let r=await (await fetch(e,{credentials:"same-origin"})).blob();return URL.createObjectURL(r)},eF=async e=>(await import(e)).default,eH=(eB(),ec(eM)).default,eK=async()=>{if(!eW)throw Error("Failed to load proxy worker: cannot determine the script source URL.");if(eV(eW))return[void 0,eH()];let e=await eG(eW);return[e,eH(e)]},eZ=(nA(),ec(eD)).default,eX=async(e,r,i,a)=>{let n=eZ&&!(e||r);if(n)if(eW)n=eV(eW)||a&&!i;else if(a&&!i)n=!0;else throw Error("cannot determine the script source URL.");if(n)return[void 0,eZ];{let a,n,s="ort-wasm-simd-threaded.jsep.mjs",o=e??((e,r)=>{let i=r??eW;try{return(i?new URL(e,i):new URL(e)).href}catch{return}})(s,r),u=i&&o&&!eV(o,r),l=u?await eG(o):o??(a=s,n=r,`${n??"./"}${a}`);return[u?l:void 0,await eF(l)]}}}),nM=ed(()=>{nO(),eY=!1,eJ=!1,e0=!1,e1=async e=>{if(eY)return Promise.resolve();if(eJ)throw Error("multiple calls to 'initializeWebAssembly()' detected.");if(e0)throw Error("previous call to 'initializeWebAssembly()' failed.");eJ=!0;let r=e.initTimeout,i=e.numThreads;if(!1!==e.simd){if("relaxed"===e.simd){if(!(()=>{try{return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,19,1,17,0,65,1,253,15,65,2,253,15,65,3,253,15,253,147,2,11]))}catch{return!1}})())throw Error("Relaxed WebAssembly SIMD is not supported in the current environment.")}else if(!(()=>{try{return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,30,1,28,0,65,0,253,15,253,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,253,186,1,26,11]))}catch{return!1}})())throw Error("WebAssembly SIMD is not supported in the current environment.")}let a=(()=>{if(typeof SharedArrayBuffer>"u")return!1;try{return"u">typeof MessageChannel&&new MessageChannel().port1.postMessage(new SharedArrayBuffer(1)),WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,5,4,1,3,1,1,10,11,1,9,0,65,0,254,16,2,0,26,11]))}catch{return!1}})();i>1&&!a&&("u">typeof self&&!self.crossOriginIsolated&&console.warn("env.wasm.numThreads is set to "+i+", but this will not work unless you enable crossOriginIsolated mode. See https://web.dev/cross-origin-isolation-guide/ for more info."),console.warn("WebAssembly multi-threading is not supported in the current environment. Falling back to single-threading."),e.numThreads=i=1);let n=e.wasmPaths,s="string"==typeof n?n:void 0,o=n?.mjs,u=o?.href??o,l=n?.wasm,d=l?.href??l,p=e.wasmBinary,[c,h]=await eX(u,s,i>1,!!p||!!d),f=!1,m=[];if(r>0&&m.push(new Promise(e=>{setTimeout(()=>{f=!0,e()},r)})),m.push(new Promise((e,r)=>{let a={numThreads:i};if(p)a.wasmBinary=p,a.locateFile=e=>e;else if(d||s)a.locateFile=e=>d??s+e;else if(u&&0!==u.indexOf("blob:"))a.locateFile=e=>new URL(e,u).href;else if(c){let e=ej();e&&(a.locateFile=r=>e+r)}h(a).then(r=>{eJ=!1,eY=!0,eQ=r,e(),c&&URL.revokeObjectURL(c)},e=>{eJ=!1,e0=!0,r(e)})})),await Promise.race(m),f)throw Error(`WebAssembly backend initializing failed due to timeout: ${r}ms`)},e2=()=>{if(eY&&eQ)return eQ;throw Error("WebAssembly is not initialized yet.")}}),nR=ed(()=>{nM(),e3=(e,r)=>{let i=e2(),a=i.lengthBytesUTF8(e)+1,n=i._malloc(a);return i.stringToUTF8(e,n,a),r.push(n),n},e4=(e,r,i,a)=>{if("object"==typeof e&&null!==e){if(i.has(e))throw Error("Circular reference in options");i.add(e)}Object.entries(e).forEach(([e,n])=>{let s=r?r+e:e;if("object"==typeof n)e4(n,s+".",i,a);else if("string"==typeof n||"number"==typeof n)a(s,n.toString());else if("boolean"==typeof n)a(s,n?"1":"0");else throw Error(`Can't handle extra config type: ${typeof n}`)})},e6=e=>{let r=e2(),i=r.stackSave();try{let i=r.PTR_SIZE,a=r.stackAlloc(2*i);r._OrtGetLastError(a,a+i);let n=Number(r.getValue(a,4===i?"i32":"i64")),s=r.getValue(a+i,"*"),o=s?r.UTF8ToString(s):"";throw Error(`${e} ERROR_CODE: ${n}, ERROR_MESSAGE: ${o}`)}finally{r.stackRestore(i)}}}),nN=ed(()=>{nM(),nR(),e8=e=>{let r=e2(),i=0,a=[],n=e||{};try{if(e?.logSeverityLevel===void 0)n.logSeverityLevel=2;else if("number"!=typeof e.logSeverityLevel||!Number.isInteger(e.logSeverityLevel)||e.logSeverityLevel<0||e.logSeverityLevel>4)throw Error(`log severity level is not valid: ${e.logSeverityLevel}`);if(e?.logVerbosityLevel===void 0)n.logVerbosityLevel=0;else if("number"!=typeof e.logVerbosityLevel||!Number.isInteger(e.logVerbosityLevel))throw Error(`log verbosity level is not valid: ${e.logVerbosityLevel}`);e?.terminate===void 0&&(n.terminate=!1);let s=0;return e?.tag!==void 0&&(s=e3(e.tag,a)),i=r._OrtCreateRunOptions(n.logSeverityLevel,n.logVerbosityLevel,!!n.terminate,s),0===i&&e6("Can't create run options."),e?.extra!==void 0&&e4(e.extra,"",new WeakSet,(e,n)=>{let s=e3(e,a),o=e3(n,a);0!==r._OrtAddRunConfigEntry(i,s,o)&&e6(`Can't set a run config entry: ${e} - ${n}.`)}),[i,a]}catch(e){throw 0!==i&&r._OrtReleaseRunOptions(i),a.forEach(e=>r._free(e)),e}}}),nB=ed(()=>{nM(),nR(),e5=(e,r,i,a)=>{let n=e3(r,a),s=e3(i,a);0!==e2()._OrtAddSessionConfigEntry(e,n,s)&&e6(`Can't set a session config entry: ${r} - ${i}.`)},e9=async(e,r,i)=>{for(let a of r.executionProviders){let r="string"==typeof a?a:a.name,n=[];switch(r){case"webnn":if(r="WEBNN",e5(e,"session.disable_quant_qdq","1",i),e5(e,"session.disable_qdq_constant_folding","1",i),"string"!=typeof a){let r=a?.deviceType;r&&e5(e,"deviceType",r,i)}break;case"webgpu":if(r="JS","string"!=typeof a&&a?.preferredLayout){if("NCHW"!==a.preferredLayout&&"NHWC"!==a.preferredLayout)throw Error(`preferredLayout must be either 'NCHW' or 'NHWC': ${a.preferredLayout}`);e5(e,"preferredLayout",a.preferredLayout,i)}break;case"wasm":case"cpu":continue;default:throw Error(`not supported execution provider: ${r}`)}let s=e3(r,i),o=n.length,u=0,l=0;if(o>0){u=e2()._malloc(o*e2().PTR_SIZE),i.push(u),l=e2()._malloc(o*e2().PTR_SIZE),i.push(l);for(let e=0;e<o;e++)e2().setValue(u+e*e2().PTR_SIZE,n[e][0],"*"),e2().setValue(l+e*e2().PTR_SIZE,n[e][1],"*")}await e2()._OrtAppendExecutionProvider(e,s,u,l,o)!==0&&e6(`Can't append execution provider: ${r}.`)}},e7=async e=>{var r;let i,a=e2(),n=0,s=[],o=e||{};(r=o).extra||(r.extra={}),r.extra.session||(r.extra.session={}),(i=r.extra.session).use_ort_model_bytes_directly||(i.use_ort_model_bytes_directly="1"),r.executionProviders&&r.executionProviders.some(e=>("string"==typeof e?e:e.name)==="webgpu")&&(r.enableMemPattern=!1);try{let e=(e=>{switch(e){case"disabled":return 0;case"basic":return 1;case"extended":return 2;case"layout":return 3;case"all":return 99;default:throw Error(`unsupported graph optimization level: ${e}`)}})(o.graphOptimizationLevel??"all"),r=(e=>{switch(e){case"sequential":return 0;case"parallel":return 1;default:throw Error(`unsupported execution mode: ${e}`)}})(o.executionMode??"sequential"),i="string"==typeof o.logId?e3(o.logId,s):0,u=o.logSeverityLevel??2;if(!Number.isInteger(u)||u<0||u>4)throw Error(`log severity level is not valid: ${u}`);let l=o.logVerbosityLevel??0;if(!Number.isInteger(l)||l<0||l>4)throw Error(`log verbosity level is not valid: ${l}`);let d="string"==typeof o.optimizedModelFilePath?e3(o.optimizedModelFilePath,s):0;if(n=a._OrtCreateSessionOptions(e,!!o.enableCpuMemArena,!!o.enableMemPattern,r,!!o.enableProfiling,0,i,u,l,d),0===n&&e6("Can't create session options."),o.executionProviders&&await e9(n,o,s),void 0!==o.enableGraphCapture){if("boolean"!=typeof o.enableGraphCapture)throw Error(`enableGraphCapture must be a boolean value: ${o.enableGraphCapture}`);e5(n,"enableGraphCapture",o.enableGraphCapture.toString(),s)}if(o.freeDimensionOverrides)for(let[e,r]of Object.entries(o.freeDimensionOverrides)){if("string"!=typeof e)throw Error(`free dimension override name must be a string: ${e}`);if("number"!=typeof r||!Number.isInteger(r)||r<0)throw Error(`free dimension override value must be a non-negative integer: ${r}`);let i=e3(e,s);0!==a._OrtAddFreeDimensionOverride(n,i,r)&&e6(`Can't set a free dimension override: ${e} - ${r}.`)}return void 0!==o.extra&&e4(o.extra,"",new WeakSet,(e,r)=>{e5(n,e,r,s)}),[n,s]}catch(e){throw 0!==n&&0!==a._OrtReleaseSessionOptions(n)&&e6("Can't release session options."),s.forEach(e=>a._free(e)),e}}}),nD=ed(()=>{te=e=>{switch(e){case"int8":return 3;case"uint8":return 2;case"bool":return 9;case"int16":return 5;case"uint16":return 4;case"int32":return 6;case"uint32":return 12;case"float16":return 10;case"float32":return 1;case"float64":return 11;case"string":return 8;case"int64":return 7;case"uint64":return 13;case"int4":return 22;case"uint4":return 21;default:throw Error(`unsupported data type: ${e}`)}},tt=e=>{switch(e){case 3:return"int8";case 2:return"uint8";case 9:return"bool";case 5:return"int16";case 4:return"uint16";case 6:return"int32";case 12:return"uint32";case 10:return"float16";case 1:return"float32";case 11:return"float64";case 8:return"string";case 7:return"int64";case 13:return"uint64";case 22:return"int4";case 21:return"uint4";default:throw Error(`unsupported data type: ${e}`)}},tr=(e,r)=>{let i=[-1,4,1,1,2,2,4,8,-1,1,2,8,4,8,-1,-1,-1,-1,-1,-1,-1,.5,.5][e],a="number"==typeof r?r:r.reduce((e,r)=>e*r,1);return i>0?Math.ceil(a*i):void 0},ti=e=>{switch(e){case"float16":return"u">typeof Float16Array&&Float16Array.from?Float16Array:Uint16Array;case"float32":return Float32Array;case"uint8":case"bool":return Uint8Array;case"int8":return Int8Array;case"uint16":return Uint16Array;case"int16":return Int16Array;case"int32":return Int32Array;case"float64":return Float64Array;case"uint32":return Uint32Array;case"int64":return BigInt64Array;case"uint64":return BigUint64Array;default:throw Error(`unsupported type: ${e}`)}},ta=e=>{switch(e){case"verbose":return 0;case"info":return 1;case"warning":return 2;case"error":return 3;case"fatal":return 4;default:throw Error(`unsupported logging level: ${e}`)}},tn=e=>"float32"===e||"float16"===e||"int32"===e||"int64"===e||"uint32"===e||"uint8"===e||"bool"===e||"uint4"===e||"int4"===e,ts=e=>"float32"===e||"float16"===e||"int32"===e||"int64"===e||"uint32"===e||"uint64"===e||"int8"===e||"uint8"===e||"bool"===e||"uint4"===e||"int4"===e,to=e=>{switch(e){case"none":return 0;case"cpu":return 1;case"cpu-pinned":return 2;case"texture":return 3;case"gpu-buffer":return 4;case"ml-tensor":return 5;default:throw Error(`unsupported data location: ${e}`)}}}),nU=ed(()=>{eO(),tu=async e=>{if("string"!=typeof e)return e instanceof Blob?new Uint8Array(await e.arrayBuffer()):e instanceof Uint8Array?e:new Uint8Array(e);{let r=await fetch(e);if(!r.ok)throw Error(`failed to load external data file: ${e}`);let i=r.headers.get("Content-Length"),a=i?parseInt(i,10):0;if(a<0x40000000)return new Uint8Array(await r.arrayBuffer());{if(!r.body)throw Error(`failed to load external data file: ${e}, no response body.`);let i=r.body.getReader(),n;try{n=new ArrayBuffer(a)}catch(e){if(e instanceof RangeError){let e=Math.ceil(a/65536);n=new WebAssembly.Memory({initial:e,maximum:e}).buffer}else throw e}let s=0;for(;;){let{done:e,value:r}=await i.read();if(e)break;let a=r.byteLength;new Uint8Array(n,s,a).set(r),s+=a}return new Uint8Array(n,0,a)}}}}),nP=ed(()=>{nD(),tl=["V","I","W","E","F"],tc=(e,r)=>{td=e,tp=r},th=(...e)=>{tp&&((e,r)=>{var i,a;let n=ta(e);n>=ta(td)&&(i=n,a="function"==typeof r?r():r,console.log(`[${tl[i]},${new Date().toISOString()}]${a}`))})(...e)}}),nL=ed(()=>{tf=class{static calcMatMulShape(e,r){return e[1]!==r[0]?void 0:[e[0],r[1]]}},tm=class{static calcShape(e,r,i=!1){let a=e.length,n=r.length;if(0===a)return r;if(0===n)return e;let s=Math.max(e.length,r.length),o=Array(s);if(i){if(a<2||n<2)return;let i=tf.calcMatMulShape([e[a-2],e[a-1]],[r[n-2],r[n-1]]);if(void 0===i)return;[o[s-2],o[s-1]]=i}for(let u=i?3:1;u<=s;u++){let i=a-u<0?1:e[a-u],l=n-u<0?1:r[n-u];if(i!==l&&i>1&&l>1)return;let d=Math.max(i,l);if(i&&l)o[s-u]=Math.max(i,l);else{if(d>1)return;o[s-u]=0}}return o}static isValidBroadcast(e,r){let i=e.length,a=r.length;if(i>a)return!1;for(let n=1;n<=i;n++)if(1!==e[i-n]&&e[i-n]!==r[a-n])return!1;return!0}},tg=class e{static size(r){return e.getSizeFromDimensionRange(r,0,r.length)}static convertShape(e,r=4){let i=e.length;if(0===i)return[];let a=Array(i),n=i-1;for(;n>=0;){if(e[n]%r==0){a[n]=e[n]/r;break}if(r%e[n]!=0)throw Error("cannot convert shape");a[n]=1,r/=e[n],n--}for(n--;n>=0;n--)a[n]=e[n];return a}static sizeFromDimension(r,i){if(i<0||i>r.length)throw Error(`invalid dimension of ${i} for sizeFromDimension as Tensor has ${r.length} dimensions.`);return e.getSizeFromDimensionRange(r,i,r.length)}static sizeToDimension(r,i){if(i<0||i>r.length)throw Error(`invalid dimension of ${i} for sizeToDimension as Tensor has ${r.length} dimensions.`);return e.getSizeFromDimensionRange(r,0,i)}static getSizeFromDimensionRange(e,r,i){let a=1;for(let n=r;n<i;n++){if(e[n]<0)throw Error("cannot get valid size from specified dimension range. Most likely the range contains negative values in them.");a*=Number(e[n])}return a}static computeStrides(e){let r=e.length;if(0===r)return[];if(1===r)return[1];let i=Array(r);i[r-1]=1,i[r-2]=e[r-1];for(let a=r-3;a>=0;--a)i[a]=i[a+1]*e[a+1];return i}static normalizeAxis(e,r){if(e<-r&&e>=r)throw Error("unsupported axis for this operation.");return e<0?e+r:e}static normalizeAxes(e,r){return e.map(i=>this.normalizeAxis(i,r??e.length))}static sortBasedOnPerm(e,r){return r?r.map(r=>e[r]):e.slice().reverse()}static padShape(e,r){let i=e.length;return e.map((e,a)=>e+r[a]+r[a+i])}static areEqual(e,r){return e.length===r.length&&e.every((e,i)=>e===r[i])}},ty=class e{static adjustPoolAttributes(e,r,i,a,n,s){if(!e&&i.length!==r.length-2)throw Error("length of specified kernel shapes should be 2 less than length of input dimensions");if(e)for(let e=0;e<r.length-2;e++)e>=i.length?i.push(r[e+2]):i[e]=r[e+2];for(let e=0;e<i.length;e++)if(e<a.length){if(a[e]<0)throw Error("strides should be greater than or equal to 1")}else a.push(1);for(let e=0;e<i.length;e++)if(e<n.length){if(n[e]<0)throw Error("dilations should be greater than or equal to 1")}else n.push(1);for(let e=0;e<2*i.length;e++)if(e<s.length){if(s[e]<0)throw Error("pad should be greater than or equal to 1")}else s.push(0);for(let e=0;e<i.length;e++){if(i[e]<=0)throw Error("kernel shapes need to be greater than 0");if(s[e]>=i[e]||s[e+i.length]>=i[e])throw Error("pads should be smaller than kernel")}}static adjustPadsBasedOnAutoPad(r,i,a,n,s,o,u){if(u){if(s.length!==2*(r.length-2))throw Error("length of pads should be twice the length of data dimensions");if(i.length!==r.length-2)throw Error("length of strides should be the length of data dimensions");if(n.length!==r.length-2)throw Error("length of kernel shapes should be the length of data dimensions");for(let l=0;l<r.length-2;l++)e.adjustPadAndReturnShape(r[l+(o?1:2)],i[l],a[l],n[l],s,l,l+r.length-2,u)}}static computePoolOutputShape(r,i,a,n,s,o,u){if(i.length<=0)throw Error("input shape must be of size greater than 0");let l=[i[0],i[1]];return e.computeShapeHelper(r,i,l,a,n,s,o,u),l}static computeConvOutputShape(r,i,a,n,s,o,u){if(r.length<=0||i.length<=0)throw Error("invalid input tensor dims or invalid filter tensor dims");let l=[r[0],i[0]];return e.computeShapeHelper(!1,r,l,a,n,s,o,u),l}static computeShapeHelper(r,i,a,n,s,o,u,l){if(r)for(let e=0;e<i.length-2;e++)a.push(1);else for(let r=0;r<i.length-2;r++)a.push(e.adjustPadAndReturnShape(i[r+2],n[r],s[r],o[r],u,r,r+i.length-2,l))}static adjustPadAndReturnShape(e,r,i,a,n,s,o,u){let l=i*(a-1)+1;if(!u||"NOTSET"===u)return Math.floor((e+n[s]+n[o]-l)/r+1);switch(u){case"VALID":return n[s]=0,n[o]=0,Math.floor((e-l)/r+1);case"SAME_LOWER":case"SAME_UPPER":if(1!==i)throw Error("Dilation not supported for SAME_UPPER or SAME_LOWER");{let i=((e+r-1)/r-1)*r+a-e;return n[s]=Math.floor("SAME_LOWER"===u?(i+1)/2:i/2),n[o]=i-n[s],Math.floor((e+i-a)/r+1)}default:throw Error("Unsupported AutoPad type")}}},tb=class{static getShapeOfGemmResult(e,r,i,a,n){let s,o,u;if(2!==e.length||2!==i.length)throw Error("shape need to be of size 2");r?(s=e[1],o=e[0]):(s=e[0],o=e[1]);let l=-1;if(a?(u=i[0],l=1):(u=i[1],l=0),i[l]!==o)throw Error("dimension mismatch");if(s<=0||u<=0||o<=0)throw Error("invalid shape specified");if(n&&!tm.isValidBroadcast(n,[s,u]))throw Error("gemm: invalid bias shape for broadcast");return[s,u,o]}},t_=-34028234663852886e22,t$=34028234663852886e22}),nq=ed(()=>{nD(),tv=(e,r)=>new(ti(r))(e)}),nW=ed(()=>{nD(),nP(),tw=new Map([["float32",32],["float16",16],["int32",32],["uint32",32],["int64",64],["uint64",64],["int8",8],["uint8",8],["int4",4],["uint4",4]]),tx=(e,r)=>{if("int32"===r)return e;let i=tw.get(r);if(!i)throw Error(`WebNN backend does not support data type: ${r}`);let a=i/8;if(e.byteLength%a!=0)throw Error(`Invalid Uint8Array length - must be a multiple of ${a}.`);let n=e.byteLength/a,s=new(ti(r))(e.buffer,e.byteOffset,n);switch(r){case"int64":case"uint64":{let e=new Int32Array(n);for(let r=0;r<n;r++){let i=s[r];if(i>2147483647n||i<-2147483648n)throw Error("Can not convert int64 data to int32 - value out of range.");e[r]=Number(i)}return new Uint8Array(e.buffer)}case"int8":case"uint8":case"uint32":if("uint32"===r&&s.some(e=>e>0x7fffffff))throw Error("Can not convert uint32 data to int32 - value out of range.");return new Uint8Array(Int32Array.from(s,Number).buffer);default:throw Error(`Unsupported data conversion from ${r} to 'int32'`)}},tk=(e,r)=>{if("int32"===r)return e;if(e.byteLength%4!=0)throw Error("Invalid Uint8Array length - must be a multiple of 4 (int32).");let i=e.byteLength/4,a=new Int32Array(e.buffer,e.byteOffset,i);switch(r){case"int64":return new Uint8Array(BigInt64Array.from(a,BigInt).buffer);case"uint64":if(a.some(e=>e<0))throw Error("Can not convert int32 data to uin64 - negative value found.");return new Uint8Array(BigUint64Array.from(a,BigInt).buffer);case"int8":if(a.some(e=>e<-128||e>127))throw Error("Can not convert int32 data to int8 - value out of range.");return new Uint8Array(Int8Array.from(a,Number).buffer);case"uint8":if(a.some(e=>e<0||e>255))throw Error("Can not convert int32 data to uint8 - value out of range.");return Uint8Array.from(a,Number);case"uint32":if(a.some(e=>e<0))throw Error("Can not convert int32 data to uint32 - negative value found.");return new Uint8Array(Uint32Array.from(a,Number).buffer);default:throw Error(`Unsupported data conversion from 'int32' to ${r}`)}},tS=1,tT=()=>tS++,tI=new Map([["int8","int32"],["uint8","int32"],["uint32","int32"],["int64","int32"]]),tC=(e,r)=>{let i=tw.get(e);if(!i)throw Error(`WebNN backend does not support data type: ${e}`);return r.length>0?Math.ceil(r.reduce((e,r)=>e*r)*i/8):0},tE=class{constructor(e){this.isDataConverted=!1;let{sessionId:r,context:i,tensor:a,dataType:n,shape:s,fallbackDataType:o}=e;this.sessionId=r,this.mlContext=i,this.mlTensor=a,this.dataType=n,this.tensorShape=s,this.fallbackDataType=o}get tensor(){return this.mlTensor}get type(){return this.dataType}get fallbackType(){return this.fallbackDataType}get shape(){return this.tensorShape}get byteLength(){return tC(this.dataType,this.tensorShape)}destroy(){th("verbose",()=>"[WebNN] TensorWrapper.destroy"),this.mlTensor.destroy()}write(e){this.mlContext.writeTensor(this.mlTensor,e)}async read(e){if(!this.fallbackDataType)return e?this.mlContext.readTensor(this.mlTensor,e):this.mlContext.readTensor(this.mlTensor);{let r=tk(new Uint8Array(await this.mlContext.readTensor(this.mlTensor)),this.dataType);return e?void(e instanceof ArrayBuffer?new Uint8Array(e):new Uint8Array(e.buffer,e.byteOffset,e.byteLength)).set(r):r.buffer}}canReuseTensor(e,r,i){return this.mlContext===e&&this.dataType===r&&this.tensorShape.length===i.length&&this.tensorShape.every((e,r)=>e===i[r])}setIsDataConverted(e){this.isDataConverted=e}},tz=class{constructor(e,r){this.tensorManager=e,this.wrapper=r}get tensorWrapper(){return this.wrapper}releaseTensor(){this.tensorWrapper&&(this.tensorManager.releaseTensor(this.tensorWrapper),this.wrapper=void 0)}async ensureTensor(e,r,i,a){let n=this.tensorManager.getMLContext(e),s=this.tensorManager.getMLOpSupportLimits(e),o;if(!s?.input.dataTypes.includes(r)){if(!(o=tI.get(r))||s?.input.dataTypes.includes(o))throw Error(`WebNN backend does not support data type: ${r}`);th("verbose",()=>`[WebNN] TensorIdTracker.ensureTensor: fallback dataType from ${r} to ${o}`)}if(this.wrapper){if(this.wrapper.canReuseTensor(n,r,i))return this.wrapper.tensor;if(a){if(this.wrapper.byteLength!==tC(r,i))throw Error("Unable to copy data to tensor with different size.");this.activeUpload=new Uint8Array(await this.wrapper.read())}this.tensorManager.releaseTensor(this.wrapper)}let u=typeof MLTensorUsage>"u"?void 0:MLTensorUsage.READ|MLTensorUsage.WRITE;return this.wrapper=await this.tensorManager.getCachedTensor(e,r,i,u,!0,!0,o),a&&this.activeUpload&&(this.wrapper.write(this.activeUpload),this.activeUpload=void 0),this.wrapper.tensor}upload(e){let r=e;if(this.wrapper){if(this.wrapper.fallbackType)if("int32"===this.wrapper.fallbackType)r=tx(e,this.wrapper.type),this.wrapper.setIsDataConverted(!0);else throw Error(`Unsupported fallback data type: ${this.wrapper.fallbackType}`);if(e.byteLength===this.wrapper.byteLength)return void this.wrapper.write(r);th("verbose",()=>"Data size does not match tensor size. Releasing tensor."),this.releaseTensor()}this.activeUpload?this.activeUpload.set(r):this.activeUpload=new Uint8Array(r)}async download(e){if(this.activeUpload){let r=this.wrapper?.isDataConverted?tk(this.activeUpload,this.wrapper?.type):this.activeUpload;return e?void(e instanceof ArrayBuffer?new Uint8Array(e).set(r):new Uint8Array(e.buffer,e.byteOffset,e.byteLength).set(r)):r.buffer}if(!this.wrapper)throw Error("Tensor has not been created.");return e?this.wrapper.read(e):this.wrapper.read()}},tA=class{constructor(e){this.backend=e,this.tensorTrackersById=new Map,this.freeTensors=[],this.externalTensors=new Set}getMLContext(e){let r=this.backend.getMLContext(e);if(!r)throw Error("MLContext not found for session.");return r}getMLOpSupportLimits(e){return this.backend.getMLOpSupportLimits(e)}reserveTensorId(){let e=tT();return this.tensorTrackersById.set(e,new tz(this)),e}releaseTensorId(e){let r=this.tensorTrackersById.get(e);r&&(this.tensorTrackersById.delete(e),r.tensorWrapper&&this.releaseTensor(r.tensorWrapper))}async ensureTensor(e,r,i,a,n){th("verbose",()=>`[WebNN] TensorManager.ensureTensor {tensorId: ${r}, dataType: ${i}, shape: ${a}, copyOld: ${n}}`);let s=this.tensorTrackersById.get(r);if(!s)throw Error("Tensor not found.");return s.ensureTensor(e,i,a,n)}upload(e,r){let i=this.tensorTrackersById.get(e);if(!i)throw Error("Tensor not found.");i.upload(r)}async download(e,r){th("verbose",()=>`[WebNN] TensorManager.download {tensorId: ${e}, dstBuffer: ${r?.byteLength}}`);let i=this.tensorTrackersById.get(e);if(!i)throw Error("Tensor not found.");return i.download(r)}releaseTensorsForSession(e){for(let r of this.freeTensors)r.sessionId===e&&r.destroy();this.freeTensors=this.freeTensors.filter(r=>r.sessionId!==e)}registerTensor(e,r,i,a){let n=this.getMLContext(e),s=tT(),o=new tE({sessionId:e,context:n,tensor:r,dataType:i,shape:a});return this.tensorTrackersById.set(s,new tz(this,o)),this.externalTensors.add(o),s}async getCachedTensor(e,r,i,a,n,s,o){let u=this.getMLContext(e);for(let[a,n]of this.freeTensors.entries())if(n.canReuseTensor(u,r,i)){th("verbose",()=>`[WebNN] Reusing tensor {dataType: ${r}, ${o?`fallbackDataType: ${o},`:""} shape: ${i}`);let n=this.freeTensors.splice(a,1)[0];return n.sessionId=e,n}th("verbose",()=>`[WebNN] MLContext.createTensor {dataType: ${r}, ${o?`fallbackDataType: ${o},`:""} shape: ${i}}`);let l=await u.createTensor({dataType:o??r,shape:i,dimensions:i,usage:a,writable:n,readable:s});return new tE({sessionId:e,context:u,tensor:l,dataType:r,shape:i,fallbackDataType:o})}releaseTensor(e){this.externalTensors.has(e)&&this.externalTensors.delete(e),this.freeTensors.push(e)}},tO=(...e)=>new tA(...e)}),nj=ed(()=>{nD(),nM(),nq(),nW(),nP(),tM=new Map([[1,"float32"],[10,"float16"],[6,"int32"],[12,"uint32"],[7,"int64"],[13,"uint64"],[22,"int4"],[21,"uint4"],[3,"int8"],[2,"uint8"],[9,"uint8"]]),tR=class{constructor(e){this.tensorManager=tO(this),this.mlContextBySessionId=new Map,this.sessionIdsByMLContext=new Map,this.mlContextCache=[],this.sessionGraphInputs=new Map,this.sessionGraphOutputs=new Map,this.temporaryGraphInputs=[],this.temporaryGraphOutputs=[],this.temporarySessionTensorIds=new Map,this.mlOpSupportLimitsBySessionId=new Map,tc(e.logLevel,!!e.debug)}get currentSessionId(){if(void 0===this.activeSessionId)throw Error("No active session");return this.activeSessionId}onRunStart(e){th("verbose",()=>`[WebNN] onRunStart {sessionId: ${e}}`),this.activeSessionId=e}onRunEnd(e){th("verbose",()=>`[WebNN] onRunEnd {sessionId: ${e}}`);let r=this.temporarySessionTensorIds.get(e);if(r){for(let e of r)th("verbose",()=>`[WebNN] releasing temporary tensor {tensorId: ${e}}`),this.tensorManager.releaseTensorId(e);this.temporarySessionTensorIds.delete(e),this.activeSessionId=void 0}}async createMLContext(e){if(e instanceof GPUDevice){let r=this.mlContextCache.findIndex(r=>r.gpuDevice===e);if(-1!==r)return this.mlContextCache[r].mlContext;{let r=await navigator.ml.createContext(e);return this.mlContextCache.push({gpuDevice:e,mlContext:r}),r}}if(void 0===e){let e=this.mlContextCache.findIndex(e=>void 0===e.options&&void 0===e.gpuDevice);if(-1!==e)return this.mlContextCache[e].mlContext;{let e=await navigator.ml.createContext();return this.mlContextCache.push({mlContext:e}),e}}let r=this.mlContextCache.findIndex(r=>((e,r)=>{if(e===r)return!0;if(void 0===e||void 0===r)return!1;let i=Object.keys(e).sort(),a=Object.keys(r).sort();return i.length===a.length&&i.every((i,n)=>i===a[n]&&e[i]===r[i])})(r.options,e));if(-1!==r)return this.mlContextCache[r].mlContext;{let r=await navigator.ml.createContext(e);return this.mlContextCache.push({options:e,mlContext:r}),r}}registerMLContext(e,r){this.mlContextBySessionId.set(e,r);let i=this.sessionIdsByMLContext.get(r);i||(i=new Set,this.sessionIdsByMLContext.set(r,i)),i.add(e),this.mlOpSupportLimitsBySessionId.has(e)||this.mlOpSupportLimitsBySessionId.set(e,r.opSupportLimits()),this.temporaryGraphInputs.length>0&&(this.sessionGraphInputs.set(e,this.temporaryGraphInputs),this.temporaryGraphInputs=[]),this.temporaryGraphOutputs.length>0&&(this.sessionGraphOutputs.set(e,this.temporaryGraphOutputs),this.temporaryGraphOutputs=[])}onReleaseSession(e){this.sessionGraphInputs.delete(e),this.sessionGraphOutputs.delete(e);let r=this.mlContextBySessionId.get(e);if(!r)return;this.tensorManager.releaseTensorsForSession(e),this.mlContextBySessionId.delete(e),this.mlOpSupportLimitsBySessionId.delete(e);let i=this.sessionIdsByMLContext.get(r);if(i.delete(e),0===i.size){this.sessionIdsByMLContext.delete(r);let e=this.mlContextCache.findIndex(e=>e.mlContext===r);-1!==e&&this.mlContextCache.splice(e,1)}}getMLContext(e){return this.mlContextBySessionId.get(e)}getMLOpSupportLimits(e){return this.mlOpSupportLimitsBySessionId.get(e)}reserveTensorId(){return this.tensorManager.reserveTensorId()}releaseTensorId(e){th("verbose",()=>`[WebNN] releaseTensorId {tensorId: ${e}}`),this.tensorManager.releaseTensorId(e)}async ensureTensor(e,r,i,a,n){let s=tM.get(i);if(!s)throw Error(`Unsupported ONNX data type: ${i}`);return this.tensorManager.ensureTensor(e??this.currentSessionId,r,s,a,n)}async createTemporaryTensor(e,r,i){th("verbose",()=>`[WebNN] createTemporaryTensor {onnxDataType: ${r}, shape: ${i}}`);let a=tM.get(r);if(!a)throw Error(`Unsupported ONNX data type: ${r}`);let n=this.tensorManager.reserveTensorId();await this.tensorManager.ensureTensor(e,n,a,i,!1);let s=this.temporarySessionTensorIds.get(e);return s?s.push(n):this.temporarySessionTensorIds.set(e,[n]),n}uploadTensor(e,r){if(!e2().shouldTransferToMLTensor)throw Error("Trying to upload to a MLTensor while shouldTransferToMLTensor is false");th("verbose",()=>`[WebNN] uploadTensor {tensorId: ${e}, data: ${r.byteLength}}`),this.tensorManager.upload(e,r)}async downloadTensor(e,r){return this.tensorManager.download(e,r)}createMLTensorDownloader(e,r){return async()=>{let i=await this.tensorManager.download(e);return tv(i,r)}}registerMLTensor(e,r,i,a){let n=tM.get(i);if(!n)throw Error(`Unsupported ONNX data type: ${i}`);let s=this.tensorManager.registerTensor(e,r,n,a);return th("verbose",()=>`[WebNN] registerMLTensor {tensor: ${r}, dataType: ${n}, dimensions: ${a}} -> {tensorId: ${s}}`),s}registerMLConstant(e,r,i,a,n,s,o=!1){if(!s)throw Error("External mounted files are not available.");let u=e;e.startsWith("./")&&(u=e.substring(2));let l=s.get(u);if(!l)throw Error(`File with name ${u} not found in preloaded files.`);if(r+i>l.byteLength)throw Error("Out of bounds: data offset and length exceed the external file data size.");let d=l.slice(r,r+i).buffer,p;switch(n.dataType){case"float32":p=new Float32Array(d);break;case"float16":p="u">typeof Float16Array&&Float16Array.from?new Float16Array(d):new Uint16Array(d);break;case"int32":p=new Int32Array(d);break;case"uint32":p=new Uint32Array(d);break;case"int64":o?(p=new Int32Array(tx(new Uint8Array(d),"int64").buffer),n.dataType="int32"):p=new BigInt64Array(d);break;case"uint64":p=new BigUint64Array(d);break;case"int8":p=new Int8Array(d);break;case"int4":case"uint4":case"uint8":p=new Uint8Array(d);break;default:throw Error(`Unsupported data type: ${n.dataType} in creating WebNN Constant from external data.`)}return th("verbose",()=>`[WebNN] registerMLConstant {dataType: ${n.dataType}, shape: ${n.shape}}} ${o?"(Note: it was int64 data type and registered to int32 as workaround)":""}`),a.constant(n,p)}registerGraphInput(e){this.temporaryGraphInputs.push(e)}registerGraphOutput(e){this.temporaryGraphOutputs.push(e)}isGraphInput(e,r){let i=this.sessionGraphInputs.get(e);return!!i&&i.includes(r)}isGraphOutput(e,r){let i=this.sessionGraphOutputs.get(e);return!!i&&i.includes(r)}isGraphInputOutputTypeSupported(e,r,i=!0){let a=tM.get(te(r)),n=this.mlOpSupportLimitsBySessionId.get(e);return!(typeof a>"u")&&(i?!!n?.input.dataTypes.includes(a):!!n?.output.dataTypes.includes(a))}flush(){}}}),nV=ed(()=>{}),nG=ed(()=>{nP(),nV(),tN=new Map([[64,250],[128,200],[256,200],[512,200],[2048,230],[4096,200],[8192,50],[16384,50],[32768,50],[65536,50],[131072,50],[262144,50],[524288,50],[1048576,50],[2097152,30],[4194304,20],[8388608,10],[0xc00000,10],[0x1000000,10],[0x1900000,15],[0x2000000,22],[0x2a30000,2],[0x3840000,6],[0x4000000,6],[0x8000000,6],[0xa000000,6]]),tB=[],tD=e=>16*Math.ceil(Number(e)/16),tU=1,tP=()=>tU++,tL=async(e,r,i,a)=>{let n=tD(i),s=e.device.createBuffer({size:n,usage:GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ});try{let o=e.getCommandEncoder();e.endComputePass(),o.copyBufferToBuffer(r,0,s,0,n),e.flush(),await s.mapAsync(GPUMapMode.READ);let u=s.getMappedRange();if(!a)return new Uint8Array(u.slice(0,i));{let e=a();return e.set(new Uint8Array(u,0,i)),e}}finally{s.destroy()}},tq=class{constructor(e){for(let[r]of(this.backend=e,this.storageCache=new Map,this.freeBuffers=new Map,this.freeUniformBuffers=new Map,this.buffersPending=[],this.capturedPendingBuffers=new Map,tN))tB.push(r),this.freeBuffers.set(r,[]),this.freeUniformBuffers.set(r,[]);this.sessionCount=0}upload(e,r){let i=r.buffer,a=r.byteOffset,n=r.byteLength,s=tD(n),o=this.storageCache.get(e);if(!o)throw Error("gpu data for uploading does not exist");if(Number(o.originalSize)!==n)throw Error(`inconsistent data size. gpu data size=${o.originalSize}, data size=${n}`);let u=this.backend.device.createBuffer({mappedAtCreation:!0,size:s,usage:GPUBufferUsage.MAP_WRITE|GPUBufferUsage.COPY_SRC});new Uint8Array(u.getMappedRange()).set(new Uint8Array(i,a,n)),u.unmap();let l=this.backend.device.createCommandEncoder();l.copyBufferToBuffer(u,0,o.gpuData.buffer,0,s),this.backend.device.queue.submit([l.finish()]),u.destroy(),th("verbose",()=>`[WebGPU] GpuDataManager.upload(id=${e})`)}memcpy(e,r){let i=this.storageCache.get(e);if(!i)throw Error("source gpu data for memcpy does not exist");let a=this.storageCache.get(r);if(!a)throw Error("destination gpu data for memcpy does not exist");if(i.originalSize!==a.originalSize)throw Error("inconsistent source and destination gpu data size");let n=tD(i.originalSize),s=this.backend.getCommandEncoder();this.backend.endComputePass(),s.copyBufferToBuffer(i.gpuData.buffer,0,a.gpuData.buffer,0,n)}registerExternalBuffer(e,r,i){let a;if(i){if(a=i[0],e===i[1])return th("verbose",()=>`[WebGPU] GpuDataManager.registerExternalBuffer(size=${r}) => id=${a}, buffer is the same, skip.`),a;if(this.backend.capturedCommandList.has(this.backend.currentSessionId))throw Error(`Registering a different external buffer under graph capture mode is not supported yet.
+             Please use the previous external buffer!`)}else a=tP();return this.storageCache.set(a,{gpuData:{id:a,type:0,buffer:e},originalSize:r}),th("verbose",()=>`[WebGPU] GpuDataManager.registerExternalBuffer(size=${r}) => id=${a}, registered.`),a}unregisterExternalBuffer(e){void 0!==e&&(this.storageCache.delete(e),th("verbose",()=>`[WebGPU] GpuDataManager.unregisterExternalBuffer() => id=${e}`))}create(e,r=GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST){let i=(e=>{for(let r=0;r<tB.length;r++){let i=tB[r];if(e<=i)return i}return 16*Math.ceil(e/16)})(e),a,n=(r&GPUBufferUsage.STORAGE)===GPUBufferUsage.STORAGE,s=(r&GPUBufferUsage.UNIFORM)===GPUBufferUsage.UNIFORM;if(n||s){let e=(n?this.freeBuffers:this.freeUniformBuffers).get(i);a=e&&e.length>0?e.pop():this.backend.device.createBuffer({size:i,usage:r})}else a=this.backend.device.createBuffer({size:i,usage:r});let o={id:tP(),type:0,buffer:a};return this.storageCache.set(o.id,{gpuData:o,originalSize:Number(e)}),th("verbose",()=>`[WebGPU] GpuDataManager.create(size=${e}) => id=${o.id}`),o}get(e){return this.storageCache.get(e)?.gpuData}release(e){let r="bigint"==typeof e?Number(e):e,i=this.storageCache.get(r);if(!i){if(0===this.storageCache.size)return 0;throw Error("releasing data does not exist")}return th("verbose",()=>`[WebGPU] GpuDataManager.release(id=${r}), gpuDataId=${i.gpuData.id}`),this.storageCache.delete(r),this.buffersPending.push(i.gpuData.buffer),i.originalSize}async download(e,r){let i=this.storageCache.get(Number(e));if(!i)throw Error("data does not exist");await tL(this.backend,i.gpuData.buffer,i.originalSize,r)}refreshPendingBuffers(){if(0!==this.buffersPending.length)if("default"===this.backend.sessionStatus){for(let e of this.buffersPending){let r=tN.get(e.size);if((e.usage&GPUBufferUsage.STORAGE)===GPUBufferUsage.STORAGE){let i=this.freeBuffers.get(e.size)||[];void 0===r||i.length>=r?e.destroy():i.push(e)}else if((e.usage&GPUBufferUsage.UNIFORM)===GPUBufferUsage.UNIFORM){let i=this.freeUniformBuffers.get(e.size)||[];void 0===r||i.length>=r?e.destroy():i.push(e)}else e.destroy()}this.buffersPending=[]}else{let e=this.capturedPendingBuffers.get(this.backend.currentSessionId);for(let r of(e||(e=[],this.capturedPendingBuffers.set(this.backend.currentSessionId,e)),this.buffersPending))e.push(r);this.buffersPending=[]}}dispose(){this.freeBuffers.forEach(e=>{e.forEach(e=>{e.destroy()})}),this.freeUniformBuffers.forEach(e=>{e.forEach(e=>{e.destroy()})}),this.storageCache.forEach(e=>{e.gpuData.buffer.destroy()}),this.capturedPendingBuffers.forEach(e=>{e.forEach(e=>{e.destroy()})}),this.storageCache=new Map,this.freeBuffers=new Map,this.freeUniformBuffers=new Map,this.capturedPendingBuffers=new Map}onCreateSession(){this.sessionCount+=1}onReleaseSession(e){let r=this.capturedPendingBuffers.get(e);r&&(r.forEach(e=>{e.destroy()}),this.capturedPendingBuffers.delete(e)),this.sessionCount-=1,0===this.sessionCount&&(th("warning",()=>"[WebGPU] Clearing webgpu buffer cache"),this.storageCache.forEach(e=>{e.gpuData.buffer.destroy()}),this.storageCache=new Map)}},tW=(...e)=>new tq(...e)}),nF=ed(()=>{tj=class{constructor(e){Object.assign(this,e)}get cacheKey(){return this.key||(this.key=Object.getOwnPropertyNames(this).sort().map(e=>`${this[e]}`).join(";")),this.key}},tV=e=>new tj(e)}),nH=ed(()=>{nD(),nL(),tG=64,tF=(e,r)=>{if(3===r)throw Error("vec3 has same alignment as vec4, use vec4 instead");switch(Number(e)){case 10:return r>1?`vec${r}<f16>`:"f16";case 1:return r>1?`vec${r}<f32>`:"f32";case 6:return r>1?`vec${r}<i32>`:"i32";case 12:return r>1?`vec${r}<u32>`:"u32";case 7:if(r>1)throw Error("currently not supported vecX of uint64 yet");return["vec2<u32>","i32"];case 13:if(r>1)throw Error("currently not supported vecX of uint64 yet");return["vec2<u32>","u32"];case 9:if(4!==r)throw Error("bool must be vec4");return["u32","vec4<bool>"];case 22:return"i32";case 21:return"u32";default:throw Error(`Unknown data type: ${e}`)}},tH=(e,r=1)=>{let i=tF(e,r);return"string"==typeof i?i:i[0]},tK=(e,r=1)=>{let i=tF(e,r);return"string"==typeof i?i:i[1]},tZ=(...e)=>{let r=[];return e.forEach(e=>{0!==e.length&&r.push({type:12,data:e},{type:12,data:tg.computeStrides(e)})}),r},tX=e=>e%4==0?4:e%2==0?2:1,tQ=(e="f32",r,i="0")=>r&&1!==r?`vec${r}<${e}>(${i})`:`${e}(${i})`,tY=(e,r,i)=>"f32"===e?i:1===r?`f32(${i})`:`vec${r}<f32>(${i})`,tJ=(e,r)=>4===r?`(${e}.x + ${e}.y + ${e}.z + ${e}.w)`:2===r?`(${e}.x + ${e}.y)`:3===r?`(${e}.x + ${e}.y + ${e}.z)`:e,t0=(e,r,i,a)=>e.startsWith("uniforms.")&&i>4?"string"==typeof r?"f16"===a?`${e}[(${r}) / 8][(${r}) % 8 / 4][(${r}) % 8 % 4]`:`${e}[(${r}) / 4][(${r}) % 4]`:"f16"===a?`${e}[${Math.floor(r/8)}][${Math.floor(r%8/4)}][${r%8%4}]`:`${e}[${Math.floor(r/4)}][${r%4}]`:i>1?`${e}[${r}]`:e,t1=(e,r,i,a,n)=>{let s,o,u,l,d="number"==typeof i,p=d?i:i.length,c=[...Array(p).keys()],h=p<2?"u32":p<=4?`vec${p}<u32>`:`array<u32, ${p}>`,f=tF(r,n),m="string"==typeof f?f:f[1],g={indices:h,value:m,storage:"string"==typeof f?f:f[0],tensor:r},y=e=>"string"==typeof e?e:`${e}u`,b={offsetToIndices:!1,indicesToOffset:!1,broadcastedIndicesToOffset:!1,set:!1,setByIndices:!1,get:!1,getByIndices:!1},_=d?"uniforms.":"",$=`${_}${e}_shape`,v=`${_}${e}_strides`,w="";for(let e=0;e<p-1;e++)w+=`
+    let dim${e} = current / ${t0(v,e,p)};
+    let rest${e} = current % ${t0(v,e,p)};
+    indices[${e}] = dim${e};
+    current = rest${e};
+    `;w+=`indices[${p-1}] = current;`;let x=p<2?"":`
+  fn o2i_${e}(offset: u32) -> ${g.indices} {
+    var indices: ${g.indices};
+    var current = offset;
+    ${w}
+    return indices;
+  }`,k=[];if(p>=2)for(let e=p-1;e>=0;e--)k.push(`${t0(v,e,p)} * (indices[${e}])`);let S=p<2?"":`
+  fn i2o_${e}(indices: ${g.indices}) -> u32 {
+    return ${k.join("+")};
+  }`,T=(...e)=>0===p?"0u":`${g.indices}(${e.map(y).join(",")})`,I=(e,r)=>p<2?`${e}`:`${t0(e,r,p)}`,C={},E=(r,i)=>(()=>{if(g.storage===g.value)return`${e}[${r}]=${i};`;if("vec2<u32>"===g.storage&&"i32"===g.value)return`${e}[${r}]=vec2<u32>(u32(${i}), select(0u, 0xFFFFFFFFu, ${i} < 0));`;if("vec2<u32>"===g.storage&&"u32"===g.value)return`${e}[${r}]=vec2<u32>(u32(${i}), 0u);`;if("u32"===g.storage&&"vec4<bool>"===g.value)return`${e}[${r}]=dot(vec4<u32>(0x1, 0x100, 0x10000, 0x1000000), vec4<u32>(${i}));`;throw Error(`not supported combination of storage type ${g.storage} and value type ${g.value} yet`)})(),z=r=>(()=>{if(g.storage===g.value)return`${e}[${r}]`;if("vec2<u32>"===g.storage&&"i32"===g.value)return`i32(${e}[${r}].x)`;if("vec2<u32>"===g.storage&&"u32"===g.value)return`u32(${e}[${r}].x)`;if("u32"===g.storage&&"vec4<bool>"===g.value)return`vec4<bool>(bool(${e}[${r}] & 0xFFu), bool(${e}[${r}] & 0xFF00u), bool(${e}[${r}] & 0xFF0000u), bool(${e}[${r}] & 0xFF000000u))`;throw Error(`not supported combination of storage type ${g.storage} and value type ${g.value} yet`)})(),A=p<2?"":`
+  fn get_${e}ByIndices(indices: ${g.indices}) -> ${m} {
+    return ${z(`i2o_${e}(indices)`)};
+  }`,O=p<2?"":(s=c.map(e=>`d${e}: u32`).join(", "),o=c.map(e=>`d${e}`).join(", "),`
+  fn get_${e}(${s}) -> ${m} {
+    return get_${e}ByIndices(${T(o)});
+  }`),M=p<2?"":`
+  fn set_${e}ByIndices(indices: ${g.indices}, value: ${m}) {
+    ${E(`i2o_${e}(indices)`,"value")}
+  }`,R=p<2?"":(u=c.map(e=>`d${e}: u32`).join(", "),l=c.map(e=>`d${e}`).join(", "),`
+  fn set_${e}(${u}, value: ${m}) {
+    set_${e}ByIndices(${T(l)}, value);
+  }`);return{impl:()=>{let e=[],r=!1;return b.offsetToIndices&&(e.push(x),r=!0),b.indicesToOffset&&(e.push(S),r=!0),b.broadcastedIndicesToOffset&&(Object.values(C).forEach(r=>e.push(r)),r=!0),b.set&&(e.push(R),r=!0),b.setByIndices&&(e.push(M),r=!0),b.get&&(e.push(O),r=!0),b.getByIndices&&(e.push(A),r=!0),!d&&r&&e.unshift(`const ${$} = ${g.indices}(${i.join(",")});`,`const ${v} = ${g.indices}(${tg.computeStrides(i).join(",")});`),e.join(`
+`)},type:g,offsetToIndices:r=>(b.offsetToIndices=!0,p<2?r:`o2i_${e}(${r})`),indicesToOffset:r=>(b.indicesToOffset=!0,p<2?r:`i2o_${e}(${r})`),broadcastedIndicesToOffset:(r,i)=>{b.broadcastedIndicesToOffset=!0;let a=`${i.name}broadcastedIndicesTo${e}Offset`;if(a in C)return`${a}(${r})`;let n=[];for(let e=p-1;e>=0;e--){let r=i.indicesGet("outputIndices",e+i.rank-p);n.push(`${I(v,e)} * (${r} % ${I($,e)})`)}return C[a]=`fn ${a}(outputIndices: ${i.type.indices}) -> u32 {
+             return ${n.length>0?n.join("+"):"0u"};
+           }`,`${a}(${r})`},indices:T,indicesGet:I,indicesSet:(e,r,i)=>p<2?`${e}=${i};`:`${t0(e,r,p)}=${i};`,set:(...r)=>{if(r.length!==p+1)throw Error(`indices length must be ${p}`);let i=r[p];if("string"!=typeof i)throw Error("value must be string");let a=r.slice(0,p).map(y).join(",");return 0===p?E("0u",i):1===p?E(a[0],i):(b.set=!0,b.setByIndices=!0,b.indicesToOffset=!0,`set_${e}(${a}, ${i})`)},setByOffset:E,setByIndices:(r,i)=>p<2?E(r,i):(b.setByIndices=!0,b.indicesToOffset=!0,`set_${e}ByIndices(${r}, ${i});`),get:(...r)=>{if(r.length!==p)throw Error(`indices length must be ${p}`);let i=r.map(y).join(",");return 0===p?z("0u"):1===p?z(i[0]):(b.get=!0,b.getByIndices=!0,b.indicesToOffset=!0,`get_${e}(${i})`)},getByOffset:z,getByIndices:r=>p<2?z(r):(b.getByIndices=!0,b.indicesToOffset=!0,`get_${e}ByIndices(${r})`),usage:a,name:e,strides:v,shape:$,rank:p}},t2=(e,r,i,a=1)=>t1(e,r,i,"input",a),t3=(e,r,i,a=1)=>t1(e,r,i,"output",a),t4=(e,r,i)=>t1(e,r,i,"atomicOutput",1),t6=(e,r,i,a=1)=>t1(e,r,i,"internal",a),t8=class{constructor(e,r){this.normalizedDispatchGroup=e,this.limits=r,this.internalVariables=[],this.variables=[],this.uniforms=[],this.variableIndex=0}guardAgainstOutOfBoundsWorkgroupSizes(e){return`if (global_idx >= ${"number"==typeof e?`${e}u`:e}) { return; }`}mainStart(e=tG){let r="number"==typeof e?e:e[0],i="number"==typeof e?1:e[1],a="number"==typeof e?1:e[2];if(r>this.limits.maxComputeWorkgroupSizeX||i>this.limits.maxComputeWorkgroupSizeY||a>this.limits.maxComputeWorkgroupSizeZ)throw Error(`workgroup size [${r}, ${i}, ${a}] exceeds the maximum workgroup size [${this.limits.maxComputeWorkgroupSizeX}, ${this.limits.maxComputeWorkgroupSizeY}, ${this.limits.maxComputeWorkgroupSizeZ}].`);if(r*i*a>this.limits.maxComputeInvocationsPerWorkgroup)throw Error(`workgroup size [${r}, ${i}, ${a}] exceeds the maximum workgroup invocations ${this.limits.maxComputeInvocationsPerWorkgroup}.`);let n=1===this.normalizedDispatchGroup[1]&&1===this.normalizedDispatchGroup[2],s=n?`@builtin(global_invocation_id) global_id : vec3<u32>,
+    @builtin(workgroup_id) workgroup_id : vec3<u32>,
+    @builtin(local_invocation_index) local_idx : u32,
+    @builtin(local_invocation_id) local_id : vec3<u32>`:`@builtin(global_invocation_id) global_id : vec3<u32>,
+                                             @builtin(local_invocation_id) local_id : vec3<u32>,
+    @builtin(local_invocation_index) local_idx : u32,
+    @builtin(workgroup_id) workgroup_id : vec3<u32>,
+    @builtin(num_workgroups) num_workgroups : vec3<u32>`,o=n?`let global_idx = global_id.x;
+         let workgroup_index = workgroup_id.x;`:`let workgroup_index = workgroup_id.z * num_workgroups[0] * num_workgroups[1] +
+             workgroup_id.y * num_workgroups[0] + workgroup_id.x;
+         let global_idx = workgroup_index * ${r*i*a}u + local_idx;`;return`@compute @workgroup_size(${r}, ${i}, ${a})
+  fn main(${s}) {
+    ${o}
+  `}appendVariableUniforms(e){0!==e.rank&&(e.shape.startsWith("uniforms.")&&this.uniforms.push({name:e.shape.replace("uniforms.",""),type:"u32",length:e.rank}),e.strides.startsWith("uniforms.")&&this.uniforms.push({name:e.strides.replace("uniforms.",""),type:"u32",length:e.rank}))}declareVariable(e,r){if("internal"===e.usage)throw Error("cannot use internal variable with declareVariable(). use registerInternalVariables() instead.");this.variables.push(e),this.appendVariableUniforms(e);let i="input"===e.usage?"read":"read_write",a="atomicOutput"===e.usage?"atomic<i32>":e.type.storage;return`@group(0) @binding(${r}) var<storage, ${i}> ${e.name}: array<${a}>;`}declareVariables(...e){return e.map(e=>this.declareVariable(e,this.variableIndex++)).join(`
+`)}registerInternalVariable(e){if("internal"!==e.usage)throw Error("cannot use input or output variable with registerInternalVariable(). use declareVariables() instead.");this.internalVariables.push(e),this.appendVariableUniforms(e)}registerInternalVariables(...e){return e.forEach(e=>this.registerInternalVariable(e)),this}registerUniform(e,r,i=1){return this.uniforms.push({name:e,type:r,length:i}),this}registerUniforms(e){return this.uniforms=this.uniforms.concat(e),this}uniformDeclaration(){if(0===this.uniforms.length)return"";let e=[];for(let{name:r,type:i,length:a}of this.uniforms)if(a&&a>4)"f16"===i?e.push(`@align(16) ${r}:array<mat2x4<${i}>, ${Math.ceil(a/8)}>`):e.push(`${r}:array<vec4<${i}>, ${Math.ceil(a/4)}>`);else{let n=null==a||1===a?i:`vec${a}<${i}>`;e.push(`${r}:${n}`)}return`
+      struct Uniforms { ${e.join(", ")} };
+      @group(0) @binding(${this.variableIndex}) var<uniform> uniforms: Uniforms;`}get additionalImplementations(){return this.uniformDeclaration()+this.variables.map(e=>e.impl()).join(`
+`)+this.internalVariables.map(e=>e.impl()).join(`
+`)}get variablesInfo(){if(0!==this.uniforms.length)return this.uniforms.map(e=>[[12,10,1,6][["u32","f16","f32","i32"].indexOf(e.type)],e.length??1])}},t5=(e,r)=>new t8(e,r)}),nK=ed(()=>{nD(),nL(),nF(),nH(),t9=(e,r)=>0!==r.length?r:[...Array(e).keys()].reverse(),t7=(e,r)=>{let i,a,n=e.dataType,s=e.dims.length,o=t9(s,r),u=(i=e.dims,a=o,tg.sortBasedOnPerm(i,t9(i.length,a))),l=e.dims,d=u;if(s<2||((e,r)=>{let i=0;for(let a=0;a<e.length;++a)if(1!==r[e[a]]){if(e[a]<i)return!1;i=e[a]}return!0})(o,e.dims))return{name:"TransposeCopy",shaderCache:{inputDependencies:["type"]},getRunData:()=>{let r=tg.size(u);return{outputs:[{dims:u,dataType:e.dataType}],dispatchGroup:{x:Math.ceil(r/64/4)},programUniforms:[{type:12,data:Math.ceil(r/4)}]}},getShaderSource:e=>{let r=t2("input",n,l,4),i=t3("output",n,d,4);return`
+  ${e.registerUniform("output_size","u32").declareVariables(r,i)}
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    output[global_idx] = input[global_idx];
+  }`}};let{newShape:p,newPerm:c}=((e,r)=>{let i=[],a=[];for(let n=0;n<e.length;++n)1!==e[n]&&i.push(e[n]),1!==e[r[n]]&&a.push(r[n]);return{newShape:i,newPerm:a}})(e.dims,o),h=tg.areEqual(c,[2,3,1]),f=tg.areEqual(c,[3,1,2]);return 2===p.length||h||f?(d=[(l=h?[p[0],p[1]*p[2]]:f?[p[0]*p[1],p[2]]:p)[1],l[0]],{name:"TransposeShared",shaderCache:{inputDependencies:["type"]},getRunData:()=>{let r=tg.size(u);return{outputs:[{dims:u,dataType:e.dataType}],dispatchGroup:{x:Math.ceil(d[1]/16),y:Math.ceil(d[0]/16)},programUniforms:[{type:12,data:r},...tZ(l,d)]}},getShaderSource:e=>{let r=t2("a",n,l.length),i=t3("output",n,d.length);return`
+  ${e.registerUniform("output_size","u32").declareVariables(r,i)}
+  var<workgroup> tile : array<array<${i.type.value}, 17>, 16>;
+  ${e.mainStart([16,16,1])}
+    let stride = (uniforms.output_shape[1] - 1) / 16 + 1;
+    let workgroup_id_x = workgroup_index % stride;
+    let workgroup_id_y = workgroup_index / stride;
+    let input_col = workgroup_id_y * 16u + local_id.x;
+    let input_row = workgroup_id_x * 16u + local_id.y;
+    if (input_row < uniforms.a_shape[0] && input_col < uniforms.a_shape[1]) {
+      tile[local_id.y][local_id.x] = ${r.getByIndices(`${r.type.indices}(input_row, input_col)`)};
+    }
+    workgroupBarrier();
+
+    let output_col = workgroup_id_x * 16u + local_id.x;
+    let output_row = workgroup_id_y * 16u + local_id.y;
+    if (output_row < uniforms.output_shape[0] && output_col < uniforms.output_shape[1]) {
+      ${i.setByIndices(`${i.type.indices}(output_row, output_col)`,"tile[local_id.x][local_id.y]")}
+    }
+  }`}}):{name:"Transpose",shaderCache:{hint:`${r}`,inputDependencies:["rank"]},getRunData:()=>{let r=tg.size(u);return{outputs:[{dims:u,dataType:e.dataType}],dispatchGroup:{x:Math.ceil(r/64)},programUniforms:[{type:12,data:r},...tZ(l,d)]}},getShaderSource:e=>{let r=t2("a",n,l.length),i=t3("output",n,d.length);return`
+  ${e.registerUniform("output_size","u32").declareVariables(r,i)}
+
+  ${((e,r,i,a)=>{let n=`fn perm(i: ${a.type.indices}) -> ${i.type.indices} {
+    var a: ${i.type.indices};`;for(let i=0;i<r;++i)n+=`a[${e[i]}]=i[${i}];`;return n+"return a;}"})(o,s,r,i)}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+
+    let indices = ${i.offsetToIndices("global_idx")};
+    let aIndices = perm(indices);
+
+    ${i.setByOffset("global_idx",r.getByIndices("aIndices"))}
+  }`}}},re=(e,r)=>{((e,r)=>{if(!e||1!==e.length)throw Error("Transpose requires 1 input.");if(0!==r.length&&r.length!==e[0].dims.length)throw Error(`perm size ${r.length} does not match input rank ${e[0].dims.length}`)})(e.inputs,r.perm),e.compute(t7(e.inputs[0],r.perm))},rt=e=>tV({perm:e.perm})}),nZ=ed(()=>{nD(),nL(),nH(),nX(),nK(),rr={max:"select(bestValue, candidate, candidate > bestValue)",min:"select(bestValue, candidate, candidate < bestValue)",mean:"bestValue + candidate",sum:"bestValue + candidate",prod:"bestValue * candidate",sumSquare:"bestValue + candidate * candidate",logSumExp:"bestValue + exp(candidate)",l1:"bestValue + abs(candidate)",l2:"bestValue + candidate * candidate",logSum:"bestValue + candidate"},ri={max:"select(bestValue, candidate, candidate > bestValue)",min:"select(bestValue, candidate, candidate < bestValue)",mean:"bestValue + candidate",sum:"bestValue + candidate",prod:"bestValue * candidate",sumSquare:"bestValue + candidate",logSumExp:"bestValue + candidate",l1:"bestValue + candidate",l2:"bestValue + candidate",logSum:"bestValue + candidate"},ra={max:"_A[offset]",min:"_A[offset]",mean:"0",sum:"0",prod:"1",sumSquare:"0",logSumExp:"0",l1:"0",l2:"0",logSum:"0"},rn={max:"bestValue",min:"bestValue",sum:"bestValue",prod:"bestValue",sumSquare:"bestValue",logSumExp:"log(bestValue)",l1:"bestValue",l2:"sqrt(bestValue)",logSum:"log(bestValue)"},rs=(e,r,i,a)=>{var n,s,o,u,l,d,p;let c,h,f,m,g,y,b,_=1===e.inputs.length?i:r$(e.inputs,i),$=_.axes;0!==$.length||_.noopWithEmptyAxes||($=e.inputs[0].dims.map((e,r)=>r));let v=tg.normalizeAxes($,e.inputs[0].dims.length),w=v,x=e.inputs[0],k=((e,r)=>{let i=[];if(!((e,r)=>{for(let i=0;i<e.length;++i)if(e[e.length-i-1]!==r-1-i)return!1;return!0})(e,r)){for(let a=0;a<r;++a)-1===e.indexOf(a)&&i.push(a);e.forEach(e=>i.push(e))}return i})(w,e.inputs[0].dims.length);k.length>0&&(x=e.compute(t7(e.inputs[0],k),{inputs:[0],outputs:[-1]})[0],w=((e,r)=>{let i=[];for(let a=r-e;a<r;++a)i.push(a);return i})(w.length,x.dims.length));let[S,T]=((e,r)=>{let i=[],a=e.length;for(let n=0;n<a;n++)-1===r.indexOf(n)&&i.push(e[n]);return[i,r.map(r=>e[r])]})(x.dims,w),I=S;_.keepDims&&(I=((e,r)=>{let i=e.length+r.length,a=[],n=0;for(let s=0;s<i;s++)-1===r.indexOf(s)?a.push(e[n++]):a.push(1);return a})(S,v)),e.compute((n=r,s=_.cacheKey,o=[x],u=a,l=e.inputs[0].dataType,d=I,p=T,c=o[0].dims,h=tg.size(d),f=tg.size(p),m=t2("_A",o[0].dataType,c),g=t3("output",l,d),y=64,1===h&&(y=256),b=`
+          var<workgroup> aBestValues : array<f32, ${y}>;
+       `,{name:n,shaderCache:{hint:`${s};${y}`,inputDependencies:["type"]},getShaderSource:e=>`
+        ${e.registerUniform("reduceSize","u32").declareVariables(m,g)}
+        ${b}
+        fn DIV_CEIL(a : u32, b : u32) -> u32 {
+          return ((a - 1u) / b + 1u);
+         }
+         ${e.mainStart(y)}
+
+          let outputIndex = global_idx / ${y};
+          let offset = outputIndex * uniforms.reduceSize;
+
+          var bestValue = f32(${ra[u]});
+          let Length = uniforms.reduceSize;
+          for (var k = local_idx; k < Length; k = k + ${y}) {
+           let candidate = f32(${m.getByOffset("offset + k")});
+           bestValue = ${rr[u]};
+          }
+          aBestValues[local_idx] = bestValue;
+          workgroupBarrier();
+
+         var reduceSize = min(Length, ${y}u);
+         for (var currentSize = reduceSize / 2u; reduceSize > 1u;
+             currentSize = reduceSize / 2u) {
+           let interval = DIV_CEIL(reduceSize, 2u);
+           if (local_idx < currentSize) {
+            let candidate = aBestValues[local_idx + interval];
+            bestValue = ${ri[u]};
+            aBestValues[local_idx] = bestValue;
+           }
+           reduceSize = interval;
+           workgroupBarrier();
+         }
+
+         if (local_idx == 0u) {
+          ${g.setByOffset("outputIndex",`${"mean"===u?`${g.type.storage}(bestValue / f32(uniforms.reduceSize))`:`${g.type.storage}(${rn[u]})`}`)};
+         }
+        }`,getRunData:()=>({outputs:[{dims:d,dataType:l}],dispatchGroup:{x:h},programUniforms:[{type:12,data:f}]})}),{inputs:[x]})},ro=(e,r)=>{rs(e,"ReduceMeanShared",r,"mean")},ru=(e,r)=>{rs(e,"ReduceL1Shared",r,"l1")},rl=(e,r)=>{rs(e,"ReduceL2Shared",r,"l2")},rd=(e,r)=>{rs(e,"ReduceLogSumExpShared",r,"logSumExp")},rp=(e,r)=>{rs(e,"ReduceMaxShared",r,"max")},rc=(e,r)=>{rs(e,"ReduceMinShared",r,"min")},rh=(e,r)=>{rs(e,"ReduceProdShared",r,"prod")},rf=(e,r)=>{rs(e,"ReduceSumShared",r,"sum")},rm=(e,r)=>{rs(e,"ReduceSumSquareShared",r,"sumSquare")},rg=(e,r)=>{rs(e,"ReduceLogSumShared",r,"logSum")}}),nX=ed(()=>{nD(),nL(),nF(),nH(),nZ(),ry=e=>{if(!e||0===e.length||e.length>2)throw Error("Reduce op requires 1 or 2 inputs.");if(2===e.length&&1!==e[1].dims.length)throw Error("Invalid axes input dims.")},rb=e=>["","",`var value = ${e.getByIndices("input_indices")};`,""],r_=(e,r,i,a,n,s,o=!1,u=!1)=>{let l=[],d=i[0].dims,p=d.length,c=tg.normalizeAxes(n,p),h=!u&&0===c.length;d.forEach((e,r)=>{h||c.indexOf(r)>=0?o&&l.push(1):l.push(e)});let f=l.length,m=tg.size(l);return{name:e,shaderCache:r,getShaderSource:e=>{let r=[],n=t2("_A",i[0].dataType,p),u=t3("output",s,f),l=a(n,u,c),m=l[2];for(let e=0,i=0;e<p;e++)h||c.indexOf(e)>=0?(o&&i++,m=`for(var j${e}: u32 = 0; j${e} < ${d[e]}; j${e}++) {
+                  ${l[2].includes("last_index")?`let last_index = j${e};`:""}
+                  ${n.indicesSet("input_indices",e,`j${e}`)}
+                  ${m}
+                }`):(r.push(`${n.indicesSet("input_indices",e,u.indicesGet("output_indices",i))};`),i++);return`
+
+        ${e.registerUniform("output_size","u32").declareVariables(n,u)}
+
+        ${e.mainStart()}
+          ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+          var input_indices: ${n.type.indices};
+          let output_indices = ${u.offsetToIndices("global_idx")};
+
+          ${r.join(`
+`)}
+          ${l[0]}       // init ops for reduce max/min
+          ${l[1]}
+          ${m}
+          ${l[3]}
+          ${4===l.length?u.setByOffset("global_idx","value"):l.slice(4).join(`
+`)}
+        }`},getRunData:()=>({outputs:[{dims:l,dataType:s}],dispatchGroup:{x:Math.ceil(m/64)},programUniforms:[{type:12,data:m},...tZ(d,l)]})}},r$=(e,r)=>{let i=[];return e[1].dims[0]>0&&e[1].getBigInt64Array().forEach(e=>i.push(Number(e))),tV({axes:i,keepDims:r.keepDims,noopWithEmptyAxes:r.noopWithEmptyAxes})},rv=(e,r,i,a)=>{let n=e.inputs,s=1===n.length?i:r$(n,i);e.compute(r_(r,{hint:s.cacheKey,inputDependencies:["rank"]},[n[0]],s.noopWithEmptyAxes&&0===s.axes.length?rb:a,s.axes,n[0].dataType,s.keepDims,s.noopWithEmptyAxes),{inputs:[0]})},rw=(e,r,i)=>{if(0===r.length)return i;let a=1,n=1;for(let i=0;i<r.length;i++)-1===r.indexOf(i)?a*=e[i]:n*=e[i];return n<32&&a>1024},rx=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceMean",a,(e,r,a)=>{let n=1;for(let r=0;r<e.rank;r++)(a.indexOf(r)>=0||0===a.length)&&(n*=i.inputs[0].dims[r]);return["var sum = f32(0);","",`sum += f32(${e.getByIndices("input_indices")});`,`let value = ${r.type.value}(sum / ${n});`]})):ro(e,r)},rk=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceL1",a,(e,r)=>[`var value = ${r.type.storage}(0);`,"",`value += abs(${e.getByIndices("input_indices")});`,""])):ru(e,r)},rS=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceL2",a,(e,r)=>[`var t = ${r.type.value}(0); var value = ${r.type.value}(0);`,"",`t = ${e.getByIndices("input_indices")}; value += (t * t);`,"value = sqrt(value);"])):rl(e,r)},rT=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceLogSumExp",a,(e,r)=>[`var value = ${r.type.storage}(0);`,"",`value += exp(${e.getByIndices("input_indices")});`,"value = log(value);"])):rd(e,r)},rI=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceMax",a,(e,r,i)=>{let a=[];for(let r=0;r<e.rank;r++)(i.indexOf(r)>=0||0===i.length)&&a.push(e.indicesSet("input_indices",r,0));return[`${a.join(`
+`)}`,`var value = ${e.getByIndices("input_indices")};`,`value = max(value, ${e.getByIndices("input_indices")});`,""]})):rp(e,r)},rC=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceMin",a,(e,r,i)=>{let a=[];for(let r=0;r<e.rank;r++)(i.indexOf(r)>=0||0===i.length)&&a.push(`input_indices[${r}] = 0;`);return[`${a.join(`
+`)}`,`var value = ${e.getByIndices("input_indices")};`,`value = min(value, ${e.getByIndices("input_indices")});`,""]})):rc(e,r)},rE=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceProd",a,(e,r)=>[`var value = ${r.type.storage}(1);`,"",`value *= ${e.getByIndices("input_indices")};`,""])):rh(e,r)},rz=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceSum",a,(e,r)=>[`var value = ${r.type.storage}(0);`,"",`value += ${e.getByIndices("input_indices")};`,""])):rf(e,r)},rA=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceSumSquare",a,(e,r)=>[`var t = ${r.type.value}(0); var value = ${r.type.value}(0);`,"",`t = ${e.getByIndices("input_indices")}; value += t * t;`,""])):rm(e,r)},rO=(e,r)=>{var i,a;rw(e.inputs[0].dims,r.axes,r.noopWithEmptyAxes)?(i=e,a=r,ry(i.inputs),rv(i,"ReduceLogSum",a,(e,r)=>[`var value = ${r.type.storage}(0);`,"",`value += ${e.getByIndices("input_indices")};`,"value = log(value);"])):rg(e,r)}}),nQ=ed(()=>{nD(),nF(),nX(),rM=e=>{if(!e||0===e.length||e.length>2)throw Error("ArgMinMaxOp op requires 1 or 2 inputs.");if(1!==e[0].dataType)throw Error("Invalid input type.")},rR=(e,r)=>{rM(e.inputs),e.compute(r_("ArgMin",{hint:r.cacheKey,inputDependencies:["rank"]},[e.inputs[0]],(e,i,a)=>{let n=[];for(let r=0;r<e.rank;r++)(a.indexOf(r)>=0||0===a.length)&&n.push(`input_indices[${r}] = 0;`);return[`${n.join(`
+`)}`,`var value = ${e.getByIndices("input_indices")};
+var best_index : i32 = 0;`,`if (${e.getByIndices("input_indices")} ${r.selectLastIndex>0?"<=":"<"} value) {
+         value = ${e.getByIndices("input_indices")};
+         best_index = i32(last_index);
+       }`,"",i.setByOffset("global_idx","best_index")]},[r.axis],7,r.keepDims),{inputs:[0]})},rN=(e,r)=>{rM(e.inputs),e.compute(r_("argMax",{hint:r.cacheKey,inputDependencies:["rank"]},[e.inputs[0]],(e,i,a)=>{let n=[];for(let r=0;r<e.rank;r++)(a.indexOf(r)>=0||0===a.length)&&n.push(`input_indices[${r}] = 0;`);return[`${n.join(`
+`)}`,`var value = ${e.getByIndices("input_indices")};
+var best_index : i32 = 0;`,`if (${e.getByIndices("input_indices")} ${r.selectLastIndex>0?">=":">"} value) {
+         value = ${e.getByIndices("input_indices")};
+         best_index = i32(last_index);
+       }`,"",i.setByOffset("global_idx","best_index")]},[r.axis],7,r.keepDims),{inputs:[0]})},rB=e=>tV(e)}),nY=ed(()=>{nD(),nL(),nV(),nH(),rD=(e,r,i)=>r&&e?`
+      let total_sequence_length_input = u32(${r.getByOffset("0")});
+      let present_sequence_length = max(total_sequence_length_input, uniforms.past_sequence_length);
+      let is_subsequent_prompt: bool = sequence_length > 1 && sequence_length != total_sequence_length_input;
+      let is_first_prompt: bool = is_subsequent_prompt == false && sequence_length == total_sequence_length_input;
+      total_sequence_length = u32(${e?.getByOffset("batchIdx")}) + 1;
+      var past_sequence_length: u32 = 0;
+      if (is_first_prompt == false) {
+        past_sequence_length = total_sequence_length - sequence_length;
+      }
+       `:`
+    ${i?"let past_sequence_length = uniforms.past_sequence_length":""};
+    let present_sequence_length = total_sequence_length;
+    `,rU=(e,r,i,a,n,s,o,u,l,d,p,c)=>{var h,f,m,g,y,b,_,$,v,w,x,k,S,T,I,C,E,z,A,O,M,R,N,B,D;let U,P,L,q,W,j,V,G,F,H,K,Z,X,Q,Y,J,ee,et,er,ei,ea,en,es,eo,eu,el,ed,ep,ec,eh,ef,em,eg,ey=Math.min(e.outputCount,1+ +!!o+ +!!u),eb=ey>1?o:void 0,e_=ey>1?u:void 0,e$=ey>1?d.pastSequenceLength:0,ev=e$+d.kvSequenceLength,ew=l&&tg.size(l.dims)>0?l:void 0,ex=[r,i];eb&&tg.size(eb.dims)>0&&ex.push(eb),ew&&ex.push(ew),p&&ex.push(p),c&&ex.push(c);let ek=e.compute((h=ey,f=r,m=i,g=eb,y=ew,b=d,_=e$,$=p,v=c,U=_+b.kvSequenceLength,P=[b.batchSize,b.numHeads,b.sequenceLength,U],L=h>1&&g,q=b.kvNumHeads?b.kvNumHeads:b.numHeads,W=L?[b.batchSize,q,U,b.headSize]:void 0,j=b.nReps?b.nReps:1,V=0===b.scale?1/Math.sqrt(b.headSize):b.scale,G=tX(b.headSize),F=b.headSize/G,H={x:Math.ceil(U/12),y:Math.ceil(b.sequenceLength/12),z:b.batchSize*b.numHeads},K=[{type:12,data:b.sequenceLength},{type:12,data:F},{type:12,data:U},{type:12,data:b.numHeads},{type:12,data:b.headSize},{type:1,data:V},{type:12,data:_},{type:12,data:b.kvSequenceLength},{type:12,data:j}],Z=L&&g&&tg.size(g.dims)>0,X=["type","type"],Z&&X.push("type"),y&&X.push("type"),$&&X.push("type"),v&&X.push("type"),Q=[{dims:P,dataType:f.dataType,gpuDataType:0}],L&&Q.push({dims:W,dataType:f.dataType,gpuDataType:0}),{name:"AttentionProbs",shaderCache:{hint:`${G};${void 0!==y};${void 0!==g};${h}`,inputDependencies:X},getRunData:()=>({outputs:Q,dispatchGroup:H,programUniforms:K}),getShaderSource:e=>{let r=t2("q",f.dataType,f.dims,G),i=[r,t2("key",m.dataType,m.dims,G)];if(Z){let e=t2("past_key",g.dataType,g.dims,G);i.push(e)}y&&i.push(t2("attention_bias",y.dataType,y.dims));let a=$?t2("seq_lens",$.dataType,$.dims):void 0;a&&i.push(a);let n=v?t2("total_sequence_length_input",v.dataType,v.dims):void 0;n&&i.push(n);let s=t3("output",f.dataType,P),o=[s];L&&o.push(t3("present_key",f.dataType,W,G));let u=tK(1,G);return`
+  const TILE_SIZE = 12u;
+
+  var<workgroup> tileQ: array<${r.type.storage}, 144>;
+  var<workgroup> tileK: array<${r.type.storage}, 144>;
+  ${e.registerUniforms([{name:"M",type:"u32"},{name:"K",type:"u32"},{name:"N",type:"u32"},{name:"num_heads",type:"u32"},{name:"head_size",type:"u32"},{name:"alpha",type:"f32"},{name:"past_sequence_length",type:"u32"},{name:"kv_sequence_length",type:"u32"},{name:"n_reps",type:"u32"}]).declareVariables(...i,...o)}
+  ${e.mainStart([12,12,1])}
+    // x holds the N and y holds the M
+    let headIdx = workgroup_id.z % uniforms.num_heads;
+    let kvHeadIdx = ${1===j?"headIdx":"headIdx / uniforms.n_reps"};
+    let kv_num_heads = ${1===j?"uniforms.num_heads":"uniforms.num_heads / uniforms.n_reps"};
+    let batchIdx = workgroup_id.z / uniforms.num_heads;
+    let m = workgroup_id.y * TILE_SIZE;
+    let n = workgroup_id.x * TILE_SIZE;
+    let sequence_length = uniforms.M;
+    var total_sequence_length = uniforms.N;
+    ${rD(a,n,!0)}
+    let absKvHeadIdx = batchIdx * kv_num_heads + kvHeadIdx;
+    let qOffset = workgroup_id.z * uniforms.M * uniforms.K + m * uniforms.K;
+    ${Z&&L?"let pastKeyOffset = absKvHeadIdx * uniforms.past_sequence_length * uniforms.K;":""};
+    let kOffset = absKvHeadIdx * uniforms.kv_sequence_length * uniforms.K;
+    ${L?"let presentKeyOffset = absKvHeadIdx * uniforms.N * uniforms.K;":""}
+    var value = ${u}(0);
+    for (var w: u32 = 0u; w < uniforms.K; w += TILE_SIZE) {
+      if (global_id.y < uniforms.M && w + local_id.x < uniforms.K) {
+        tileQ[TILE_SIZE * local_id.y + local_id.x] = q[qOffset + local_id.y * uniforms.K + w + local_id.x];
+      }
+      if (n + local_id.y < uniforms.N && w + local_id.x < uniforms.K) {
+        var idx = TILE_SIZE * local_id.y + local_id.x;
+      ${Z&&L?`
+              if (n + local_id.y < past_sequence_length) {
+                tileK[idx] = past_key[pastKeyOffset + (n + local_id.y) * uniforms.K + w + local_id.x];
+              } else if (n + local_id.y - past_sequence_length < uniforms.kv_sequence_length) {
+                tileK[idx] = key[kOffset + (n + local_id.y - past_sequence_length) * uniforms.K + w + local_id.x];
+              }`:`
+          if (n + local_id.y < uniforms.kv_sequence_length) {
+            tileK[idx] = key[kOffset + (n + local_id.y) * uniforms.K + w + local_id.x];
+          }`}
+      ${L?`if (n + local_id.y < present_sequence_length) {
+        present_key[presentKeyOffset + (n + local_id.y) * uniforms.K + w + local_id.x] = tileK[idx];
+      }`:""}
+      }
+      workgroupBarrier();
+
+      for (var k: u32 = 0u; k < TILE_SIZE && w+k < uniforms.K; k++) {
+          value += ${u}(tileQ[TILE_SIZE * local_id.y + k] * tileK[TILE_SIZE * local_id.x + k]);
+      }
+
+      workgroupBarrier();
+    }
+
+    if (global_id.y < uniforms.M && global_id.x < total_sequence_length) {
+      let headOffset = workgroup_id.z * uniforms.M * uniforms.N;
+      let outputIdx = headOffset + global_id.y * uniforms.N + global_id.x;
+      var sum: f32 = ${(()=>{switch(G){case 1:return"value";case 2:return"value.x + value.y";case 4:return"value.x + value.y + value.z + value.w";default:throw Error(`Unsupported components: ${G}`)}})()};
+        output[outputIdx] = ${s.type.value} (sum * uniforms.alpha) + ${y?"attention_bias[outputIdx]":"0.0"};
+    }
+  }`}}),{inputs:ex,outputs:ey>1?[-1,1]:[-1]})[0];e.compute((w=ek,x=d.batchSize,k=d.numHeads,S=e$,T=d.sequenceLength,I=ev,C=p,E=c,Y=tX(C?1:I),J=64,(ee=I/Y)<64&&(J=32),et=[{type:12,data:x},{type:12,data:k},{type:12,data:S},{type:12,data:T},{type:12,data:ee},{type:12,data:Math.ceil(I/Y/J)}],er=tH(w.dataType,Y),ei=tK(1,Y),ea=["type"],C&&ea.push("type"),E&&ea.push("type"),{name:"AttentionProbsSoftmax",shaderCache:{hint:`${J};${er};${Y}`,inputDependencies:ea},getShaderSource:e=>{let r=t3("x",w.dataType,w.dims,Y),i=[r],a=C?t2("seq_lens",C.dataType,C.dims):void 0;a&&i.push(a);let n=E?t2("total_sequence_length_input",E.dataType,E.dims):void 0;n&&i.push(n);let s=tK(w.dataType);return`
+  var<workgroup> thread_max: array<f32, ${J}>;
+  var<workgroup> thread_sum: array<f32, ${J}>;
+  ${e.registerUniforms([{name:"batch_size",type:"u32"},{name:"num_heads",type:"u32"},{name:"past_sequence_length",type:"u32"},{name:"sequence_length",type:"u32"},{name:"total_sequence_length",type:"u32"},{name:"elements_per_thread",type:"u32"}]).declareVariables(...i)}
+  ${e.mainStart([J,1,1])}
+    let batchIdx = workgroup_id.z / uniforms.num_heads;
+    let headIdx = workgroup_id.z % uniforms.num_heads;
+    let sequence_length = uniforms.sequence_length;
+    var total_sequence_length = uniforms.total_sequence_length;
+    ${rD(a,n,!1)}
+    let local_offset = local_idx * uniforms.elements_per_thread;
+    let offset = (global_idx / ${J}) * uniforms.total_sequence_length + local_offset;
+    let seq_causal_length = ${C?"u32(past_sequence_length + workgroup_id.y + 1)":"total_sequence_length"};
+    var thread_max_vector = ${ei}(-3.4028234663852886e+38f);
+    for (var i: u32 = 0; i < uniforms.elements_per_thread && i + local_offset < seq_causal_length; i++) {
+      thread_max_vector = max(${ei}(x[offset + i]), thread_max_vector);
+    }
+    thread_max[local_idx] = ${(()=>{switch(Y){case 1:return"thread_max_vector";case 2:return"max(thread_max_vector.x, thread_max_vector.y)";case 4:return"max(max(thread_max_vector.x, thread_max_vector.y), max(thread_max_vector.z, thread_max_vector.w))";default:throw Error(`Unsupported components: ${Y}`)}})()};
+    workgroupBarrier();
+
+    var max_value =  f32(-3.4028234663852886e+38f);
+    for (var i = 0u; i < ${J}; i++) {
+      max_value = max(thread_max[i], max_value);
+    }
+
+    var sum_vector = ${ei}(0);
+    for (var i: u32 = 0; i < uniforms.elements_per_thread && i + local_offset < seq_causal_length; i++) {
+      sum_vector += exp(${ei}(x[offset + i]) - max_value);
+    }
+    thread_sum[local_idx] = ${(()=>{switch(Y){case 1:return"sum_vector";case 2:return"sum_vector.x + sum_vector.y";case 4:return"sum_vector.x + sum_vector.y + sum_vector.z + sum_vector.w";default:throw Error(`Unsupported components: ${Y}`)}})()};
+    workgroupBarrier();
+
+    var sum: f32 = 0;
+    for (var i = 0u; i < ${J}; i++) {
+      sum += thread_sum[i];
+    }
+
+    if (sum == 0) {
+      for (var i: u32 = 0; i < uniforms.elements_per_thread && i + local_offset < seq_causal_length; i++) {
+        x[offset + i] = ${r.type.value}(${s}(1.0) / ${s}(seq_causal_length));
+      }
+    } else {
+      for (var i: u32 = 0; i < uniforms.elements_per_thread && i + local_offset < seq_causal_length; i++) {
+        var f32input = ${ei}(x[offset + i]);
+        x[offset + i] = ${r.type.value}(exp(f32input - max_value) / sum);
+      }
+    }
+      ${C?`
+        for (var total_seq_id: u32 = seq_causal_length; total_seq_id + local_offset < uniforms.total_sequence_length; total_seq_id++) {
+          x[offset + total_seq_id] = ${r.type.value}(${s}(0));
+        }`:""};
+  }`},getRunData:()=>({outputs:[],dispatchGroup:{x:1,y:T,z:x*k},programUniforms:et})}),{inputs:p&&c?[ek,p,c]:[ek],outputs:[]});let eS=[ek,a];e_&&tg.size(e_.dims)>0&&eS.push(e_),p&&eS.push(p),c&&eS.push(c),e.compute((z=ey,A=ek,O=a,M=e_,R=d,N=e$,B=p,D=c,en=N+R.kvSequenceLength,es=R.nReps?R.nReps:1,eo=R.vHiddenSize*es,eu=z>1&&M,el=R.kvNumHeads?R.kvNumHeads:R.numHeads,ed=eu?[R.batchSize,el,en,R.headSize]:void 0,ep=[R.batchSize,R.sequenceLength,eo],ec={x:Math.ceil(R.vHeadSize/12),y:Math.ceil(R.sequenceLength/12),z:R.batchSize*R.numHeads},eh=[{type:12,data:R.sequenceLength},{type:12,data:en},{type:12,data:R.vHeadSize},{type:12,data:R.numHeads},{type:12,data:R.headSize},{type:12,data:eo},{type:12,data:N},{type:12,data:R.kvSequenceLength},{type:12,data:es}],ef=eu&&M&&tg.size(M.dims)>0,em=["type","type"],ef&&em.push("type"),B&&em.push("type"),D&&em.push("type"),eg=[{dims:ep,dataType:A.dataType,gpuDataType:0}],eu&&eg.push({dims:ed,dataType:A.dataType,gpuDataType:0}),{name:"AttentionScore",shaderCache:{hint:`${void 0!==M};${z}`,inputDependencies:em},getRunData:()=>({outputs:eg,dispatchGroup:ec,programUniforms:eh}),getShaderSource:e=>{let r=t2("probs",A.dataType,A.dims),i=[r,t2("v",O.dataType,O.dims)];ef&&i.push(t2("past_value",M.dataType,M.dims));let a=B?t2("seq_lens",B.dataType,B.dims):void 0;B&&i.push(a);let n=D?t2("total_sequence_length_input",D.dataType,D.dims):void 0;D&&i.push(n);let s=[t3("output",A.dataType,ep)];return eu&&s.push(t3("present_value",A.dataType,ed)),`
+  const TILE_SIZE = 12u;
+  var<workgroup> tileQ: array<${r.type.value}, 144>;
+  var<workgroup> tileV: array<${r.type.value}, 144>;
+  ${e.registerUniforms([{name:"M",type:"u32"},{name:"K",type:"u32"},{name:"N",type:"u32"},{name:"num_heads",type:"u32"},{name:"head_size",type:"u32"},{name:"v_hidden_size",type:"u32"},{name:"past_sequence_length",type:"u32"},{name:"kv_sequence_length",type:"u32"},{name:"n_reps",type:"u32"}]).declareVariables(...i,...s)}
+  ${e.mainStart([12,12,1])}
+   let headIdx = workgroup_id.z % uniforms.num_heads;
+   let batchIdx = workgroup_id.z / uniforms.num_heads;
+   let kvHeadIdx = ${1===es?"headIdx":"headIdx / uniforms.n_reps"};
+   let kv_num_heads = ${1===es?"uniforms.num_heads":"uniforms.num_heads / uniforms.n_reps"};
+   let m = global_id.y;
+   let n = global_id.x;
+   let sequence_length = uniforms.M;
+   var total_sequence_length = uniforms.K;
+   ${rD(a,n,!0)}
+   let offsetA = workgroup_id.z * uniforms.M * uniforms.K + m * uniforms.K;
+   let absKvHeadIdx = batchIdx * kv_num_heads + kvHeadIdx; // kvHeadIdx is relative to the batch
+   ${ef&&eu?"let pastValueOffset = absKvHeadIdx * uniforms.N * uniforms.past_sequence_length + n;":""};
+   let vOffset = absKvHeadIdx * uniforms.N * uniforms.kv_sequence_length + n;
+   ${eu?"let presentValueOffset = absKvHeadIdx * uniforms.N * uniforms.K + n;":""}
+   var value = ${r.type.storage}(0);
+   for (var w: u32 = 0u; w < uniforms.K; w += TILE_SIZE) {
+      if (m < uniforms.M && w + local_id.x < uniforms.K) {
+        tileQ[TILE_SIZE * local_id.y + local_id.x] = probs[offsetA + w + local_id.x];
+      }
+      if (n < uniforms.N && w + local_id.y < uniforms.K) {
+        var idx = TILE_SIZE * local_id.y + local_id.x;
+        ${ef&&eu?`
+        if (w + local_id.y < past_sequence_length) {
+          tileV[idx] = past_value[pastValueOffset + (w + local_id.y) * uniforms.N];
+        } else if (w + local_id.y - past_sequence_length < uniforms.kv_sequence_length) {
+          tileV[idx] = v[vOffset + (w + local_id.y - past_sequence_length) * uniforms.N];
+        }
+      `:`
+            if (w + local_id.y < uniforms.kv_sequence_length) {
+              tileV[idx] = v[vOffset + (w + local_id.y) * uniforms.N];
+            }`}
+        ${eu?`
+            if (w + local_id.y < present_sequence_length) {
+          present_value[presentValueOffset + (w + local_id.y) * uniforms.N] = tileV[idx];
+        }`:""}
+      }
+     workgroupBarrier();
+     for (var k: u32 = 0u; k < TILE_SIZE && w+k < total_sequence_length; k++) {
+       value += tileQ[TILE_SIZE * local_id.y + k] * tileV[TILE_SIZE * k + local_id.x];
+     }
+     workgroupBarrier();
+   }
+
+   // we need to transpose output from BNSH_v to BSND_v
+   if (m < uniforms.M && n < uniforms.N) {
+     let outputIdx = batchIdx * uniforms.M * uniforms.v_hidden_size + m * uniforms.v_hidden_size
+       + headIdx * uniforms.N + n;
+     output[outputIdx] = value;
+   }
+  }`}}),{inputs:eS,outputs:ey>1?[0,2]:[0]})},rP=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c=((e,r)=>{let i=e[0],a=e[1],n=e[2],s=e[3],o=e[4],u=e[5];if(o&&u)throw Error("Attention cannot have both past and attention_bias");if(3!==i.dims.length)throw Error('Input "input" must have 3 dimensions');let l=i.dims[0],d=i.dims[1],p=i.dims[2];if(1!==n.dims.length)throw Error('Input "bias" is expected to have 1 dimensions');if(2!==a.dims.length)throw Error('Input "weights" is expected to have 2 dimensions');if(a.dims[0]!==p)throw Error("Input 1 dimension 0 should have same length as dimension 2 of input 0");if(n.dims[0]!==a.dims[1])throw Error('Input "bias" dimension 0 should have same length as dimension 1 of input "weights"');let c=n.dims[0]/3,h=c,f=h;if(r.qkvHiddenSizes.length>0){if(3!==r.qkvHiddenSizes.length)throw Error("qkv_hidden_sizes attribute should have 3 elements");for(let e of r.qkvHiddenSizes)if(e%r.numHeads!=0)throw Error("qkv_hidden_sizes should be divisible by num_heads");c=r.qkvHiddenSizes[0],h=r.qkvHiddenSizes[1],f=r.qkvHiddenSizes[2]}if(c!==h)throw Error("qkv_hidden_sizes first element should be same as the second");if(n.dims[0]!==c+h+f)throw Error('Input "bias" dimension 0 should have same length as sum of Q/K/V hidden sizes');let m=0;if(o){if(h!==f)throw Error('Input "past" expect k_hidden_size == v_hidden_size');if(5!==o.dims.length)throw Error('Input "past" must have 5 dimensions');if(2!==o.dims[0])throw Error('Input "past" first dimension must be 2');if(o.dims[1]!==l)throw Error('Input "past" second dimension must be batch_size');if(o.dims[2]!==r.numHeads)throw Error('Input "past" third dimension must be num_heads');if(o.dims[4]!==h/r.numHeads)throw Error('Input "past" fifth dimension must be k_hidden_size / num_heads');r.pastPresentShareBuffer||(m=o.dims[3])}let g=d+m;if(s)throw Error("Mask not supported");if(o)throw Error("past is not supported");if(u){if(4!==u.dims.length)throw Error('Input "attention_bias" must have 4 dimensions');if(u.dims[0]!==l||u.dims[1]!==r.numHeads||u.dims[2]!==d||u.dims[3]!==g)throw Error('Expect "attention_bias" shape (batch_size, num_heads, sequence_length, total_sequence_length)')}return{batchSize:l,sequenceLength:d,pastSequenceLength:m,kvSequenceLength:d,totalSequenceLength:g,maxSequenceLength:-1,inputHiddenSize:p,hiddenSize:c,vHiddenSize:f,headSize:Math.floor(c/r.numHeads),vHeadSize:Math.floor(f/r.numHeads),numHeads:r.numHeads,isUnidirectional:!1,pastPresentShareBuffer:!1,maskFilterValue:r.maskFilterValue,maskType:0,scale:r.scale,broadcastResPosBias:!1,passPastInKv:!1,qkvFormat:1}})(e.inputs,r),[h,f,m]=(i=e,n=[(a=c).batchSize,a.numHeads,a.sequenceLength,a.headSize],s=a.sequenceLength,o=a.inputHiddenSize,u=a.headSize,l={x:Math.ceil(a.headSize/12),y:Math.ceil(a.sequenceLength/12),z:a.batchSize*a.numHeads},d=[i.inputs[0],i.inputs[1],i.inputs[2]],p=[{type:12,data:s},{type:12,data:o},{type:12,data:u},{type:12,data:a.numHeads},{type:12,data:a.headSize},{type:12,data:a.hiddenSize},{type:12,data:a.hiddenSize+a.hiddenSize+a.vHiddenSize}],i.compute({name:"AttentionPrepare",shaderCache:{inputDependencies:["type","type","type"]},getRunData:()=>({outputs:[{dims:n,dataType:i.inputs[0].dataType,gpuDataType:0},{dims:n,dataType:i.inputs[0].dataType,gpuDataType:0},{dims:n,dataType:i.inputs[0].dataType,gpuDataType:0}],dispatchGroup:l,programUniforms:p}),getShaderSource:e=>{let r=t3("output_q",d[0].dataType,n),i=t3("output_k",d[0].dataType,n),a=t3("output_v",d[0].dataType,n),s=t2("input",d[0].dataType,d[0].dims),o=t2("weight",d[1].dataType,d[1].dims),u=t2("bias",d[2].dataType,d[2].dims),l=s.type.storage;return`
+  const TILE_SIZE = 12u;
+  var<workgroup> tileInput: array<${l}, 144>;
+  var<workgroup> tileWeightQ: array<${l}, 144>;
+  var<workgroup> tileWeightK: array<${l}, 144>;
+  var<workgroup> tileWeightV: array<${l}, 144>;
+  ${e.registerUniforms([{name:"M",type:"u32"},{name:"K",type:"u32"},{name:"N",type:"u32"},{name:"num_heads",type:"u32"},{name:"head_size",type:"u32"},{name:"hidden_size",type:"u32"},{name:"ldb",type:"u32"}]).declareVariables(s,o,u,r,i,a)}
+  ${e.mainStart([12,12,1])}
+    let batchIndex = workgroup_id.z / uniforms.num_heads;
+    let headNumber = workgroup_id.z % uniforms.num_heads;
+    let m = global_id.y;
+    let n = global_id.x;
+
+    let inputOffset = batchIndex * (uniforms.M * uniforms.K) + m * uniforms.K;
+    let biasOffsetQ = headNumber * uniforms.head_size;
+    let biasOffsetK = uniforms.hidden_size + biasOffsetQ;
+    let biasOffsetV = uniforms.hidden_size + biasOffsetK;
+
+    var valueQ = ${l}(0);
+    var valueK = ${l}(0);
+    var valueV = ${l}(0);
+    for (var w: u32 = 0u; w < uniforms.K; w += TILE_SIZE) {
+      if (m < uniforms.M && w + local_id.x < uniforms.K) {
+        tileInput[TILE_SIZE * local_id.y + local_id.x] = input[inputOffset + w + local_id.x];
+      }
+      if (n < uniforms.N && w + local_id.y < uniforms.K) {
+        let offset = n + (w + local_id.y) * uniforms.ldb;
+        tileWeightQ[TILE_SIZE * local_id.y + local_id.x] = weight[biasOffsetQ + offset];
+        tileWeightK[TILE_SIZE * local_id.y + local_id.x] = weight[biasOffsetK + offset];
+        tileWeightV[TILE_SIZE * local_id.y + local_id.x] = weight[biasOffsetV + offset];
+      }
+      workgroupBarrier();
+      for (var k: u32 = 0u; k<TILE_SIZE && w+k < uniforms.K; k++) {
+        let inputTileOffset = TILE_SIZE * local_id.y + k;
+        let weightTileOffset = TILE_SIZE * k + local_id.x;
+        valueQ += tileInput[inputTileOffset] * tileWeightQ[weightTileOffset];
+        valueK += tileInput[inputTileOffset] * tileWeightK[weightTileOffset];
+        valueV += tileInput[inputTileOffset] * tileWeightV[weightTileOffset];
+      }
+
+      workgroupBarrier();
+    }
+
+    let headOffset = (m * uniforms.N + n) % uniforms.head_size;
+    valueQ += bias[headOffset + biasOffsetQ];
+    valueK += bias[headOffset + biasOffsetK];
+    valueV += bias[headOffset + biasOffsetV];
+
+    let offset = workgroup_id.z * uniforms.M * uniforms.N;
+    if (m < uniforms.M && n < uniforms.N) {
+      let outputIdx = offset + m * uniforms.N + n;
+      output_q[outputIdx] = valueQ;
+      output_k[outputIdx] = valueK;
+      output_v[outputIdx] = valueV;
+    }
+  }`}},{inputs:d,outputs:[-1,-1,-1]}));return rU(e,h,f,m,e.inputs[4],void 0,void 0,void 0,e.inputs[5],c)}}),nJ=ed(()=>{eA(),nD(),nL(),nF(),nH(),rL=(e,r)=>{let i,{inputs:a,outputCount:n}=e,s=(i={...r,outputCount:n},tV(i));if(R.webgpu.validateInputContent&&((e,r)=>{if(!e||5!==e.length)throw Error("BatchNormalization requires 5 inputs");let i=(e,r,i)=>{let a=r.length;if(a!==e.length)throw Error(`${i}: num dimensions != ${a}`);r.forEach((r,a)=>{if(r!==e[a])throw Error(`${i}: dim[${a}] do not match`)})};if(e[0].dims.length>1){let a="NHWC"===r.format?r.spatial?e[0].dims.slice(-1):e[0].dims.slice(-1).concat(e[0].dims.slice(1,e[0].dims.length-1)):e[0].dims.slice(1,r.spatial?2:void 0);i(e[1].dims,a,"Invalid input scale"),i(e[2].dims,a,"Invalid input B"),i(e[3].dims,a,"Invalid input mean"),i(e[4].dims,a,"Invalid input var")}else i(e[1].dims,[1],"Invalid input scale"),i(e[2].dims,[1],"Invalid input B"),i(e[3].dims,[1],"Invalid input mean"),i(e[4].dims,[1],"Invalid input var")})(a,s),r.trainingMode)throw Error("BatchNormalization trainingMode is not supported yet.");e.compute(((e,r)=>{let{epsilon:i,spatial:a,format:n}=r,s=e[0].dims,o=a?tX(s[s.length-1]):1,u="NHWC"===n&&s.length>1?o:1,l=tg.size(s)/o,d=a?s.length:s,p=t2("x",e[0].dataType,e[0].dims,o),c=t2("scale",e[1].dataType,e[1].dims,u),h=t2("bias",e[2].dataType,e[2].dims,u),f=t2("inputMean",e[3].dataType,e[3].dims,u),m=t2("inputVar",e[4].dataType,e[4].dims,u),g=t3("y",e[0].dataType,d,o);return{name:"BatchNormalization",shaderCache:{hint:`${r.epsilon}_${r.format}_${a}_${o}`,inputDependencies:a?["rank","type","type","type","type"]:void 0},getShaderSource:e=>`
+  const epsilon = ${i};
+  ${e.registerUniform("outputSize","u32").declareVariables(p,c,h,f,m,g)}
+  ${e.mainStart()}
+  ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+    var outputIndices = ${g.offsetToIndices(`global_idx * ${o}`)};
+    ${(()=>{let e="";if(a)e=`let cOffset = ${1===s.length?"0u":"NHWC"===n?`outputIndices[${s.length-1}] / ${o}`:"outputIndices[1]"};`;else if("NCHW"===n)e=`
+            ${g.indicesSet("outputIndices","0","0")}
+            let cOffset = ${g.indicesToOffset("outputIndices")};`;else{e=`var cIndices = ${c.type.indices}(0);
+                       cIndices[0] = outputIndices[${s.length-1}];`;for(let r=1;r<c.rank;r++)e+=`cIndices[${r}] = outputIndices[${r}];`;e+=`let cOffset = ${c.indicesToOffset("cIndices")};`}return e})()}
+    let scale = ${c.getByOffset("cOffset")};
+    let bias = ${h.getByOffset("cOffset")};
+    let inputMean = ${f.getByOffset("cOffset")};
+    let inputVar = ${m.getByOffset("cOffset")};
+    let x = ${p.getByOffset("global_idx")};
+    let value = (x - inputMean) * inverseSqrt(inputVar + epsilon) * scale + bias;
+    ${g.setByOffset("global_idx","value")}
+  }`,getRunData:()=>({outputs:[{dims:e[0].dims,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(l/64)},programUniforms:a?[{type:12,data:l},...tZ(s)]:[{type:12,data:l}]})}})(a,s))}}),n0=ed(()=>{nL(),nH(),rq=e=>{var r;let i,a,n,s,o,u,l,d;(e=>{if(3!==e[0].dims.length)throw Error("input should have 3 dimensions");if(![320,640,1280].includes(e[0].dims[2]))throw Error("number of channels should be 320, 640 or 1280");if(1!==e[1].dims.length)throw Error("bias is expected to have 1 dimensions");if(e[0].dims[2]!==e[1].dims[0])throw Error("last dimension of input and bias are not the same")})(e.inputs),e.compute((i=(r=e.inputs)[0].dims,a=r[0].dims[2],n=tg.size(i)/4,s=r[0].dataType,o=t2("input",s,i,4),u=t2("bias",s,[a],4),l=t2("residual",s,i,4),d=t3("output",s,i,4),{name:"BiasAdd",getRunData:()=>({outputs:[{dims:i,dataType:r[0].dataType}],dispatchGroup:{x:Math.ceil(n/64)}}),getShaderSource:e=>`
+  const channels = ${a}u / 4;
+  ${e.declareVariables(o,u,l,d)}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes(n)}
+    let value = ${o.getByOffset("global_idx")}
+      + ${u.getByOffset("global_idx % channels")} + ${l.getByOffset("global_idx")};
+    ${d.setByOffset("global_idx","value")}
+  }`}))}}),n1=ed(()=>{nD(),nL(),nF(),nH(),rW=(e,r,i,a,n,s=e.dataType,o,u)=>{let l=[{type:12,data:Math.ceil(tg.size(e.dims)/4)}];return o&&l.push(...o),{name:r,shaderCache:{hint:n,inputDependencies:["type"]},getShaderSource:r=>{var n,o,l,d,p,c,h;let f,m,g,y,b;return n=r,o=tg.size(e.dims),l=e.dataType,d=s,p=i,c=a,h=u,f=Math.ceil(o/4),m="",m="string"==typeof p?`${p}(a)`:p("a"),g=t2("inputData",l,[f],4),y=t3("outputData",d,[f],4),b=[{name:"vec_size",type:"u32"}],h&&b.push(...h),`
+      ${n.registerUniforms(b).declareVariables(g,y)}
+
+  ${c??""}
+
+  ${n.mainStart()}
+    ${n.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.vec_size")}
+
+    let a = ${g.getByOffset("global_idx")};
+    ${y.setByOffset("global_idx",m)}
+  }`},getRunData:r=>({outputs:[{dims:e.dims,dataType:s}],dispatchGroup:{x:Math.ceil(tg.size(r[0].dims)/64/4)},programUniforms:l})}},rj=e=>{e.compute(rW(e.inputs[0],"Abs","abs"))},rV=e=>{e.compute(rW(e.inputs[0],"Acos","acos"))},rG=e=>{e.compute(rW(e.inputs[0],"Acosh","acosh"))},rF=e=>{e.compute(rW(e.inputs[0],"Asin","asin"))},rH=e=>{e.compute(rW(e.inputs[0],"Asinh","asinh"))},rK=e=>{e.compute(rW(e.inputs[0],"Atan","atan"))},rZ=e=>{e.compute(rW(e.inputs[0],"Atanh","atanh"))},rX=e=>tV(e),rQ=(e,r)=>{let i;switch(r.to){case 10:i="vec4<f16>";break;case 1:i="vec4<f32>";break;case 12:i="vec4<u32>";break;case 6:i="vec4<i32>";break;case 9:i="vec4<bool>";break;default:throw RangeError(`not supported type (specified in attribute 'to' from 'Cast' operator): ${r.to}`)}e.compute(rW(e.inputs[0],"Cast",i,void 0,r.cacheKey,r.to))},rY=(e,r)=>{let i=r||(e=>{let r,i,a=e.length>=2&&0!==e[1].data,n=e.length>=3&&0!==e[2].data;switch(e[0].dataType){case 1:r=a?e[1].getFloat32Array()[0]:-34028234663852886e22,i=n?e[2].getFloat32Array()[0]:34028234663852886e22;break;case 10:r=a?e[1].getUint16Array()[0]:64511,i=n?e[2].getUint16Array()[0]:31743;break;default:throw Error("Unsupport data type")}return tV({min:r,max:i})})(e.inputs),a=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"Clip",e=>`clamp(${e}, vec4<${a}>(uniforms.min), vec4<${a}>(uniforms.max))`,void 0,i.cacheKey,void 0,[{type:e.inputs[0].dataType,data:i.min},{type:e.inputs[0].dataType,data:i.max}],[{name:"min",type:a},{name:"max",type:a}]),{inputs:[0]})},rJ=e=>{e.compute(rW(e.inputs[0],"Ceil","ceil"))},r0=e=>{e.compute(rW(e.inputs[0],"Cos","cos"))},r1=e=>{e.compute(rW(e.inputs[0],"Cosh","cosh"))},r2=e=>tV(e),r3=(e,r)=>{let i=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"Elu",e=>`elu_vf32(${e})`,`
+  const elu_alpha_ = ${i}(${r.alpha});
+
+  fn elu_f32(a: ${i}) -> ${i} {
+  return select((exp(a) - 1.0) * elu_alpha_, a, a >= 0.0);
+  }
+
+  fn elu_vf32(v: vec4<${i}>) -> vec4<${i}> {
+  return vec4(elu_f32(v.x), elu_f32(v.y), elu_f32(v.z), elu_f32(v.w));
+  }`,r.cacheKey))},r4=(e="f32")=>`
+const r0: ${e} = 0.3275911;
+const r1: ${e} = 0.254829592;
+const r2: ${e} = -0.284496736;
+const r3: ${e} = 1.421413741;
+const r4: ${e} = -1.453152027;
+const r5: ${e} = 1.061405429;
+
+fn erf_vf32(v: vec4<${e}>) -> vec4<${e}> {
+  let absv = abs(v);
+  let x = 1.0 / (1.0 + r0 * absv);
+  return sign(v) * (1.0 - ((((r5 * x + r4) * x + r3) * x + r2) * x + r1) * x * exp(-absv * absv));
+}`,r6=e=>{let r=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"Erf",e=>`erf_vf32(${e})`,r4(r)))},r8=e=>{e.compute(rW(e.inputs[0],"Exp","exp"))},r5=e=>{e.compute(rW(e.inputs[0],"Floor","floor"))},r9=e=>{let r=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"Gelu",e=>`0.5 * ${e} * (1.0 + erf_vf32(${e} * 0.7071067811865475))`,r4(r)))},r7=(e,r)=>{let i=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"LeakyRelu",e=>`select(leaky_relu_alpha_ * ${e}, ${e}, ${e} >= vec4<${i}>(0.0))`,`const leaky_relu_alpha_ = ${i}(${r.alpha});`,r.cacheKey))},ie=e=>{e.compute(rW(e.inputs[0],"Not",e=>`!${e}`))},it=e=>{e.compute(rW(e.inputs[0],"Neg",e=>`-${e}`))},ir=e=>{e.compute(rW(e.inputs[0],"Reciprocal",e=>`1.0/${e}`))},ii=e=>{let r=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"Relu",e=>`select(vec4<${r}>(0.0), ${e}, ${e} > vec4<${r}>(0.0))`))},ia=e=>{e.compute(rW(e.inputs[0],"Sigmoid",e=>`(1.0 / (1.0 + exp(-${e})))`))},is=e=>tV(e),io=(e,r)=>{let i=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"HardSigmoid",e=>`max(vec4<${i}>(0.0), min(vec4<${i}>(1.0), ${r.alpha} * ${e} + vec4<${i}>(${r.beta})))`,void 0,r.cacheKey))},iu=e=>{e.compute(rW(e.inputs[0],"Sin","sin"))},il=e=>{e.compute(rW(e.inputs[0],"Sinh","sinh"))},id=e=>{e.compute(rW(e.inputs[0],"Sqrt","sqrt"))},ip=e=>{e.compute(rW(e.inputs[0],"Tan","tan"))},ic=e=>`sign(${e}) * (1 - exp(-2 * abs(${e}))) / (1 + exp(-2 * abs(${e})))`,ih=e=>{e.compute(rW(e.inputs[0],"Tanh",ic))},im=(e="f32")=>`
+const fast_gelu_a: ${e} = 0.5;
+const fast_gelu_b: ${e} = 0.7978845608028654;
+const fast_gelu_c: ${e} = 0.035677408136300125;
+
+fn tanh_v(v: vec4<${e}>) -> vec4<${e}> {
+  return ${ic("v")};
+}
+`,ig=e=>`(fast_gelu_a + fast_gelu_a * tanh_v(${e} * (fast_gelu_c * ${e} * ${e} + fast_gelu_b))) * ${e}`,iy=e=>{let r=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"FastGelu",ig,im(r),void 0,e.inputs[0].dataType))},ib=(e,r)=>{let i=tK(e.inputs[0].dataType);return e.compute(rW(e.inputs[0],"ThresholdedRelu",e=>`select(vec4<${i}>(0.0), ${e}, ${e} > thresholded_relu_alpha_)`,`const thresholded_relu_alpha_ = vec4<${i}>(${r.alpha});`,r.cacheKey)),0},i_=e=>{e.compute(rW(e.inputs[0],"Log","log"))},i$=e=>`quick_gelu_impl(${e})`,iv=(e,r)=>{let i,a,n=tK(e.inputs[0].dataType);e.compute(rW(e.inputs[0],"QuickGelu",i$,(i=n,a=r.alpha,`
+const alpha = vec4<${i}>(${a});
+const one = ${i}(1.0);
+const zero = ${i}(0.0);
+
+fn quick_gelu_impl(x: vec4<${i}>) -> vec4<${i}> {
+  let v = x *alpha;
+  var x1 : vec4<${i}>;
+  for (var i = 0; i < 4; i = i + 1) {
+    if (v[i] >= zero) {
+      x1[i] = one / (one + exp(-v[i]));
+    } else {
+      x1[i] = one - one / (one + exp(v[i]));
+    }
+  }
+  return x * x1;
+}
+`),r.cacheKey,e.inputs[0].dataType))}}),n2=ed(()=>{nL(),nH(),n1(),iw=e=>{var r;let i,a,n,s,o,u;(e=>{if(3!==e[0].dims.length)throw Error("input should have 3 dimensions");if(![2560,5120,10240].includes(e[0].dims[2]))throw Error("hidden state should be 2560, 5120 or 10240");if(1!==e[1].dims.length)throw Error("bias is expected to have 1 dimensions");if(e[0].dims[2]!==e[1].dims[0])throw Error("last dimension of input and bias are not the same")})(e.inputs),e.compute(((i=(r=e.inputs)[0].dims.slice())[2]=i[2]/2,a=t2("input",r[0].dataType,r[0].dims,4),n=t2("bias",r[0].dataType,[r[0].dims[2]],4),s=t3("output",r[0].dataType,i,4),o=tg.size(i)/4,u=tH(r[0].dataType),{name:"BiasSplitGelu",getRunData:()=>({outputs:[{dims:i,dataType:r[0].dataType}],dispatchGroup:{x:Math.ceil(o/64)}}),getShaderSource:e=>`
+  const M_SQRT2 = sqrt(2.0);
+  const halfChannels = ${r[0].dims[2]/4/2}u;
+
+  ${e.declareVariables(a,n,s)}
+
+  ${r4(u)}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes(o)}
+    let biasIdx = global_idx % halfChannels;
+    let batchIndex = global_idx / halfChannels;
+    let inputOffset = biasIdx + batchIndex * halfChannels * 2;
+    let valueLeft = input[inputOffset] + bias[biasIdx];
+    let valueRight = input[inputOffset + halfChannels] + bias[biasIdx + halfChannels];
+    let geluRight = valueRight * 0.5 * (erf_vf32(valueRight / M_SQRT2) + 1);
+
+    ${s.setByOffset("global_idx","valueLeft * geluRight")}
+  }`}))}}),n3=ed(()=>{nD(),nL(),nH(),ix=(e,r,i,a,n,s)=>{e.compute(((e,r,i,a,n,s,o=i.dataType)=>{let u=i.dims.map(Number),l=a.dims.map(Number),d=!tg.areEqual(u,l),p=u,c=tg.size(u),h=!1,f=!1,m=[d];if(d){let e=tm.calcShape(u,l,!1);if(!e)throw Error("Can't perform binary op on the given tensors");p=e.slice(),c=tg.size(p);let r=1===tg.size(u),i=1===tg.size(l),a=u.length>0&&u[u.length-1]%4==0,n=l.length>0&&l[l.length-1]%4==0;m.push(r),m.push(i),m.push(a),m.push(n);let s=1;for(let e=1;e<p.length;e++){let r=u[u.length-e];if(r===l[l.length-e])s*=r;else break}s%4==0?(f=!0,h=!0):(r||i||a||n)&&(h=!0)}else h=!0;return m.push(h),{name:e,shaderCache:{hint:r+m.map(e=>e.toString()).join("_"),inputDependencies:["rank","rank"]},getShaderSource:e=>((e,r,i,a,n,s,o,u,l,d,p,c)=>{let h,f;"string"==typeof u?h=f=(e,r)=>`${u}((${e}),(${r}))`:"function"==typeof u?h=f=u:(h=u.scalar,f=u.vector);let m=t3("outputData",p,a.length,4),g=t2("aData",l,r.length,4),y=t2("bData",d,i.length,4),b;if(n)if(s){let e=1===tg.size(r),a=1===tg.size(i),n=r.length>0&&r[r.length-1]%4==0,s=i.length>0&&i[i.length-1]%4==0;b=e||a?m.setByOffset("global_idx",f(e?`${g.type.value}(${g.getByOffset("0")}.x)`:g.getByOffset("global_idx"),a?`${y.type.value}(${y.getByOffset("0")}.x)`:y.getByOffset("global_idx"))):`
+            let outputIndices = ${m.offsetToIndices("global_idx * 4u")};
+            let offsetA = ${g.broadcastedIndicesToOffset("outputIndices",m)};
+            let offsetB = ${y.broadcastedIndicesToOffset("outputIndices",m)};
+            ${m.setByOffset("global_idx",f(o||n?g.getByOffset("offsetA / 4u"):`${g.type.value}(${g.getByOffset("offsetA / 4u")}[offsetA % 4u])`,o||s?y.getByOffset("offsetB / 4u"):`${y.type.value}(${y.getByOffset("offsetB / 4u")}[offsetB % 4u])`))}
+          `}else b=m.setByOffset("global_idx",f(g.getByOffset("global_idx"),y.getByOffset("global_idx")));else{if(!s)throw Error("no necessary to use scalar implementation for element-wise binary op implementation.");let e=(e,r,i="")=>{let a=`aData[indexA${r}][componentA${r}]`,n=`bData[indexB${r}][componentB${r}]`;return`
+            let outputIndices${r} = ${m.offsetToIndices(`global_idx * 4u + ${r}u`)};
+            let offsetA${r} = ${g.broadcastedIndicesToOffset(`outputIndices${r}`,m)};
+            let offsetB${r} = ${y.broadcastedIndicesToOffset(`outputIndices${r}`,m)};
+            let indexA${r} = offsetA${r} / 4u;
+            let indexB${r} = offsetB${r} / 4u;
+            let componentA${r} = offsetA${r} % 4u;
+            let componentB${r} = offsetB${r} % 4u;
+            ${e}[${r}] = ${i}(${h(a,n)});
+          `};b=9===p?`
+            var data = vec4<u32>(0);
+            ${e("data",0,"u32")}
+            ${e("data",1,"u32")}
+            ${e("data",2,"u32")}
+            ${e("data",3,"u32")}
+            outputData[global_idx] = dot(vec4<u32>(0x1, 0x100, 0x10000, 0x1000000), vec4<u32>(data));`:`
+            ${e("outputData[global_idx]",0)}
+            ${e("outputData[global_idx]",1)}
+            ${e("outputData[global_idx]",2)}
+            ${e("outputData[global_idx]",3)}
+          `}return`
+        ${e.registerUniform("vec_size","u32").declareVariables(g,y,m)}
+
+        ${c??""}
+
+        ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.vec_size")}
+        ${b}
+      }`})(e,u,l,p,h,d,f,n,i.dataType,a.dataType,o,s),getRunData:()=>({outputs:[{dims:p,dataType:o}],dispatchGroup:{x:Math.ceil(c/64/4)},programUniforms:[{type:12,data:Math.ceil(tg.size(p)/4)},...tZ(u,l,p)]})}})(r,n??"",e.inputs[0],e.inputs[1],i,a,s))},ik=e=>{ix(e,"Add",(e,r)=>`${e}+${r}`)},iS=e=>{ix(e,"Div",(e,r)=>`${e}/${r}`)},iT=e=>{ix(e,"Equal",{scalar:(e,r)=>`u32(${e}==${r})`,vector:(e,r)=>`vec4<u32>(${e}==${r})`},void 0,void 0,9)},iI=e=>{ix(e,"Mul",(e,r)=>`${e}*${r}`)},iC=e=>{let r=t2("input",e.inputs[0].dataType,e.inputs[0].dims).type.value;ix(e,"Pow",{scalar:(e,r)=>`pow_custom(${e},${r})`,vector:(e,r)=>`pow_vector_custom(${e},${r})`},`
+    fn pow_custom(a : ${r}, b : ${r}) -> ${r} {
+      if (b == ${r}(0.0)) {
+        return ${r}(1.0);
+      } else if (a < ${r}(0.0) && f32(b) != floor(f32(b))) {
+        return ${r}(pow(f32(a), f32(b))); // NaN
+      }
+      return select(sign(a), ${r}(1.0), round(f32(abs(b) % ${r}(2.0))) != 1.0) * ${r}(${"i32"===r?"round":""}(pow(f32(abs(a)), f32(b))));
+    }
+    fn pow_vector_custom(a : vec4<${r}>, b : vec4<${r}>) -> vec4<${r}> {
+      // TODO: implement vectorized pow
+      return vec4<${r}>(pow_custom(a.x, b.x), pow_custom(a.y, b.y), pow_custom(a.z, b.z), pow_custom(a.w, b.w));
+    }
+      `)},iE=e=>{ix(e,"Sub",(e,r)=>`${e}-${r}`)},iz=e=>{ix(e,"Greater",{scalar:(e,r)=>`u32(${e}>${r})`,vector:(e,r)=>`vec4<u32>(${e}>${r})`},void 0,void 0,9)},iA=e=>{ix(e,"Less",{scalar:(e,r)=>`u32(${e}<${r})`,vector:(e,r)=>`vec4<u32>(${e}<${r})`},void 0,void 0,9)},iO=e=>{ix(e,"GreaterOrEqual",{scalar:(e,r)=>`u32(${e}>=${r})`,vector:(e,r)=>`vec4<u32>(${e}>=${r})`},void 0,void 0,9)},iM=e=>{ix(e,"LessOrEqual",{scalar:(e,r)=>`u32(${e}<=${r})`,vector:(e,r)=>`vec4<u32>(${e}<=${r})`},void 0,void 0,9)}}),n4=ed(()=>{nD(),nL(),nF(),nH(),iR=(e,r)=>{let i=e.inputs,a=i[0].dims,n=tg.normalizeAxis(r.axis,a.length);var s=i,o=n;if(!s||s.length<1)throw Error("too few inputs");let u=s[0],l=u.dataType,d=u.dims.length;s.forEach((e,r)=>{if(0!==r){if(e.dataType!==l)throw Error("input tensors should be one type");if(e.dims.length!==d)throw Error("input tensors should have the same shape");e.dims.forEach((e,r)=>{if(r!==o&&e!==u.dims[r])throw Error("non concat dimensions must match")})}});let p=a.slice();p[n]=i.reduce((e,r)=>e+(r.dims.length>n?r.dims[n]:0),0);let c=i.filter(e=>tg.size(e.dims)>0);e.compute(((e,r,i,a)=>{let n=tg.size(i),s=Array(e.length),o=Array(e.length),u=0,l=[],d=[],p=[{type:12,data:n}];for(let i=0;i<e.length;++i)u+=e[i].dims[r],s[i]=u,d.push(e[i].dims.length),o[i]=t2(`input${i}`,a,d[i]),l.push("rank"),p.push({type:12,data:s[i]});for(let r=0;r<e.length;++r)p.push(...tZ(e[r].dims));p.push(...tZ(i));let c=t3("output",a,i.length),h=c.indicesGet("indices",r),f=Array.from(Array(s.length).keys()).map(e=>`uniforms.sizeInConcatAxis${e}`).join(",");return{name:"Concat",shaderCache:{hint:`${r}`,inputDependencies:l},getRunData:()=>({outputs:[{dims:i,dataType:a}],dispatchGroup:{x:Math.ceil(n/64)},programUniforms:p}),getShaderSource:r=>{let i,a;return`
+
+  ${(()=>{r.registerUniform("outputSize","u32");for(let i=0;i<e.length;i++)r.registerUniform(`sizeInConcatAxis${i}`,"u32");return r.declareVariables(...o,c)})()}
+
+  ${i=s.length,a=f,`
+  fn calculateInputIndex(index: u32) -> u32 {
+    let sizeInConcatAxis = array<u32, ${i}u>(${a});
+    for (var i: u32 = 0u; i < ${i}; i += 1u ) {
+      if (index < sizeInConcatAxis[i]) {
+        return i;
+      }
+    }
+    return ${i}u;
+  }`}
+
+  ${r.mainStart()}
+    ${r.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+
+    var indices = ${c.offsetToIndices("global_idx")};
+
+    let inputIndex = calculateInputIndex(${h});
+    if (inputIndex != 0u) {
+      let sizeInConcatAxis = array<u32, ${s.length}u>(${f});
+      ${h} -= sizeInConcatAxis[inputIndex - 1u];
+    }
+
+    ${((e,r)=>{let i=e.length,a=[];for(let n=0;n<i;++n){let s=r.setByOffset("global_idx",e[n].getByIndices("indices"));1===i?a.push(s):0===n?a.push(`if (inputIndex == ${n}u) { ${s} }`):n===i-1?a.push(`else { ${s} }`):a.push(`else if (inputIndex == ${n}) { ${s} }`)}return a.join(`
+`)})(o,c)}
+  }`}}})(c,n,p,i[0].dataType),{inputs:c})},iN=e=>tV({axis:e.axis})}),n6=ed(()=>{nD(),nL(),iB=(e,r,i="f32")=>{switch(e.activation){case"Relu":return`value = max(value, ${r}(0.0));`;case"Sigmoid":return`value = (${r}(1.0) / (${r}(1.0) + exp(-value)));`;case"Clip":return`value = clamp(value, ${r}(${i}(uniforms.clip_min)), ${r}(${i}(uniforms.clip_max)));`;case"HardSigmoid":return`value = max(${r}(0.0), min(${r}(1.0), ${i}(uniforms.alpha) * value + ${i}(uniforms.beta)));`;case"LeakyRelu":return`value = select(${i}(uniforms.alpha) * value, value, value >= ${r}(0.0));`;case"Tanh":return`let e2x = exp(-2.0 * abs(value));
+              value = sign(value) * (1.0 - e2x) / (1.0 + e2x);
+        `;case"":return"";default:throw Error(`Unsupported activation ${e.activation}`)}},iD=(e,r)=>{"Clip"===e.activation?r.push({type:1,data:e.clipMax},{type:1,data:e.clipMin}):"HardSigmoid"===e.activation?r.push({type:1,data:e.alpha},{type:1,data:e.beta}):"LeakyRelu"===e.activation&&r.push({type:1,data:e.alpha})},iU=(e,r)=>{"Clip"===e.activation?r.push({name:"clip_max",type:"f32"},{name:"clip_min",type:"f32"}):"HardSigmoid"===e.activation?r.push({name:"alpha",type:"f32"},{name:"beta",type:"f32"}):"LeakyRelu"===e.activation&&r.push({name:"alpha",type:"f32"})},iP=e=>{let r=e?.activation||"";if("HardSigmoid"===r){let[i,a]=e?.activation_params||[.2,.5];return{activation:r,alpha:i,beta:a}}if("Clip"===r){let[i,a]=e?.activation_params||[t_,t$];return{activation:r,clipMax:a,clipMin:i}}if("LeakyRelu"===r){let[i]=e?.activation_params||[.01];return{activation:r,alpha:i}}return{activation:r}}}),n8=ed(()=>{iL=(e,r)=>{switch(e){case 1:return r;case 2:return`vec2<${r}>`;case 3:return`vec3<${r}>`;case 4:return`vec4<${r}>`;default:throw Error(`${e}-component is not supported.`)}},iq=e=>`
+      ${e?"value = value + getBiasByOutputCoords(coords);":""}
+      `}),n5=ed(()=>{iW=e=>`
+fn getIndexFromCoords4D(coords : vec4<i32>, shape : vec4<i32>) -> i32 {
+  return dot(coords, vec4<i32>(
+      shape.y * shape.z * shape.w, shape.z * shape.w, shape.w, 1));
+}
+fn getOutputIndexFromCoords(coords : vec4<i32>) -> i32 {
+  return dot(coords, vec4<i32>(
+    i32(${e}.x), i32(${e}.y), i32(${e}.z), 1));
+}
+`}),n9=ed(()=>{nD(),nL(),nH(),n6(),ij=(e,r,i,a,n)=>{let s=a-i;return`
+      ${Array.from({length:i}).map((i,o)=>`
+      if (${t0(r.shape,o,r.rank)} != 1) {
+        ${r.indicesSet(e,o,t0(n,o+s,a))}
+      } else {
+        ${r.indicesSet(e,o,0)}
+      }`).join("")}
+`},iV=(e,r,i,a,n=!1,s)=>{let o=e[0].dims,u=e[1].dims,l=o[o.length-2],d=u[u.length-1],p=o[o.length-1],c=tX(d),h=tX(p),f=tX(l),m=tg.size(i)/c/f,g=e.length>2,y=a?a.slice(0,-2):i.slice(0,-2),b=[tg.size(y),l,d],_=[{type:12,data:m},{type:12,data:l},{type:12,data:d},{type:12,data:p}];return iD(r,_),_.push(...tZ(y,o,u)),g&&_.push(...tZ(e[2].dims)),_.push(...tZ(b)),{name:"MatMulNaive",shaderCache:{hint:`${r.activation};${c};${h};${f};${n}`,inputDependencies:g?["rank","rank","rank"]:["rank","rank"]},getRunData:()=>({outputs:[{dims:s?s(i):i,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(m/64)},programUniforms:_}),getShaderSource:a=>{let s=t6("batch_dims",e[0].dataType,y.length),l=t2("a",e[0].dataType,o.length,h),d=t2("b",e[1].dataType,u.length,c),p=t3("output",e[0].dataType,b.length,c),m=tH(p.type.tensor),_=iB(r,p.type.value,m),$=[l,d],v="";if(g){let r=n?c:1;$.push(t2("bias",e[2].dataType,e[2].dims.length,r)),v=`${n?`value += bias[col / ${r}];`:`value += ${p.type.value}(bias[row + i]);`}`}let w=[{name:"output_size",type:"u32"},{name:"M",type:"u32"},{name:"N",type:"u32"},{name:"K",type:"u32"}];return iU(r,w),`
+  ${a.registerUniforms(w).registerInternalVariables(s).declareVariables(...$,p)}
+  ${a.mainStart()}
+    ${a.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    let col = (global_idx % (uniforms.N / ${c})) * ${c};
+    var index1 = global_idx / (uniforms.N / ${c});
+    let stride1 = uniforms.M / ${f};
+    let row = (index1 % stride1) * ${f};
+    let batch = index1 / stride1;
+
+    ${2===i.length?"":`let batch_indices = ${s.offsetToIndices("batch")};`}
+
+    var a_indices: ${l.type.indices};
+    ${ij("a_indices",l,l.rank-2,s.rank,"batch_indices")}
+    ${l.indicesSet("a_indices",l.rank-2,0)}
+    ${l.indicesSet("a_indices",l.rank-1,0)}
+    let a_offset = ${l.indicesToOffset("a_indices")};
+
+    var b_indices: ${d.type.indices};
+    ${ij("b_indices",d,d.rank-2,s.rank,"batch_indices")}
+    ${d.indicesSet("b_indices",d.rank-2,0)}
+    ${d.indicesSet("b_indices",d.rank-1,0)}
+    let b_offset = ${d.indicesToOffset("b_indices")};
+    var values: array<${p.type.value}, ${f}>;
+    for (var k: u32 = 0u; k < uniforms.K; k = k + ${h}) {
+      ${(()=>{let e=`var a_data: ${l.type.value};`;for(let r=0;r<h;r++)e+=`
+              let b_data${r} = b[(b_offset + (k + ${r}) * uniforms.N + col) / ${c}];`;for(let r=0;r<f;r++){e+=`a_data = a[(a_offset + (row + ${r}) * uniforms.K + k) / ${h}];`;for(let i=0;i<h;i++)e+=`
+            values[${r}] = fma(${d.type.value}(a_data${1===h?"":`[${i}]`}), b_data${i}, values[${r}]);
+`}return e})()}
+    }
+    for (var i = 0u; i < ${f}u; i++) {
+      var value = values[i];
+      ${v}
+      ${_}
+      let cur_indices = ${p.type.indices}(batch, row + i, col);
+      let offset = ${p.indicesToOffset("cur_indices")};
+      ${p.setByOffset(`offset / ${c}`,"value")};
+    }
+  }
+  `}}}}),n7=ed(()=>{nD(),nL(),nH(),n6(),n9(),n8(),iG=(e,r,i="f32",a,n=!1,s=32,o=!1,u=32)=>{let l,d,p,c,h=r[1]*e[1],f=r[0]*e[0],m=n?h:s,g=n?s:h,y=m/r[0],b=s/r[1];if(!((n&&4===y&&4===e[1]||!n&&(3===y||4===y))&&m%r[0]==0&&s%r[1]==0&&4===e[0]))throw Error(`If transposeA ${n} is true, innerElementSize ${y} and workPerThread[1] ${e[1]} must be 4.
+      Otherwise, innerElementSize ${y} must be 3 or 4.
+  tileAWidth ${m} must be divisible by workgroupSize[0]${r[0]}. tileInner ${s} must be divisible by workgroupSize[1] ${r[1]}. colPerThread ${e[0]} must be 4.`);return`
+var<workgroup> mm_Asub: array<array<vec${y}<${i}>, ${m/y}>, ${g}>;
+var<workgroup> mm_Bsub: array<array<vec4<${i}>, ${f/e[0]}>, ${s}>;
+
+const rowPerThread = ${e[1]};
+const colPerThread = ${e[0]};
+const innerElementSize = ${y};
+const tileInner = ${s};
+
+@compute @workgroup_size(${r[0]}, ${r[1]}, ${r[2]})
+fn main(@builtin(local_invocation_id) localId : vec3<u32>,
+        @builtin(global_invocation_id) globalId : vec3<u32>,
+        @builtin(workgroup_id) workgroupId : vec3<u32>) {
+  let localRow = i32(localId.y);
+  let tileRow = localRow * rowPerThread;
+  let tileCol = i32(localId.x);
+
+  let globalRow =i32(globalId.y) * rowPerThread;
+  let globalCol = i32(globalId.x);
+  let batch = ${o?"0":"i32(globalId.z)"};
+  ${a?`let batchIndices = ${a.offsetToIndices("u32(batch)")};`:""}
+  let globalRowStart = i32(workgroupId.y) * ${h};
+
+  let num_tiles = ${o?`${Math.ceil(u/s)}`:"(uniforms.dim_inner - 1) / tileInner + 1"};
+  var kStart = ${o?`i32(globalId.z) * ${u}`:"0"};
+
+  var acc: array<vec4<${i}>, rowPerThread>;
+
+  // Loop over shared dimension.
+  let tileRowB = localRow * ${b};
+  for (var t = 0; t < num_tiles; t = t + 1) {
+      // Load one tile of A into local memory.
+      for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+          let inputRow = tileRow + innerRow;
+          let inputCol = tileCol;
+          ${l=n,d=a,l?`
+        mm_Asub[inputRow][inputCol] = mm_readA(batch,
+          kStart + inputRow,
+          globalRowStart / innerElementSize + inputCol${d?", batchIndices":""});
+        `:`
+        mm_Asub[inputRow][inputCol] = mm_readA(batch,
+          globalRow + innerRow,
+          kStart / innerElementSize + inputCol${d?", batchIndices":""});
+        `}
+      }
+
+      // Load one tile of B into local memory.
+      for (var innerRow = 0; innerRow < ${b}; innerRow = innerRow + 1) {
+          let inputRow = tileRowB + innerRow;
+          let inputCol = tileCol;
+          mm_Bsub[inputRow][inputCol] = mm_readB(batch, kStart + inputRow, globalCol${a?", batchIndices":""});
+      }
+      kStart = kStart + tileInner;
+      workgroupBarrier();
+
+      // Compute acc values for a single thread.
+      for (var k = 0; k < tileInner / innerElementSize; k = k + 1) {
+          let BCached0 = mm_Bsub[k * innerElementSize][tileCol];
+          let BCached1 = mm_Bsub[k * innerElementSize + 1][tileCol];
+          let BCached2 = mm_Bsub[k * innerElementSize + 2][tileCol];
+          ${3===y?"":"let BCached3 = mm_Bsub[k * innerElementSize + 3][tileCol];"}
+
+          ${p=n,c=y,p?`
+        let ACached0 = mm_Asub[k * innerElementSize][localRow];
+        let ACached1 = mm_Asub[k * innerElementSize + 1][localRow];
+        let ACached2 = mm_Asub[k * innerElementSize + 2][localRow];
+        ${3===c?"":"let ACached3 = mm_Asub[k * innerElementSize + 3][localRow];"}
+        for (var i = 0; i < rowPerThread; i = i + 1) {
+          acc[i] = BCached0 * ACached0[i] + acc[i];
+          acc[i] = BCached1 * ACached1[i] + acc[i];
+          acc[i] = BCached2 * ACached2[i] + acc[i];
+          ${3===c?"":"acc[i] = BCached3 * ACached3[i] + acc[i];"}
+        }`:`
+        for (var i = 0; i < rowPerThread; i = i + 1) {
+          let ACached = mm_Asub[tileRow + i][k];
+          acc[i] = BCached0 * ACached.x + acc[i];
+          acc[i] = BCached1 * ACached.y + acc[i];
+          acc[i] = BCached2 * ACached.z + acc[i];
+          ${3===c?"":"acc[i] = BCached3 * ACached.w + acc[i];"}
+        }`}
+      }
+
+      workgroupBarrier();
+  }
+
+  for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+      mm_write(batch, globalRow + innerRow, globalCol, acc[innerRow]);
+  }
+}`},iF=(e,r)=>e?`
+            mm_Asub[inputRow][inputCol] = mm_readA(batch,
+              kStart + inputRow,
+              globalRowStart + inputCol${r?", batchIndices":""});
+            `:`
+            mm_Asub[inputRow][inputCol] = mm_readA(batch,
+              globalRowStart + inputRow,
+              kStart + inputCol${r?", batchIndices":""});
+            `,iH=(e,r,i="f32",a,n=!1,s=32,o=!1,u=32,l=!1)=>{let d=e[1]*r[1],p=e[0]*r[0],c=n?d:s,h=n?s:d;if(h%r[1]!=0||c%r[0]!=0||s%r[1]!=0)throw Error(`tileAHight ${h} must be divisible by workgroupSize[1]${r[1]}, tileAWidth ${c} must be divisible by workgroupSize[0]${r[0]}, tileInner ${s} must be divisible by workgroupSize[1]${r[1]}`);let f=h/r[1],m=c/r[0],g=s/r[1],y=l?`
+    let localRow = i32(localId.y);
+    let localCol = i32(localId.x);
+    let globalRowStart = i32(workgroupId.y) * ${d};
+    let globalColStart = i32(workgroupId.x) * ${p};
+
+    // Loop over shared dimension.
+    for (var t = 0; t < num_tiles; t = t + 1) {
+      // Load one tile of A into local memory.
+      for (var inputRow = localRow; inputRow < ${h}; inputRow = inputRow + ${r[1]}) {
+        for (var inputCol = localCol; inputCol < ${c}; inputCol = inputCol + ${r[0]}) {
+          ${iF(n,a)}
+        }
+      }
+      // Load one tile of B into local memory.
+      for (var inputRow = localRow; inputRow < ${s}; inputRow = inputRow + ${r[1]}) {
+            for (var inputCol = localCol; inputCol < ${p}; inputCol = inputCol + ${r[0]}) {
+          mm_Bsub[inputRow][inputCol] = mm_readB(batch,
+            kStart + inputRow,
+            globalColStart + inputCol${a?", batchIndices":""});
+        }
+      }
+      kStart = kStart + tileInner;
+      workgroupBarrier();
+
+      // Compute acc values for a single thread.
+      var BCached : array<${i}, colPerThread>;
+      for (var k = 0; k < tileInner; k = k + 1) {
+        for (var inner = 0; inner < colPerThread; inner = inner + 1) {
+          BCached[inner] = mm_Bsub[k][localCol + inner * ${r[0]}];
+        }
+        for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+          let ACached = ${n?`mm_Asub[k][localRow + innerRow * ${r[1]}];`:`mm_Asub[localRow + innerRow * ${r[1]}][k];`}
+          for (var innerCol = 0; innerCol < colPerThread; innerCol = innerCol + 1) {
+            acc[innerRow][innerCol] = acc[innerRow][innerCol] +
+                ACached * BCached[innerCol];
+          }
+        }
+      }
+      workgroupBarrier();
+    }
+    for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+      let gRow = globalRowStart + localRow + innerRow * ${r[1]};
+      for (var innerCol = 0; innerCol < colPerThread; innerCol = innerCol + 1) {
+        let gCol = globalColStart + localCol + innerCol * ${r[0]};
+        mm_write(batch, gRow, gCol, acc[innerRow][innerCol]);
+      }
+    }
+    `:`
+let tileRow = i32(localId.y) * rowPerThread;
+let tileCol = i32(localId.x) * colPerThread;
+
+let globalRow = i32(globalId.y) * rowPerThread;
+let globalCol = i32(globalId.x) * colPerThread;
+let globalRowStart = i32(workgroupId.y) * ${d};
+
+let tileRowA = i32(localId.y) * ${f};
+let tileColA = i32(localId.x) * ${m};
+let tileRowB = i32(localId.y) * ${g};
+// Loop over shared dimension.
+for (var t = 0; t < num_tiles; t = t + 1) {
+  // Load one tile of A into local memory.
+  for (var innerRow = 0; innerRow < ${f}; innerRow = innerRow + 1) {
+    for (var innerCol = 0; innerCol < ${m}; innerCol = innerCol + 1) {
+      let inputRow = tileRowA + innerRow;
+      let inputCol = tileColA + innerCol;
+      ${iF(n,a)}
+    }
+  }
+
+  // Load one tile of B into local memory.
+  for (var innerRow = 0; innerRow < ${g}; innerRow = innerRow + 1) {
+    for (var innerCol = 0; innerCol < colPerThread; innerCol = innerCol + 1) {
+      let inputRow = tileRowB + innerRow;
+      let inputCol = tileCol + innerCol;
+      mm_Bsub[inputRow][inputCol] = mm_readB(batch,
+        kStart + inputRow,
+        globalCol + innerCol${a?", batchIndices":""});
+    }
+  }
+  kStart = kStart + tileInner;
+  workgroupBarrier();
+
+  // Compute acc values for a single thread.
+  var BCached : array<${i}, colPerThread>;
+  for (var k = 0; k < tileInner; k = k + 1) {
+    for (var inner = 0; inner < colPerThread; inner = inner + 1) {
+      BCached[inner] = mm_Bsub[k][tileCol + inner];
+    }
+
+    for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+      ${n?"let ACached = mm_Asub[k][tileRow + innerRow];":"let ACached = mm_Asub[tileRow + innerRow][k];"}
+      for (var innerCol = 0; innerCol < colPerThread; innerCol = innerCol + 1) {
+        acc[innerRow][innerCol] = acc[innerRow][innerCol] + ACached * BCached[innerCol];
+      }
+    }
+  }
+
+  workgroupBarrier();
+}
+
+for (var innerRow = 0; innerRow < rowPerThread; innerRow = innerRow + 1) {
+  for (var innerCol = 0; innerCol < colPerThread; innerCol = innerCol + 1) {
+    mm_write(batch, globalRow + innerRow, globalCol + innerCol,
+        acc[innerRow][innerCol]);
+  }
+}
+`;return`
+  var<workgroup> mm_Asub : array<array<${i}, ${c}>, ${h}>;
+  var<workgroup> mm_Bsub : array<array<${i}, ${p}>, ${s}>;
+  const rowPerThread = ${e[1]};
+  const colPerThread = ${e[0]};
+  const tileInner = ${s};
+
+@compute @workgroup_size(${r[0]}, ${r[1]}, ${r[2]})
+fn main(@builtin(local_invocation_id) localId : vec3<u32>,
+        @builtin(global_invocation_id) globalId : vec3<u32>,
+        @builtin(workgroup_id) workgroupId : vec3<u32>) {
+    let batch = ${o?"0":"i32(globalId.z)"};
+    ${a?`let batchIndices = ${a.offsetToIndices("u32(batch)")};`:""}
+    let num_tiles = ${o?`${Math.ceil(u/s)}`:"(uniforms.dim_inner - 1) / tileInner + 1"};
+    var kStart = ${o?`i32(globalId.z) * ${u}`:"0"};
+
+    var acc : array<array<${i}, colPerThread>, rowPerThread>;
+    ${y}
+  }
+`},iK=(e,r,i,a,n=!1,s)=>{let o=e[0].dims,u=e[1].dims,l=o.slice(0,-2),d=u.slice(0,-2),p=a?a.slice(0,-2):i.slice(0,-2),c=tg.size(p),h=o[o.length-2],f=o[o.length-1],m=u[u.length-1],g=f%4==0&&m%4==0,y=h<=8?[4,1,1]:[4,4,1],b=[8,8,1],_=[Math.ceil(m/b[0]/y[0]),Math.ceil(h/b[1]/y[1]),Math.ceil(c/b[2]/y[2])],$=g?4:1,v=[...l,h,f/$],w=v.length,x=[...d,f,m/$],k=x.length,S=[c,h,m/$],T=[{type:6,data:h},{type:6,data:m},{type:6,data:f}];iD(r,T),T.push(...tZ(p,v,x));let I=["rank","rank"],C=e.length>2;return C&&(T.push(...tZ(e[2].dims)),I.push("rank")),T.push(...tZ(S)),{name:"MatMul",shaderCache:{hint:`${y};${r.activation};${g};${n}`,inputDependencies:I},getRunData:()=>({outputs:[{dims:s?s(i):i,dataType:e[0].dataType}],dispatchGroup:{x:_[0],y:_[1],z:_[2]},programUniforms:T}),getShaderSource:i=>{let a=p.length,s=t6("batchDims",e[0].dataType,a,1),o=tH(e[0].dataType),u=t2("a",e[0].dataType,w,$),l=t2("b",e[1].dataType,k,$),d=t3("result",e[0].dataType,S.length,$),c=[u,l];if(C){let r=n?$:1;c.push(t2("bias",e[2].dataType,e[2].dims.length,r))}let h=[{name:"dim_a_outer",type:"i32"},{name:"dim_b_outer",type:"i32"},{name:"dim_inner",type:"i32"}];iU(r,h);let f=tH(d.type.tensor),m=((e,r,i,a,n=!1)=>{let[s,o,u,l]=a,d=tH(a[0].type.tensor);return`
+    fn mm_readA(batch: i32, row: i32, colIn: i32, batchIndices: ${s.type.indices}) -> ${iL(e,d)} {
+      var value = ${iL(e,d)}(0.0);
+      let col = colIn * ${e};
+      if(row < uniforms.dim_a_outer && col < uniforms.dim_inner)
+      {
+        var aIndices: ${o.type.indices};
+        ${ij("aIndices",o,o.rank-2,s.rank,"batchIndices")}
+        ${o.indicesSet("aIndices",o.rank-2,"u32(row)")}
+        ${o.indicesSet("aIndices",o.rank-1,"u32(colIn)")}
+        value = ${o.getByIndices("aIndices")};
+      }
+      return value;
+    }
+
+    fn mm_readB(batch: i32, row: i32, colIn: i32, batchIndices: ${s.type.indices}) -> ${iL(e,d)} {
+      var value = ${iL(e,d)}(0.0);
+      let col = colIn * ${e};
+      if(row < uniforms.dim_inner && col < uniforms.dim_b_outer)
+      {
+        var bIndices: ${u.type.indices};
+        ${ij("bIndices",u,u.rank-2,s.rank,"batchIndices")}
+        ${u.indicesSet("bIndices",u.rank-2,"u32(row)")}
+        ${u.indicesSet("bIndices",u.rank-1,"u32(colIn)")}
+        value = ${u.getByIndices("bIndices")};
+      }
+      return value;
+    }
+
+    fn mm_write(batch: i32, row: i32, colIn: i32, valueIn: ${iL(e,d)}) {
+      let col = colIn * ${e};
+      if (row < uniforms.dim_a_outer && col < uniforms.dim_b_outer) {
+        var value = valueIn;
+        let coords = vec3<i32>(batch, row, colIn);
+        ${r?`value = value + ${n?"bias[colIn]":`${iL(e,d)}(bias[row])`};`:""}
+        ${i}
+        ${l.setByIndices("vec3<u32>(coords)","value")}
+      }
+    }
+    `})($,C,iB(r,d.type.value,f),[s,u,l,d],n);return`
+  ${i.registerUniforms(h).registerInternalVariables(s).declareVariables(...c,d)}
+  ${m}
+  ${g?iG(y,b,o,s):iH(y,b,o,s)}
+                   `}}}}),se=ed(()=>{nD(),nP(),nH(),n6(),n8(),n5(),n7(),iZ=(e,r,i,a,n,s,o,u,l)=>{let d="NHWC"===r.format,p=d?e[0].dims[3]:e[0].dims[1],c=i[0],h=d?i[2]:i[3],f=d?i[1]:i[2],m=d?i[3]:i[1],g=d&&(p%4==0||p%3==0)&&m%4==0,y=d?m:h*f,b=d?h*f:m,_=[8,8,1],$=a<=8?[4,1,1]:[4,4,1],v=[Math.ceil(y/_[0]/$[0]),Math.ceil(b/_[1]/$[1]),Math.ceil(c/_[2]/$[2])];th("verbose",()=>`[conv2d_mm_webgpu] dispatch = ${v}`);let w=g?d&&p%4!=0?3:4:1,x=_[1]*$[1],k=_[0]*$[0],S=Math.max(_[0]*w,_[1]),T=a%x==0,I=n%k==0,C=s%S==0,E=g?[w,4,4]:[1,1,1],z=[{type:6,data:a},{type:6,data:n},{type:6,data:s},{type:6,data:[r.pads[0],r.pads[1]]},{type:6,data:r.strides},{type:6,data:r.dilations}];iD(r,z),z.push(...tZ(e[0].dims,e[1].dims));let A=["rank","rank"];return o&&(z.push(...tZ(e[2].dims)),A.push("rank")),z.push(...tZ(i)),{name:"Conv2DMatMul",shaderCache:{hint:`${r.cacheKey};${w};${g};${T};${I};${C};${x};${k};${S}`,inputDependencies:A},getRunData:()=>({outputs:[{dims:l?l(i):i,dataType:e[0].dataType}],dispatchGroup:{x:v[0],y:v[1],z:v[2]},programUniforms:z}),getShaderSource:a=>{let n=[{name:"dim_a_outer",type:"i32"},{name:"dim_b_outer",type:"i32"},{name:"dim_inner",type:"i32"},{name:"pad",type:"i32",length:2},{name:"stride",type:"i32",length:2},{name:"dilation",type:"i32",length:2}];iU(r,n);let s=g?4:1,l=tH(e[0].dataType),p=`
+      fn setOutputAtIndex(flatIndex : i32, value : ${g?`vec4<${l}>`:l}) {
+        result[flatIndex] = ${g?`vec4<${l}>`:l}(value);
+      }
+      fn setOutputAtCoords(d0 : i32, d1 : i32, d2 : i32, d3 : i32, value : ${g?`vec4<${l}>`:l}) {
+        let flatIndex = getOutputIndexFromCoords(vec4<i32>(d0, d1, d2, d3));
+        setOutputAtIndex(flatIndex ${g?"/ 4":""}, value);
+      }`,c=[t2("x",e[0].dataType,e[0].dims.length,3===w?1:w),t2("w",e[1].dataType,e[1].dims.length,s)],h=t3("result",e[0].dataType,i.length,s);if(o){let r=t2("bias",e[2].dataType,e[2].dims.length,s);c.push(r),p+=`
+        fn getBiasByOutputCoords(coords : vec4<i32>) -> ${g?`vec4<${l}>`:l} {
+          return bias[coords.${d?"w":"y"}${g?"/ 4":""}];
+        }`}return`
+        ${iW("uniforms.result_strides")}
+        //struct Uniforms { xShape : vec4<i32>, wShape : vec4<i32>, outShape : vec4<i32>,
+        //  outShapeStrides: vec3<i32>, filterDims : vec2<i32>, pad : vec2<i32>, stride : vec2<i32>,
+        //  dilation : vec2<i32>, dimAOuter : i32, dimBOuter : i32, dimInner : i32 };
+        ${a.registerUniforms(n).declareVariables(...c,h)}
+        ${p}
+        ${((e,r,i,a,n=!1,s,o=4,u=4,l=4,d="f32")=>{let p=e=>{switch(e){case 1:return"return w[row * i32(uniforms.w_shape[3]) + colIn];";case 4:return"return w[row * i32(uniforms.w_shape[3]) / 4 + colIn];";default:throw Error(`innerElementSize ${e} is not supported.`)}},c=e?`
+    let coord = vec4<i32>(batch, xRow, xCol, xCh);
+    `:`
+    let coord = vec4<i32>(batch, xCh, xRow, xCol);
+    `,h=e?`
+    let coords = vec4<i32>(
+      batch,
+      row / outWidth,
+      row % outWidth,
+      col);
+    `:`
+    let coords = vec4<i32>(
+      batch,
+      row,
+      col / outWidth,
+      col % outWidth);
+    `,f=e?"row":"col",m=e?"col":"row",g=`
+    let inChannels = i32(uniforms.w_shape[2]);
+    let outWidth = ${e?"i32(uniforms.result_shape[2])":"i32(uniforms.result_shape[3])"};
+    let outRow = ${f} / outWidth;
+    let outCol = ${f} % outWidth;
+
+    let WRow = ${m} / (i32(uniforms.w_shape[1]) * inChannels);
+    let WCol = ${m} / inChannels % i32(uniforms.w_shape[1]);
+    let xRow = outRow * uniforms.stride[0] + uniforms.dilation[0] * WRow - uniforms.pad[0];
+    let xCol = outCol * uniforms.stride[1] + uniforms.dilation[1] * WCol - uniforms.pad[1];
+    let xCh = ${m} % inChannels;
+    var resData = ${iL(o,d)}(0.0);
+    // The bounds checking is always needed since we use it to pad zero for
+    // the 'same' padding type.
+    if (xRow >= 0 && xRow < ${e?"i32(uniforms.x_shape[1])":"i32(uniforms.x_shape[2])"} && xCol >= 0 && xCol < ${e?"i32(uniforms.x_shape[2])":"i32(uniforms.x_shape[3])"}) {
+      ${c}
+      let xIndex = getIndexFromCoords4D(coord, vec4<i32>(uniforms.x_shape));
+      ${(e=>{switch(e){case 1:return"resData = x[xIndex];";case 3:return`resData = vec3<${d}>(x[xIndex], x[xIndex + 1], x[xIndex + 2]);`;case 4:return"resData = x[xIndex / 4];";default:throw Error(`innerElementSize ${e} is not supported.`)}})(o)}
+    }
+    return resData;`,y=e?r&&a?`
+    let col = colIn * ${o};
+    ${g}`:`
+    let col = colIn * ${o};
+    if (row < uniforms.dim_a_outer && col < uniforms.dim_inner) {
+      ${g}
+    }
+    return ${iL(o,d)}(0.0);`:a&&i?`
+    let col = colIn * ${o};
+    ${g}`:`
+    let col = colIn * ${o};
+    if (row < uniforms.dim_inner && col < uniforms.dim_b_outer) {
+      ${g}
+    }
+    return ${iL(o,d)}(0.0);`,b=e?a&&i?p(u):`
+    let col = colIn * ${u};
+    if (row < uniforms.dim_inner && col < uniforms.dim_b_outer) {
+      ${p(u)}
+    }
+    return ${iL(u,d)}(0.0);`:`
+    let col = colIn * ${u};
+    if (row < uniforms.dim_inner && col < uniforms.dim_a_outer) {
+      ${p(u)}
+    }
+    return ${iL(u,d)}(0.0);`,_=iL(l,d),$=e?iL(o,d):iL(u,d),v=e?iL(u,d):iL(o,d),w=iB(s,_,d);return`
+    fn mm_readA(batch: i32, row : i32, colIn : i32) -> ${$} {
+      ${e?y:b}
+    }
+
+    fn mm_readB(batch: i32, row : i32, colIn : i32) -> ${v} {
+      ${e?b:y}
+    }
+
+    fn mm_write(batch: i32, row : i32, colIn : i32, valueIn : ${_}) {
+      let col = colIn * ${l};
+      if (row < uniforms.dim_a_outer && col < uniforms.dim_b_outer)
+      {
+      var value = valueIn;
+      let outWidth = ${e?"i32(uniforms.result_shape[2])":"i32(uniforms.result_shape[3])"};
+      ${h}
+      ${iq(n)}
+      ${w}
+      setOutputAtCoords(coords[0], coords[1], coords[2], coords[3], value);
+      }
+    }`})(d,T,I,C,o,r,E[0],E[1],E[2],l)}
+        ${g?iG($,_,l,void 0,!d,S):iH($,_,l,void 0,!d,S,!1,void 0,u)}`}}}}),st=ed(()=>{nD(),nP(),nL(),nH(),n6(),n8(),iX=e=>"number"==typeof e?[e,e,e]:e,iQ=(e,r)=>r<=1?e:e+(e-1)*(r-1),iY=(e,r,i,a,n)=>{null==n&&(n=((e,r,i,a=1)=>{let n=iQ(r,a);return Math.floor((e[0]*(i-1)-i+n)/2)})(e,r[0],a[0]));let s=[0,0,0,i];for(let i=0;i<3;i++)e[i]+2*n>=r[i]&&(s[i]=Math.trunc((e[i]-r[i]+2*n)/a[i]+1));return s},iJ=(e,r,i,a,n,s=!1,o="channelsLast")=>{let u,l,d,p,c;if("channelsLast"===o)[u,l,d,p,c]=e;else if("channelsFirst"===o)[u,c,l,d,p]=e;else throw Error(`Unknown dataFormat ${o}`);let[h,,f,m,g]=r,[y,b,_]=iX(i),[$,v,w]=iX(a),x=iQ(f,$),k=iQ(m,v),S=iQ(g,w),{padInfo:T,outDepth:I,outHeight:C,outWidth:E}=((e,r,i,a,n,s,o,u,l,d)=>{let p,c,h,f;if("VALID"===e&&(e=0),"number"==typeof e){p={top:e,bottom:e,left:e,right:e,front:e,back:e};let m=iY([r,i,a,1],[u,l,d],1,[n,s,o],e);c=m[0],h=m[1],f=m[2]}else if(Array.isArray(e)){if(!e.every((e,r,i)=>e===i[0]))throw Error(`Unsupported padding parameter: ${e}`);p={top:e[0],bottom:e[1],left:e[2],right:e[3],front:e[4],back:e[5]};let m=iY([r,i,a,1],[u,l,d],1,[n,s,o],e[0]);c=m[0],h=m[1],f=m[2]}else if("SAME_UPPER"===e){c=Math.ceil(r/n),h=Math.ceil(i/s),f=Math.ceil(a/o);let e=(c-1)*n+u-r,m=(h-1)*s+l-i,g=(f-1)*o+d-a,y=Math.floor(e/2),b=Math.floor(m/2),_=Math.floor(g/2);p={top:b,bottom:m-b,left:_,right:g-_,front:y,back:e-y}}else throw Error(`Unknown padding parameter: ${e}`);return{padInfo:p,outDepth:c,outHeight:h,outWidth:f}})(n,l,d,p,y,b,_,x,k,S),z=s?h*c:h,A=[0,0,0,0,0];return"channelsFirst"===o?A=[u,z,I,C,E]:"channelsLast"===o&&(A=[u,I,C,E,z]),{batchSize:u,dataFormat:o,inDepth:l,inHeight:d,inWidth:p,inChannels:c,outDepth:I,outHeight:C,outWidth:E,outChannels:z,padInfo:T,strideDepth:y,strideHeight:b,strideWidth:_,filterDepth:f,filterHeight:m,filterWidth:g,effectiveFilterDepth:x,effectiveFilterHeight:k,effectiveFilterWidth:S,dilationDepth:$,dilationHeight:v,dilationWidth:w,inShape:e,outShape:A,filterShape:r}},i0=(e,r,i,a,n,s)=>{let o="channelsLast"===s,u=[Math.ceil((e=>{let r=1;for(let i=0;i<e.length;i++)r*=e[i];return r})((o?e[0].dims[3]:e[0].dims[1],{x:i.map((e,r)=>r)}).x.map(e=>i[e]))/64),1,1];th("verbose",()=>`[conv3d_naive_webgpu] dispatch = ${u}`);let l=[{type:12,data:tg.size(i)},{type:12,data:a},{type:12,data:n},{type:12,data:r.strides},{type:12,data:r.dilations}];iD(r,l),l.push(...tZ(e[0].dims,e[1].dims));let d=["rank","rank"],p=3===e.length;return p&&(l.push(...tZ(e[2].dims)),d.push("rank")),l.push(...tZ(i)),{name:"Conv3DNaive",shaderCache:{hint:`${r.cacheKey};${o};1;${p}`,inputDependencies:d},getRunData:()=>({outputs:[{dims:i,dataType:e[0].dataType}],dispatchGroup:{x:u[0],y:u[1],z:u[2]},programUniforms:l}),getShaderSource:s=>{let u=[{name:"output_size",type:"u32"},{name:"filter_dims",type:"u32",length:a.length},{name:"pads",type:"u32",length:n.length},{name:"strides",type:"u32",length:r.strides.length},{name:"dilations",type:"u32",length:r.dilations.length}];iU(r,u);let l=tH(e[0].dataType),d=t2("x",e[0].dataType,e[0].dims.length,1),c=t2("W",e[1].dataType,e[1].dims.length,1),h=[d,c],f=t3("result",e[0].dataType,i.length,1),m="";if(p){let r=t2("bias",e[2].dataType,e[2].dims.length,1);h.push(r),m+=`
+        fn getBiasByOutputCoords(coords : array<u32, 5>) -> ${l} {
+          return bias[${o?t0("coords",4,5):t0("coords",1,5)}];
+        }`}let g=iL(1,l),y=iB(r,g,l);return`
+            ${m}
+            fn getX(d0 : u32, d1 : u32, d2 : u32, d3 : u32, d4 : u32) -> f32 {
+              let aIndices = array<u32, 5>(d0, d1, d2, d3, d4);
+              return ${d.getByIndices("aIndices")};
+            }
+            fn getW(d0 : u32, d1 : u32, d2 : u32, d3 : u32, d4 : u32) -> f32 {
+              let aIndices = array<u32, 5>(d0, d1, d2, d3, d4);
+              return ${c.getByIndices("aIndices")};
+            }
+          ${s.registerUniforms(u).declareVariables(...h,f)}
+          ${s.mainStart()}
+          ${s.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+              let coords = ${f.offsetToIndices("global_idx")};
+              let batch = ${t0("coords",0,d.rank)};
+              let d2 = ${o?t0("coords",d.rank-1,d.rank):t0("coords",1,d.rank)};
+              let xFRCCorner = vec3<u32>(${o?t0("coords",1,d.rank):t0("coords",2,d.rank)},
+              ${o?t0("coords",2,d.rank):t0("coords",3,d.rank)},
+              ${o?t0("coords",3,d.rank):t0("coords",4,d.rank)}) * uniforms.strides - uniforms.pads;
+              let xFCorner = xFRCCorner.x;
+              let xRCorner = xFRCCorner.y;
+              let xCCorner = xFRCCorner.z;
+              let xShapeY = ${o?t0("uniforms.x_shape",1,d.rank):t0("uniforms.x_shape",2,d.rank)};
+              let xShapeZ = ${o?t0("uniforms.x_shape",2,d.rank):t0("uniforms.x_shape",3,d.rank)};
+              let xShapeW = ${o?t0("uniforms.x_shape",3,d.rank):t0("uniforms.x_shape",4,d.rank)};
+              let xShapeU = ${o?t0("uniforms.x_shape",4,d.rank):t0("uniforms.x_shape",1,d.rank)};
+              let inputDepthNearestVec4 = (xShapeU / 4) * 4;
+              let inputDepthVec4Remainder = xShapeU % 4;
+
+              var value = 0.0;
+              for (var wF = 0u; wF < uniforms.filter_dims[0]; wF++) {
+                let xF = xFCorner + wF * uniforms.dilations[0];
+                if (xF < 0 || xF >= xShapeY) {
+                  continue;
+                }
+
+                for (var wR = 0u; wR < uniforms.filter_dims[1]; wR++) {
+                  let xR = xRCorner + wR * uniforms.dilations[1];
+                  if (xR < 0 || xR >= xShapeZ) {
+                    continue;
+                  }
+
+                  for (var wC = 0u; wC < uniforms.filter_dims[2]; wC++) {
+                    let xC = xCCorner + wC * uniforms.dilations[2];
+                    if (xC < 0 || xC >= xShapeW) {
+                      continue;
+                    }
+
+                    for (var d1 = 0u; d1 < inputDepthNearestVec4; d1 += 4) {
+                      ${o?`let xValues = vec4<f32>(
+                               getX(batch, xF, xR, xC, d1),
+                               getX(batch, xF, xR, xC, d1 + 1),
+                               getX(batch, xF, xR, xC, d1 + 2),
+                               getX(batch, xF, xR, xC, d1 + 3));
+                            `:`let xValues = vec4<f32>(
+                               getX(batch, d1, xF, xR, xC),
+                               getX(batch, d1 + 1, xF, xR, xC),
+                               getX(batch, d1 + 2, xF, xR, xC),
+                               getX(batch, d1 + 3, xF, xR, xC));
+                            `}
+                            let wValues = vec4<f32>(
+                              getW(d2, d1, wF, wR, wC),
+                              getW(d2, d1 + 1, wF, wR, wC),
+                              getW(d2, d1 + 2, wF, wR, wC),
+                              getW(d2, d1 + 3, wF, wR, wC));
+                      value += dot(xValues, wValues);
+                    }
+                    if (inputDepthVec4Remainder == 1) {
+                        ${o?`value += getX(batch, xF, xR, xC, inputDepthNearestVec4)
+                          * getW(d2, inputDepthNearestVec4, wF, wR, wC);`:`value += getX(batch, inputDepthNearestVec4, xF, xR, xC)
+                          * getW(d2, inputDepthNearestVec4, wF, wR, wC);`}
+                    } else if (inputDepthVec4Remainder == 2) {
+                      ${o?`let xValues = vec2<f32>(
+                        getX(batch, xF, xR, xC, inputDepthNearestVec4),
+                        getX(batch, xF, xR, xC, inputDepthNearestVec4 + 1));
+                      `:`let xValues = vec2<f32>(
+                        getX(batch, inputDepthNearestVec4, xF, xR, xC),
+                        getX(batch, inputDepthNearestVec4 + 1, xF, xR, xC));
+                    `}
+                    let wValues = vec2<f32>(
+                      getW(d2, inputDepthNearestVec4, wF, wR, wC),
+                      getW(d2, inputDepthNearestVec4 + 1, wF, wR, wC));
+                      value += dot(xValues, wValues);
+                    } else if (inputDepthVec4Remainder == 3) {
+                      ${o?`let xValues = vec3<f32>(
+                        getX(batch, xF, xR, xC, inputDepthNearestVec4),
+                        getX(batch, xF, xR, xC, inputDepthNearestVec4 + 1),
+                        getX(batch, xF, xR, xC, inputDepthNearestVec4 + 2));
+                      `:`let xValues = vec3<f32>(
+                        getX(batch, inputDepthNearestVec4, xF, xR, xC),
+                        getX(batch, inputDepthNearestVec4 + 1, xF, xR, xC),
+                        getX(batch, inputDepthNearestVec4 + 2, xF, xR, xC));
+                    `}
+                    let wValues = vec3<f32>(
+                      getW(d2, inputDepthNearestVec4, wF, wR, wC),
+                      getW(d2, inputDepthNearestVec4 + 1, wF, wR, wC),
+                      getW(d2, inputDepthNearestVec4 + 2, wF, wR, wC));
+                      value += dot(xValues, wValues);
+                    }
+                  }
+                }
+              }
+              ${p?"value = value + getBiasByOutputCoords(coords)":""};
+              ${y}
+              result[global_idx] = f32(value);
+          }`}}}}),sr=ed(()=>{nD(),nL(),nH(),n6(),i1=(e,r,i,a)=>{let n=e.length>2,s=n?"value += b[output_channel];":"",o=e[0].dims,u=e[1].dims,l="NHWC"===r.format,d=l?i[3]:i[1],p=d/r.group,c=l&&p>=4?tX(d):1,h=tg.size(i)/c,f=[{type:12,data:h},{type:12,data:r.dilations},{type:12,data:[r.strides[0],r.strides[1]]},{type:12,data:[r.pads[0],r.pads[1]]},{type:12,data:p}];return iD(r,f),f.push(...tZ(o,[u[0],u[1],u[2],u[3]/c])),f.push(...tZ([i[0],i[1],i[2],i[3]/c])),{name:"GroupedConv",shaderCache:{hint:`${r.cacheKey}_${c}`,inputDependencies:n?["rank","rank","rank"]:["rank","rank"]},getRunData:()=>({outputs:[{dims:a?a(i):i,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(h/64)},programUniforms:f}),getShaderSource:a=>{let d=t3("output",e[0].dataType,i.length,c),p=tH(d.type.tensor),h=iB(r,d.type.value,p),f=t2("x",e[0].dataType,o.length),m=t2("w",e[1].dataType,u.length,c),g=[f,m];n&&g.push(t2("b",e[2].dataType,e[2].dims,c));let y=[{name:"output_size",type:"u32"},{name:"dilations",type:"u32",length:r.dilations.length},{name:"strides",type:"u32",length:2},{name:"pads",type:"u32",length:2},{name:"output_channels_per_group",type:"u32"}];iU(r,y);let b=l?`
+      for (var wHeight: u32 = 0u; wHeight < uniforms.w_shape[0]; wHeight++) {
+        let xHeight = xRCCorner.x + wHeight * uniforms.dilations[0];
+
+        if (xHeight < 0u || xHeight >= uniforms.x_shape[1]) {
+          continue;
+        }
+
+        for (var wWidth: u32 = 0u; wWidth < uniforms.w_shape[1]; wWidth++) {
+          let xWidth = xRCCorner.y + wWidth * uniforms.dilations[1];
+          if (xWidth < 0u || xWidth >= uniforms.x_shape[2]) {
+            continue;
+          }
+
+          for (var wInChannel: u32 = 0u; wInChannel < uniforms.w_shape[2]; wInChannel++) {
+            let input_channel = in_channel_offset + wInChannel;
+            let xVal = ${f.get("batch","xHeight","xWidth","input_channel")};
+            let wVal = ${m.get("wHeight","wWidth","wInChannel","output_channel")};
+            value += xVal * wVal;
+          }
+        }
+      }
+      `:`
+      for (var wInChannel: u32 = 0u; wInChannel < uniforms.w_shape[1]; wInChannel++) {
+        let input_channel = in_channel_offset + wInChannel;
+        for (var wHeight: u32 = 0u; wHeight < uniforms.w_shape[2]; wHeight++) {
+          let xHeight = xRCCorner.x + wHeight * uniforms.dilations[0];
+
+          if (xHeight < 0u || xHeight >= uniforms.x_shape[2]) {
+            continue;
+          }
+
+          for (var wWidth: u32 = 0u; wWidth < uniforms.w_shape[3]; wWidth++) {
+            let xWidth = xRCCorner.y + wWidth * uniforms.dilations[1];
+            if (xWidth < 0u || xWidth >= uniforms.x_shape[3]) {
+              continue;
+            }
+
+            let xVal = ${f.get("batch","input_channel","xHeight","xWidth")};
+            let wVal = ${m.get("output_channel","wInChannel","wHeight","wWidth")};
+            value += xVal * wVal;
+          }
+        }
+      }
+      `;return`
+  ${a.registerUniforms(y).declareVariables(...g,d)}
+
+  ${a.mainStart()}
+    ${a.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+
+    let outputIndices = ${d.offsetToIndices("global_idx")};
+    let batch: u32 = outputIndices[0];
+    let output_channel: u32 = outputIndices[${l?3:1}];
+    let xRCCorner: vec2<u32> = vec2<u32>(outputIndices[${l?1:2}], outputIndices[${l?2:3}]) * uniforms.strides - uniforms.pads;
+    let group_id: u32 = output_channel * ${c} / uniforms.output_channels_per_group;
+    var in_channel_offset = group_id * uniforms.w_shape[${l?2:1}];
+
+    var value: ${d.type.value} = ${d.type.value}(0);
+    ${b}
+    ${s}
+    ${h}
+    ${d.setByOffset("global_idx","value")}
+  }`}}},i2=(e,r,i,a)=>{let n=e.length>2,s=tX(i[3]),o=tX(i[2]),u=tg.size(i)/s/o,l=[e[0].dims[0],e[0].dims[1],e[0].dims[2],e[0].dims[3]/s],d=[e[1].dims[0],e[1].dims[1],e[1].dims[2],e[1].dims[3]/s],p=[i[0],i[1],i[2],i[3]/s],c=[{type:12,data:u},{type:6,data:[r.strides[0],r.strides[1]]},{type:6,data:[r.pads[0],r.pads[1]]}];iD(r,c),c.push(...tZ(l,d,p));let h=(o-1)*r.strides[1]+d[1];return{name:"GroupedConv-Vectorize",shaderCache:{hint:`${r.cacheKey};${s};${o};${h};${d[0]};${d[1]}`,inputDependencies:n?["rank","rank","type"]:["rank","rank"]},getRunData:()=>({outputs:[{dims:a?a(i):i,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(u/64)},programUniforms:c}),getShaderSource:i=>{let a=t3("output",e[0].dataType,p.length,s),u=tH(a.type.tensor),c=iB(r,a.type.value,u),f=t2("x",e[0].dataType,l.length,s),m=t2("w",e[1].dataType,d.length,s),g=[f,m];n&&g.push(t2("b",e[2].dataType,e[2].dims,s));let y=[{name:"output_size",type:"u32"},{name:"strides",type:"i32",length:2},{name:"pads",type:"i32",length:2}];return iU(r,y),`
+  ${i.registerUniforms(y).declareVariables(...g,a)}
+  ${i.mainStart()}
+    ${i.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    let width0 = uniforms.output_shape[3];
+    let output_channel = global_idx % width0;
+    var index1 = global_idx / width0;
+    let width1 = uniforms.output_shape[2] / ${o}u;
+    let col = (index1 % width1) * ${o}u;
+    index1 = index1 / width1;
+    let row = index1 % uniforms.output_shape[1];
+    let batch = index1 / uniforms.output_shape[1];
+
+    let x_corner = vec2<i32>(i32(row), i32(col)) * uniforms.strides - uniforms.pads;
+
+    var x_vals: array<${f.type.value}, ${h}>;
+    var values: array<${a.type.value}, ${o}>;
+    let input_channel = output_channel;
+    // Use constant instead of uniform can give better performance for w's height/width.
+    for (var w_height: u32 = 0u; w_height < ${d[0]}; w_height++) {
+      let x_height = x_corner.x + i32(w_height);
+      if (x_height >= 0 && u32(x_height) < uniforms.x_shape[1]) {
+        for (var i = 0; i < ${h}; i++) {
+          let x_width = x_corner.y + i;
+          if (x_width >= 0 && u32(x_width) < uniforms.x_shape[2]) {
+            x_vals[i] = ${f.get("batch","u32(x_height)","u32(x_width)","input_channel")};
+          } else {
+            x_vals[i] = ${f.type.value}(0);
+          }
+        }
+        for (var w_width: u32 = 0u; w_width < ${d[1]}; w_width++) {
+          let w_val = ${m.get("w_height","w_width","0","output_channel")};
+          for (var i = 0u; i < ${o}u; i++) {
+            values[i] = fma(x_vals[i * u32(uniforms.strides[1]) + w_width], w_val, values[i]);
+          }
+        }
+      }
+    }
+
+    for (var i = 0u; i < ${o}u; i++) {
+      var value = values[i];
+      ${n?"value += b[output_channel];":""}
+      ${c}
+      ${a.set("batch","row","col + i","output_channel","value")};
+    }
+  }`}}}}),si=ed(()=>{nL(),se(),st(),n7(),sr(),n6(),n9(),nK(),i3=[2,3,1,0],i4=(e,r)=>{let i=e.kernelShape.slice();i.length<r[1].dims.length-2&&i.push(...Array(r[1].dims.length-2-i.length).fill(0));for(let e=2;e<r[1].dims.length;++e)0===i[e-2]&&(i[e-2]=r[1].dims[e]);let a=e.pads.slice();ty.adjustPadsBasedOnAutoPad(r[0].dims,e.strides,e.dilations,i,a,"NHWC"===e.format,e.autoPad);let n=Object.assign({},e);return Object.assign(n,{kernelShape:i,pads:a}),n},i6=e=>{let r=iP(e),i=e.format;return{autoPad:["NOTSET","VALID","SAME_UPPER","SAME_LOWER"][e.auto_pad],format:i,dilations:e.dilations,group:e.group,kernelShape:e.kernel_shape,pads:e.pads,strides:e.strides,wIsConst:e.w_is_const(),...r,cacheKey:`${e.format};${r.activation};`}},i8=(e,r,i,a)=>{var n,s,o,u,l,d;let p,c,h,f,m,g,y="NHWC"===i.format,b=(n=r[0].dims,s=r[1].dims,o=i.dilations,u=i.pads,l=i.strides,d=y,p=n[0],h=(c=n.slice(d?1:2,d?3:4)).length,f=s[0],m=s.slice(2).map((e,r)=>e+(e-1)*(o[r]-1)),(g=c.map((e,r)=>e+u[r]+u[r+h]).map((e,r)=>Math.floor((e-m[r]+l[r])/l[r]))).splice(0,0,p),g.splice(d?3:1,0,f),g);if(1!==i.group){let n=[r[0]];if(y){let a=e.kernelCustomData.wT??e.compute(t7(r[1],i3),{inputs:[1],outputs:[i.wIsConst?-2:-1]})[0];i.wIsConst&&!e.kernelCustomData.wT&&(e.kernelCustomData.wT=a),n.push(a)}else n.push(r[1]);3===r.length&&n.push(r[2]),!e.adapterInfo.isArchitecture("ampere")&&y&&r[1].dims[0]===i.group&&1===r[1].dims[1]&&1===i.dilations[0]&&1===i.dilations[1]?e.compute(i2(n,i,b,a),{inputs:n}):e.compute(i1(n,i,b,a),{inputs:n});return}let _=3===r.length,$=r[0].dims[y?1:2],v=r[0].dims[y?2:3],w=r[0].dims[y?3:1],x=r[1].dims[2],k=r[1].dims[3],S=b[y?1:2],T=b[y?2:3],I=b[y?3:1],C=y&&x===$&&k===v&&0===i.pads[0]&&0===i.pads[1];if(C||1===x&&1===k&&1===i.dilations[0]&&1===i.dilations[1]&&1===i.strides[0]&&1===i.strides[1]&&0===i.pads[0]&&0===i.pads[1]){let n=b[0],s,o,u,l=[];if(y){let a=e.kernelCustomData.wT??e.compute(t7(r[1],i3),{inputs:[1],outputs:[i.wIsConst?-2:-1]})[0];if(i.wIsConst&&!e.kernelCustomData.wT&&(e.kernelCustomData.wT=a),C){let e=$*v*w;s=r[0].reshape([1,n,e]),o=a.reshape([1,e,I]),u=[1,n,I]}else s=r[0].reshape([n,$*v,w]),o=a.reshape([1,w,I]),u=[n,S*T,I];l.push(s),l.push(o)}else s=r[0].reshape([n,w,$*v]),o=r[1].reshape([1,I,w]),u=[n,I,S*T],l.push(o),l.push(s);_&&l.push(r[2]);let d=u[2],p=l[0].dims[l[0].dims.length-1];d<8&&p<8?e.compute(iV(l,i,b,u,y,a),{inputs:l}):e.compute(iK(l,i,b,u,y,a),{inputs:l});return}let E=e.kernelCustomData.wT??e.compute(t7(r[1],i3),{inputs:[1],outputs:[i.wIsConst?-2:-1]})[0];i.wIsConst&&!e.kernelCustomData.wT&&(e.kernelCustomData.wT=E);let z=[r[0],E];_&&z.push(r[2]);let A=y?S*T:I,O=y?I:S*T,M=x*k*w;e.compute(iZ(z,i,b,A,O,M,_,!0,a),{inputs:z})},i5=(e,r)=>{var i,a,n,s,o;if(((e,r)=>{if(!e||2!==e.length&&3!==e.length)throw Error("Conv requires 2 or 3 inputs");if(e[0].dims.length>5)throw Error("greater than 5D is not supported");if(e[0].dims.length!==e[1].dims.length)throw Error("filter does not have same dimension as input");if(e[0].dims["NHWC"===r.format?e[0].dims.length-1:1]!==e[1].dims[1]*r.group)throw Error("FILTER_IN_CHANNEL should be equal to DATA_CHANNEL");if(3===e.length&&(1!==e[2].dims.length||e[1].dims[0]!==e[2].dims[0]))throw Error("invalid bias");let i=e[0].dims.length-2;if(r.dilations.length!==i)throw Error(`dilations should be ${i}D`);if(r.strides.length!==i)throw Error(`strides should be ${i}D`);if(r.pads.length!==2*i)throw Error(`pads should be ${2*i}D`);if(0!==r.kernelShape.length&&r.kernelShape.length!==e[1].dims.length-2)throw Error("invalid kernel shape")})(e.inputs,r),3===e.inputs[0].dims.length){let n,s,o,u,l,d,p;i=e,n="NHWC"===(a=r).format,s=[i.inputs[0].reshape(n?[i.inputs[0].dims[0],1,i.inputs[0].dims[1],i.inputs[0].dims[2]]:[i.inputs[0].dims[0],i.inputs[0].dims[1],1,i.inputs[0].dims[2]]),i.inputs[1].reshape([i.inputs[1].dims[0],i.inputs[1].dims[1],1,i.inputs[1].dims[2]])],3===i.inputs.length&&s.push(i.inputs[2]),o=[0,a.pads[0],0,a.pads[1]],u=[1].concat(a.strides),l=[1].concat(a.dilations),d=[1].concat(a.kernelShape),p=i4({...a,pads:o,strides:u,dilations:l,kernelShape:d},s),i8(i,s,p,e=>n?[e[0],e[2],e[3]]:[e[0],e[1],e[3]])}else if(5===e.inputs[0].dims.length){let i,a,u,l;n=e,s=e.inputs,i="NHWC"===(o=r).format?"channelsLast":"channelsFirst",a=i4(o,s),u="NOTSET"===o.autoPad?o.pads:o.autoPad,l=iJ(s[0].dims,s[1].dims,o.strides,o.dilations,u,!1,i),n.compute(i0(s,a,l.outShape,[l.filterDepth,l.filterHeight,l.filterWidth],[l.padInfo.front,l.padInfo.top,l.padInfo.left],i))}else{let i=i4(r,e.inputs);i8(e,e.inputs,i)}}}),sa=ed(()=>{nD(),nP(),nL(),nH(),i9=(e,r,i)=>{let a=e.length>2,n=r.outputShape,s="NHWC"===r.format,o=r.group,u=e[1].dims,l=u[2]/o,d=u[3],p=s?tX(l):1,c=s&&1===d&&l>=4,h=c?4*Math.floor(l/4):Math.floor(l/p)*p,f=l-h,m=s?tX(d):1,g=s?1===d?p:m:1,y=tg.size(n)/m,b=[Math.ceil(y/64),1,1];th("verbose",()=>`[conv2d_backprop_webgpu] dispatch = ${b}`);let _=["rank","rank"],$=[r.strides[0],r.strides[1]],v=[r.kernelShape[s?1:2],r.kernelShape[s?2:3]],w=[r.dilations[0],r.dilations[1]],x=[v[0]+(r.dilations[0]<=1?0:(r.kernelShape[s?1:2]-1)*(r.dilations[0]-1)),v[1]+(r.dilations[1]<=1?0:(r.kernelShape[s?2:3]-1)*(r.dilations[1]-1))],k=[x[0]-1-Math.floor((r.pads[0]+r.pads[2])/2),x[1]-1-Math.floor((r.pads[1]+r.pads[3])/2)],S=[{type:12,data:y},{type:12,data:$},{type:12,data:v},{type:12,data:w},{type:12,data:x},{type:6,data:k},{type:12,data:h},{type:12,data:l},{type:12,data:d},...tZ(e[0].dims,e[1].dims)];return a&&(S.push(...tZ(e[2].dims)),_.push("rank")),S.push(...tZ(n)),{name:"ConvTranspose2D",shaderCache:{hint:`${r.cacheKey};${p}${g}${m}${c}${f}`,inputDependencies:_},getRunData:()=>({dispatchGroup:{x:b[0],y:b[1],z:b[2]},outputs:[{dims:i?i(n):n,dataType:e[0].dataType}],programUniforms:S}),getShaderSource:r=>{let i=[{name:"output_size",type:"u32"},{name:"strides",type:"u32",length:$.length},{name:"filter_dims",type:"u32",length:v.length},{name:"dilations",type:"u32",length:v.length},{name:"effective_filter_dims",type:"u32",length:x.length},{name:"pads",type:"i32",length:k.length},{name:"input_channels_per_group_int",type:"u32"},{name:"input_channels_per_group",type:"u32"},{name:"output_channels_per_group",type:"u32"}],o=tH(e[0].dataType),u=s?1:2,l=s?2:3,d=s?3:1,h=t2("W",e[1].dataType,e[1].dims.length,g),y=t2("Dy",e[0].dataType,e[0].dims.length,p),b=[y,h];a&&b.push(t2("bias",e[2].dataType,[n[d]].length,m));let _=t3("result",e[0].dataType,n.length,m),w=`
+            let outputIndices = ${_.offsetToIndices(`global_idx * ${m}`)};
+            let batch = ${_.indicesGet("outputIndices",0)};
+            let d1 = ${_.indicesGet("outputIndices",d)};
+            let r = ${_.indicesGet("outputIndices",u)};
+            let c = ${_.indicesGet("outputIndices",l)};
+            let dyCorner = vec2<i32>(i32(r), i32(c)) - uniforms.pads;
+            let dyRCorner = dyCorner.x;
+            let dyCCorner = dyCorner.y;
+            let groupId = d1 / uniforms.output_channels_per_group;
+            let wOutChannel = d1 - groupId * uniforms.output_channels_per_group;
+            // Convolve dy(?, ?, d2) with w(:, :, d1, d2) to compute dx(xR, xC, d1).
+            // ? = to be determined. : = across all values in that axis.
+            var dotProd = ${_.type.value}(0.0);
+            var wR: u32 = 0;
+            if (uniforms.dilations.x == 1) {
+              // Minimum wR >= 0 that satisfies (dyRCorner + wR) % (uniforms.strides.x) == 0
+              wR = u32(((dyRCorner + i32(uniforms.strides.x) - 1) / i32(uniforms.strides.x)) * i32(uniforms.strides.x) - dyRCorner);
+            }
+            for (; wR < uniforms.effective_filter_dims.x; wR = wR + 1) {
+              if (wR % uniforms.dilations.x != 0) {
+                continue;
+              }
+              let dyR = (${o}(dyRCorner) + ${o}(wR)) / ${o}(uniforms.strides[0]);
+              let wRPerm = uniforms.filter_dims.x - 1 - wR / uniforms.dilations.x;
+              if (dyR < 0.0 || dyR >= ${o}(uniforms.Dy_shape[${u}]) || fract(dyR) > 0.0 ||
+                  wRPerm < 0) {
+                continue;
+              }
+              let idyR: u32 = u32(dyR);
+              var wC: u32 = 0;
+              if (uniforms.dilations.y == 1) {
+                // Minimum wC >= 0 that satisfies (dyCCorner + wC) % (uniforms.strides.y) == 0
+                wC = u32(((dyCCorner + i32(uniforms.strides.y) - 1) / i32(uniforms.strides.y)) * i32(uniforms.strides.y) - dyCCorner);
+              }
+              for (; wC < uniforms.effective_filter_dims.y; wC = wC + 1) {
+                if (wC % uniforms.dilations.y != 0) {
+                  continue;
+                }
+                let dyC = (${o}(dyCCorner) + ${o}(wC)) / ${o}(uniforms.strides.y);
+                let wCPerm = uniforms.filter_dims.y - 1 - wC / uniforms.dilations.y;
+                if (dyC < 0.0 || dyC >= ${o}(uniforms.Dy_shape[${l}]) ||
+                    fract(dyC) > 0.0 || wCPerm < 0) {
+                  continue;
+                }
+                let idyC: u32 = u32(dyC);
+                var inputChannel = groupId * uniforms.input_channels_per_group;
+                ${c?`
+                var x_offset = ${y.indicesToOffset(`${y.type.indices}(batch, idyR, idyC, inputChannel)`)} / ${p};
+                var w_offset = ${h.indicesToOffset(`${h.type.indices}(wRPerm, wCPerm, inputChannel, wOutChannel)`)} / ${g};
+                  `:""}
+                for (var d2: u32 = 0; d2 < uniforms.input_channels_per_group_int; d2 = d2 + ${c?4:p}) {
+                  ${(()=>{let e="";if(c)4===p?e+=`
+        let xValue = ${y.getByOffset("x_offset")};
+        let wValue = ${h.getByOffset("w_offset")};
+        dotProd = dotProd + dot(xValue, wValue);
+        x_offset += 1u;
+        w_offset += 1u;`:2===p?e+=`
+          dotProd = dotProd + dot(vec4<${o}>(${y.getByOffset("x_offset")}, ${y.getByOffset("x_offset + 1u")}), vec4<${o}>(${h.getByOffset("w_offset")}, ${h.getByOffset("w_offset + 1u")}));
+          x_offset += 2u;
+          w_offset += 2u;`:1===p&&(e+=`
+          dotProd = dotProd + dot(vec4<${o}>(${y.getByOffset("x_offset")}, ${y.getByOffset("x_offset + 1u")}, ${y.getByOffset("x_offset + 2u")}, ${y.getByOffset("x_offset + 3u")}), vec4<${o}>(${h.getByOffset("w_offset")}, ${h.getByOffset("w_offset + 1u")}, ${h.getByOffset("w_offset + 2u")}, ${h.getByOffset("w_offset + 3u")}));
+          x_offset += 4u;
+          w_offset += 4u;`);else if(e+=`
+                  let xValue = ${s?y.getByOffset(`${y.indicesToOffset(`${y.type.indices}(batch, idyR, idyC, inputChannel)`)} / ${p}`):y.get("batch","inputChannel","idyR","idyC")};
+        `,1===p)e+=`
+          let w_offset = ${h.indicesToOffset(`${h.type.indices}(u32(wRPerm), u32(wCPerm), inputChannel, wOutChannel)`)};
+          let wValue = ${h.getByOffset(`w_offset / ${g}`)};
+          dotProd = dotProd + xValue * wValue;`;else for(let r=0;r<p;r++)e+=`
+            let wValue${r} = ${h.getByOffset(`${h.indicesToOffset(`${h.type.indices}(u32(wRPerm), u32(wCPerm), inputChannel + ${r}, wOutChannel)`)} / ${g}`)};
+            dotProd = dotProd + xValue[${r}] * wValue${r};`;return e})()}
+                  inputChannel = inputChannel + ${c?4:p};
+                }
+                ${(()=>{if(0===f)return"";if(!c)throw Error(`packInputAs4 ${c} is not true.`);let e="";if(1===p){e+="dotProd = dotProd";for(let r=0;r<f;r++)e+=`
+            + ${y.getByOffset(`x_offset + ${r}`)} * ${h.getByOffset(`w_offset + ${r}`)}`;e+=";"}else if(2===p){if(2!==f)throw Error(`Invalid inputChannelsRemainder ${f}.`);e+=`
+          let xValue = ${y.getByOffset("x_offset")};
+          let wValue = ${h.getByOffset("w_offset")};
+          dotProd = dotProd + dot(xValue, wValue);`}return e})()}
+                wC = wC + uniforms.strides.y - 1;
+              }
+              wR = wR + uniforms.strides[0] - 1;
+            }
+            let value = dotProd${a?` + bias[d1 / ${m}]`:""};
+            ${_.setByOffset("global_idx","value")};
+          `;return`
+    ${r.registerUniforms(i).declareVariables(...b,_)}
+      ${r.mainStart()}
+      ${r.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")};
+    ${w}}`}}}}),sn=ed(()=>{sa(),n6(),nK(),i7=(e,r,i,a,n,s)=>(e-1)*r+i+(a-1)*n+1-s,ae=(e,r,i,a,n)=>{let s=Math.floor(e/2);"SAME_UPPER"===r?(i[a]=s,i[n]=e-s):"SAME_LOWER"===r&&(i[a]=e-s,i[n]=s)},at=(e,r)=>{let i=e.kernelShape.slice();if(0===e.kernelShape.length||0===e.kernelShape.reduce((e,r)=>e*r,1)){i.length=0;for(let e=2;e<r[1].dims.length;++e)i.push(r[1].dims[e])}let a="NHWC"===e.format;i.splice(0,0,r[1].dims[0]),i.splice(a?3:1,0,r[1].dims[1]);let n=e.pads.slice(),s=e.outputShape.slice(),o=e.outputPadding.slice(),u=r[0].dims,l=e.dilations.slice();0===l.reduce((e,r)=>e+r,0)&&(l=Array(r[0].dims.length-2).fill(1));let d=e.strides.slice();0===d.reduce((e,r)=>e+r,0)&&(d=Array(r[0].dims.length-2).fill(1)),((e,r,i,a,n,s,o,u,l,d)=>{let p=e.length-2,c=0===d.length;l.length<p&&l.push(...Array(p-l.length).fill(0));let h=e[0],f=r[u?3:1]*n;for(let n=0,h=e.length-p-!!u;n<p;++n,++h){let u=e[h],f=c?u*o[n]:d[n];ae(i7(u,o[n],s[n],r[h],i[n],f),a,s,n,n+p),c&&d.push(o[n]*(u-1)+l[n]+(r[h]-1)*i[n]+1-s[n]-s[n+p])}d.splice(0,0,h),d.splice(u?3:1,0,f)})(u,i,l,e.autoPad,e.group,n,d,a,o,s);let p=Object.assign({},e);return Object.assign(p,{kernelShape:i,pads:n,outputPadding:o,outputShape:s,dilations:l,strides:d}),p},ar=e=>{let r=iP(e),i=e.format,a=["NOTSET","VALID","SAME_UPPER","SAME_LOWER"][typeof e.autoPad>"u"?0:e.autoPad],n=e.dilations,s=e.group??1,o=e.kernelShape,u=e.pads,l=e.strides,d=e.wIsConst();return{autoPad:a,format:i,dilations:n,group:s,kernelShape:o,outputPadding:e.outputPadding,outputShape:e.outputShape,pads:u,strides:l,wIsConst:d,...r,cacheKey:`${e.format};${r.activation};`}},ai=(e,r,i,a)=>{let n=e.kernelCustomData.wT??e.compute(t7(r[1],[2,3,0,1]),{inputs:[1],outputs:[i.wIsConst?-2:-1]})[0];i.wIsConst&&!e.kernelCustomData.wT&&(e.kernelCustomData.wT=n);let s=[r[0],n];3===r.length&&s.push(r[2]),e.compute(i9(s,i,a),{inputs:s})},aa=(e,r)=>{if(((e,r)=>{if(!e||2!==e.length&&3!==e.length)throw Error("Conv requires 2 or 3 inputs");if(4!==e[0].dims.length&&3!==e[0].dims.length)throw Error("currently only support 2-dimensional conv");if(e[0].dims.length!==e[1].dims.length)throw Error("filter does not have same dimension as input");if(e[0].dims["NHWC"===r.format?e[0].dims.length-1:1]!==e[1].dims[0])throw Error("FILTER_IN_CHANNEL should be equal to DATA_CHANNEL");let i=e[1].dims[1]*r.group;if(3===e.length&&(1!==e[2].dims.length||e[2].dims[0]!==i))throw Error("invalid bias");let a=e[0].dims.length-2;if(r.dilations.reduce((e,r)=>e+r,0)>0&&r.dilations.length!==a)throw Error(`dilations should be ${a}D`);if(r.strides.reduce((e,r)=>e+r,0)>0&&r.strides.length!==a)throw Error(`strides should be ${a}D`);if(r.pads.reduce((e,r)=>e+r,0)>0&&r.pads.length!==2*a)throw Error(`pads should be ${2*a}D`);if(r.outputPadding.length!==a&&0!==r.outputPadding.length)throw Error(`output_padding should be ${a}D`);if(r.kernelShape.reduce((e,r)=>e+r,0)>0&&0!==r.kernelShape.length&&r.kernelShape.length!==e[1].dims.length-2)throw Error("invalid kernel shape");if(0!==r.outputShape.length&&r.outputShape.length!==e[0].dims.length-2)throw Error("invalid output shape")})(e.inputs,r),3===e.inputs[0].dims.length){var i,a;let n,s,o,u,l,d,p,c;i=e,n="NHWC"===(a=r).format,s=[i.inputs[0].reshape(n?[i.inputs[0].dims[0],1,i.inputs[0].dims[1],i.inputs[0].dims[2]]:[i.inputs[0].dims[0],i.inputs[0].dims[1],1,i.inputs[0].dims[2]]),i.inputs[1].reshape([i.inputs[1].dims[0],i.inputs[1].dims[1],1,i.inputs[1].dims[2]])],3===i.inputs.length&&s.push(i.inputs[2]),(0===(o=a.kernelShape).length||0===o[0])&&(o=[i.inputs[1].dims[2]]),(0===(u=a.dilations).length||0===u[0])&&(u=[1]),(0===(l=a.strides).length||0===l[0])&&(l=[1]),0===(d=a.pads).length&&(d=[0,0]),d=[0,d[0],0,d[1]],l=[1].concat(l),u=[1].concat(u),o=[1].concat(o),p=[0].concat(p=a.outputPadding),c=at({...a,pads:d,strides:l,dilations:u,kernelShape:o,outputPadding:p},s),ai(i,s,c,e=>n?[e[0],e[2],e[3]]:[e[0],e[1],e[3]])}else{let i=at(r,e.inputs);ai(e,e.inputs,i)}}}),ss=ed(()=>{nD(),nL(),nF(),nH(),an=(e,r)=>{var i,a,n,s;let o,u,l,d,p,c,h=e.inputs[0].dims,f=e.inputs[0].dataType,m=e.inputs[1];e.compute((i=f,a=h,n=m,s=r,o=tg.size(a),u=a.length,l=t2("input",i,u),d=t3("output",i,u),p=6===n.dataType?n.getInt32Array()[0]:Number(n.getBigInt64Array()[0]),c=tg.normalizeAxis(p,u),{name:"CumSum",shaderCache:{hint:s.cacheKey,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:a,dataType:i}],dispatchGroup:{x:Math.ceil(o/64)},programUniforms:[{type:12,data:o},{type:12,data:c},...tZ(a,a)]}),getShaderSource:e=>{let r=` i32(${l.indicesGet("inputIndices","uniforms.axis")}) `,i=t0("uniforms.input_shape","uniforms.axis",u),a=s.reverse?r+(s.exclusive?" + 1":""):"0",n=s.reverse?i:r+(s.exclusive?"":" + 1");return`
+                ${e.registerUniform("outputSize","u32").registerUniform("axis","u32").declareVariables(l,d)}
+                ${e.mainStart()}
+                  ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+                  var inputIndices = ${d.offsetToIndices("global_idx")};
+                  var sum = ${d.type.value}(0);
+                  let first : i32 = ${a};
+                  let last : i32 = ${n};
+                  for (var i : i32 = first; i < last; i++) {
+                    ${l.indicesSet("inputIndices","uniforms.axis","u32(i)")};
+                    sum = sum + ${l.getByIndices("inputIndices")};
+                  }
+                  ${d.setByOffset("global_idx","sum")};
+                }`}}),{inputs:[0]})},as=e=>{let r=1===e.exclusive,i=1===e.reverse;return tV({exclusive:r,reverse:i})}}),so=ed(()=>{nD(),nL(),nF(),nH(),ao=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h,f,m,g,y,b;(e=>{if(!e||1!==e.length)throw Error("DepthToSpace requires 1 input.");if(4!==e[0].dims.length)throw Error("DepthToSpace requires 4D input.")})(e.inputs),e.compute((i=e.inputs[0],p="NHWC"===(a=r).format,c=a.blocksize,h="DCR"===a.mode,p?([n,s,o,u]=i.dims,l=h?[n,s,o,c,c,u/c**2]:[n,s,o,u/c**2,c,c],d=h?[0,1,3,2,4,5]:[0,1,4,2,5,3]):([n,s,o,u]=[i.dims[0],i.dims[2],i.dims[3],i.dims[1]],l=h?[n,c,c,u/c**2,s,o]:[n,u/c**2,c,c,s,o],d=h?[0,3,4,1,5,2]:[0,1,4,2,5,3]),m=(f=i.reshape(l)).dims.length,g=i.dataType,y=t2("a",g,m),b=t3("output",g,m),{name:"DepthToSpace",shaderCache:{hint:`${i.dims};${a.blocksize};${a.mode}`,inputDependencies:["rank"]},getRunData:e=>{let r=p?[n,s*c,o*c,u/c**2]:[n,u/c**2,s*c,o*c],i=tg.size(r),a=f.dims,l=tg.sortBasedOnPerm(a,d);return{outputs:[{dims:r,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(i/64)},programUniforms:[{type:12,data:i},...tZ(a,l)]}},getShaderSource:e=>`
+  ${e.registerUniform("output_size","u32").declareVariables(y,b)}
+
+  ${((e,r,i,a)=>{let n=[];n.push(`fn perm(i: ${a.type.indices}) -> ${i.type.indices} {
+    var a: ${i.type.indices};`);for(let a=0;a<r;++a)n.push(i.indicesSet("a",e[a],`i[${a}]`));return n.push("return a;}"),n.join(`
+`)})(d,m,y,b)}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+
+    let indices = ${b.offsetToIndices("global_idx")};
+    let aIndices = perm(indices);
+
+    ${b.setByOffset("global_idx",y.getByIndices("aIndices"))}
+  }`}))},au=e=>tV({blocksize:e.blocksize,mode:e.mode,format:e.format})}),su=ed(()=>{nD(),nL(),nF(),nH(),ap="^"+(ad="("+(al="[a-zA-Z]|\\.\\.\\.")+")+")+"$",ac="^"+("("+ad+",)*")+ad+"$",ah=class{constructor(e=-1){this.symbolToIndices=new Map,this.inputIndex=e}addSymbol(e,r){let i=this.symbolToIndices.get(e);void 0===i?i=[r]:i.push(r),this.symbolToIndices.set(e,i)}},af=class{constructor(e,r){this.equation=r,this.hasEllipsis=!1,this.symbolToInfo=new Map,this.lhs=[],this.outputDims=[];let[i,a]=r.includes("->")?r.split("->",2):[r,""];if(!i.match(RegExp(ac)))throw Error("Invalid LHS term");if(i.split(",").forEach((r,i)=>{let a=e[i].dims.slice();if(!r.match(RegExp(ap)))throw Error("Invalid LHS term");let n=this.processTerm(r,!0,a,i);this.lhs.push(n)}),""===a)a+=[...this.symbolToInfo.entries()].filter(([e,r])=>1===r.count||"..."===e).map(([e])=>e).join("");else if(!a.match(RegExp(ad)))throw Error("Invalid RHS");a.match(RegExp(al,"g"))?.forEach(e=>{if("..."===e)this.outputDims=this.outputDims.concat(this.ellipsisDims);else{let r=this.symbolToInfo.get(e);if(void 0===r)throw Error("Invalid RHS symbol");this.outputDims.push(r.dimValue)}}),this.rhs=this.processTerm(a,!1,this.outputDims)}addSymbol(e,r,i){let a=this.symbolToInfo.get(e);if(void 0!==a){if(a.dimValue!==r&&1!==a.count)throw Error("Dimension mismatch");a.count++,a.inputIndices.push(i)}else a={count:1,dimValue:r,inputIndices:[i]};this.symbolToInfo.set(e,a)}processTerm(e,r,i,a=-1){let n=i.length,s=!1,o=[],u=0;if(!e.match(RegExp(ap))&&!r&&""!==e)throw Error("Invalid LHS term");let l=e.match(RegExp(al,"g")),d=new ah(a);return l?.forEach((e,p)=>{if("..."===e){if(s)throw Error("Only one ellipsis is allowed per input term");s=!0;let e=n-l.length+1;if(e<0)throw Error("Ellipsis out of bounds");if(o=i.slice(u,u+e),this.hasEllipsis){if(this.ellipsisDims.length!==o.length||this.ellipsisDims.toString()!==o.toString())throw Error("Ellipsis dimensions mismatch")}else if(r)this.hasEllipsis=!0,this.ellipsisDims=o;else throw Error("Ellipsis must be specified in the LHS");for(let e=0;e<o.length;e++){let r=String.fromCharCode(48+e);d.addSymbol(r,p+e),this.addSymbol(r,i[u++],a)}}else d.addSymbol(e,p+(this.hasEllipsis?this.ellipsisDims.length-1:0)),this.addSymbol(e,i[u++],a)}),d}},am=(e,r)=>{var i,a,n,s;let o,u,l,d,p=new af(e.inputs,r.equation),c=p.outputDims,h=e.inputs.map((e,r)=>e.dims);e.compute((i=h,a=e.inputs[0].dataType,n=p,s=c,o=i.map(e=>e.length).map((e,r)=>t2(`input${r}`,a,e)),u=tg.size(s),l=t3("output",a,s.length),d=[...n.symbolToInfo.keys()].filter(e=>!n.rhs.symbolToIndices.has(e)),{name:"Einsum",shaderCache:{hint:n.equation,inputDependencies:i.map(()=>"rank")},getRunData:()=>{let e=d.filter(e=>n.symbolToInfo.has(e)).map(e=>({type:12,data:n.symbolToInfo.get(e)?.dimValue||0}));e.push({type:12,data:u});let r=i.map((e,r)=>[...tZ(e)]).reduce((e,r)=>e.concat(r),e);return r.push(...tZ(s)),{outputs:[{dims:s,dataType:a}],dispatchGroup:{x:Math.ceil(u/64)},programUniforms:r}},getShaderSource:e=>{let r=[],i=[],a=[],s=[],u=[],p=n.symbolToInfo.size===n.rhs.symbolToIndices.size;n.symbolToInfo.forEach((e,d)=>{if(n.rhs.symbolToIndices.has(d)){let i=n.rhs.symbolToIndices.get(d)?.[0];void 0!==i&&n.lhs.forEach((a,n)=>{if(e.inputIndices.includes(n)){let e=a.symbolToIndices.get(d);if(void 0===e)throw Error("Invalid symbol error");e.forEach(e=>{r.push(`${o[n].indicesSet(`input${n}Indices`,e,l.indicesGet("outputIndices",i))}`)})}})}else{let r;n.lhs.forEach((r,a)=>{if(e.inputIndices.includes(a)){let e=r.symbolToIndices.get(d);if(void 0===e)throw Error("Invalid symbol error");e.forEach(e=>{i.push(`${o[a].indicesSet(`input${a}Indices`,e,`${d}`)}`)}),u.push(`prod *= ${o[a].getByIndices(`input${a}Indices`)};`)}}),a.push(`for(var ${d}: u32 = 0; ${d} < uniforms.${(r=d)+"_max"}; ${d}++) {`),s.push("}")}});let c=p?[...r,`let sum = ${o.map((e,r)=>e.getByIndices(`input${r}Indices`)).join(" * ")};`]:[...r,"var sum = 0.0;",...a,...i,"var prod = 1.0;",...u,"sum += prod;",...s];return`
+            ${e.registerUniforms(d.map(e=>{let r;return{name:`${(r=e)+"_max"}`,type:"u32"}})).registerUniform("outputSize","u32").declareVariables(...o,l)}
+
+            ${e.mainStart()}
+            ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+            var outputIndices = ${l.offsetToIndices("global_idx")};
+            ${o.map((e,r)=>`var input${r}Indices: ${o[r].type.indices};`).join(`
+`)}
+            ${c.join(`
+`)};
+            ${l.setByOffset("global_idx","sum")};
+          }`}}))},ag=e=>{let r=e.equation.replace(/\s+/g,"");return tV({equation:r})}}),sl=ed(()=>{nD(),nL(),nH(),ay=(e,r)=>{let i=e.length-r.length,a=[];for(let r=0;r<i;++r)a.push(e[r]);for(let n=0;n<r.length;++n)a.push(1===r[n]?e[n+i]:r[n]);return a},ab=e=>{var r;let i,a,n,s,o,u,l,d,p,c;(e=>{if(!e||2!==e.length)throw Error("Expand requires 2 input.");let r=e[0].dims,i=Array.from(e[1].getBigInt64Array(),Number),a=i.length<r.length?0:i.length-r.length,n=r.length<i.length?0:r.length-i.length;for(;a<i.length&&n<r.length;++a,++n)if(i[a]!==r[n]&&1!==i[a]&&1!==r[n])throw Error("Expand requires shape to be broadcastable to input")})(e.inputs),e.compute((s=(i=n=(r=e.inputs)[0].dims,a=Array.from(r[1].getBigInt64Array(),Number),i.length>a.length?ay(i,a):ay(a,i)),u=9===(o=r[0].dataType)||1===tg.size(n),l=9===o||n.length>0&&n[n.length-1]%4==0?4:1,d=u||s.length>0&&s[s.length-1]%4==0?4:1,c=[{type:12,data:p=Math.ceil(tg.size(s)/d)},...tZ(n,s)],{name:"Expand",shaderCache:{hint:`${s.length};${l}${d}`,inputDependencies:["rank"]},getShaderSource:e=>{let r=t2("input",o,n.length,l),i=t3("output",o,s.length,d),a;if(9===o){let e=(e,a,n="")=>`
+          let outputIndices${a} = ${i.offsetToIndices(`outputOffset + ${a}u`)};
+          let offset${a} = ${r.broadcastedIndicesToOffset(`outputIndices${a}`,i)};
+          let index${a} = offset${a} / 4u;
+          let component${a} = offset${a} % 4u;
+          ${e}[${a}] = ${n}(${r.getByOffset(`index${a}`)}[component${a}]);
+        `;a=`
+        let outputOffset = global_idx * ${d};
+        var data = vec4<u32>(0);
+        ${e("data",0,"u32")}
+        ${e("data",1,"u32")}
+        ${e("data",2,"u32")}
+        ${e("data",3,"u32")}
+        ${i.setByOffset("global_idx","data")}
+      }`}else a=`
+        let outputIndices = ${i.offsetToIndices(`global_idx * ${d}`)};
+        let inputOffset = ${r.broadcastedIndicesToOffset("outputIndices",i)};
+        let data = ${i.type.value}(${r.getByOffset(`inputOffset / ${l}`)});
+        ${i.setByOffset("global_idx","data")}
+      }`;return`
+    ${e.registerUniform("vec_size","u32").declareVariables(r,i)}
+    ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.vec_size")}
+    ${a}`},getRunData:()=>({outputs:[{dims:s,dataType:r[0].dataType}],dispatchGroup:{x:Math.ceil(p/64)},programUniforms:c})}),{inputs:[0]})}}),sd=ed(()=>{nD(),nL(),nH(),n1(),a_=e=>{var r;let i,a,n,s;e.inputs.length<2||0===tg.size(e.inputs[1].dims)?iy(e):e.compute((i=(r=e.inputs)[0].dataType,a=tg.size(r[0].dims),s=(n=tg.size(r[1].dims))%4==0,{name:"FastGeluWithBias",shaderCache:{hint:`${s}`,inputDependencies:["type","type"]},getShaderSource:e=>{let r=t2("x",i,[1],4),a=t2("bias",i,[1],4),n=t3("y",i,[1],4),o=e=>`
+      let bias${e}_offset: u32 = (global_idx * 4 + ${e}) % uniforms.bias_size;
+      let bias${e} = ${a.getByOffset(`bias${e}_offset / 4`)}[bias${e}_offset % 4];`,u=s?`
+      let bias = ${a.getByOffset("global_idx % (uniforms.bias_size / 4)")};`:`${o(0)}${o(1)}${o(2)}${o(3)}
+      let bias = ${r.type.value}(bias0, bias1, bias2, bias3);`;return`${e.registerUniforms([{name:"output_vec_size",type:"u32"},{name:"bias_size",type:"u32"}]).declareVariables(r,a,n)}
+
+    ${im(tK(i))}
+
+    ${e.mainStart(tG)}
+      ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_vec_size")}
+
+      let x = ${r.getByOffset("global_idx")};
+      ${u}
+      let x_in = x + bias;
+      ${n.setByOffset("global_idx",ig("x_in"))}
+    }`},getRunData:e=>({outputs:[{dims:e[0].dims,dataType:e[0].dataType}],programUniforms:[{type:12,data:Math.ceil(a/4)},{type:12,data:n}],dispatchGroup:{x:Math.ceil(a/tG/4)}})}))}}),sp=ed(()=>{nD(),nL(),nF(),nH(),a$=e=>tV({axis:e.axis}),av=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h;(e=>{if(!e||2!==e.length)throw Error("Gather requires 2 inputs.")})(e.inputs),e.compute((i=e.inputs,a=r,n=i[0].dims,s=i[1].dims,o=n.length,u=tg.normalizeAxis(a.axis,o),(l=n.slice(0)).splice(u,1,...s),d=n[u],p=9===i[0].dataType?4:1,h=[{type:12,data:c=Math.ceil(tg.size(l)/p)},{type:6,data:d},{type:12,data:u},...tZ(i[0].dims,i[1].dims,l)],{name:"Gather",shaderCache:{hint:a.cacheKey,inputDependencies:["rank","rank"]},getRunData:()=>({outputs:[{dims:l,dataType:i[0].dataType}],dispatchGroup:{x:Math.ceil(c/64)},programUniforms:h}),getShaderSource:e=>{let r=t2("data",i[0].dataType,i[0].dims.length,p),a=t2("inputIndices",i[1].dataType,i[1].dims.length),n=t3("output",i[0].dataType,l.length,p),d=e=>{let i=s.length,n=`var indicesIndices${e}  = ${a.type.indices}(0);`;for(let r=0;r<i;r++)n+=`${i>1?`indicesIndices${e}[${r}]`:`indicesIndices${e}`} = ${l.length>1?`outputIndices${e}[uniforms.axis + ${r}]`:`outputIndices${e}`};`;n+=`
+          var idx${e} = ${a.getByIndices(`indicesIndices${e}`)};
+          if (idx${e} < 0) {
+            idx${e} = idx${e} + uniforms.axisDimLimit;
+          }
+          var dataIndices${e} : ${r.type.indices};
+        `;for(let r=0,a=0;r<o;r++)r===u?(n+=`${o>1?`dataIndices${e}[${r}]`:`dataIndices${e}`} = u32(idx${e});`,a+=i):(n+=`${o>1?`dataIndices${e}[${r}]`:`dataIndices${e}`} = ${l.length>1?`outputIndices${e}[${a}]`:`outputIndices${e}`};`,a++);return n},c;if(9===i[0].dataType){let e=(e,i,a="")=>`
+          let outputIndices${i} = ${n.offsetToIndices(`outputOffset + ${i}u`)};
+          ${d(i)};
+          let offset${i} = ${r.indicesToOffset(`dataIndices${i}`)};
+          let index${i} = offset${i} / 4u;
+          let component${i} = offset${i} % 4u;
+          ${e}[${i}] = ${a}(${r.getByOffset(`index${i}`)}[component${i}]);
+        `;c=`
+        let outputOffset = global_idx * ${p};
+        var value = vec4<u32>(0);
+        ${e("value",0,"u32")}
+        ${e("value",1,"u32")}
+        ${e("value",2,"u32")}
+        ${e("value",3,"u32")}
+        ${n.setByOffset("global_idx","value")}
+      `}else c=`
+      let outputIndices = ${n.offsetToIndices("global_idx")};
+      ${d("")};
+      let value = ${r.getByIndices("dataIndices")};
+      ${n.setByOffset("global_idx","value")};
+      `;return`
+      ${e.registerUniform("outputSize","u32").registerUniform("axisDimLimit","i32").registerUniform("axis","u32").declareVariables(r,a,n)}
+      ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+        ${c}
+      }`}}))}}),sc=ed(()=>{nD(),nL(),nH(),aw=(e,r)=>{var i,a,n,s,o,u;let l,d,p=e.inputs,c=p[0].dims,h=p[0].dataType,f=p[1].dims,m=f[f.length-1],g=tg.sizeToDimension(f,f.length-1),y=tg.sizeFromDimension(c,r.batchDims+m),b=tg.sizeToDimension(c,r.batchDims),_=tg.sizeFromDimension(c,r.batchDims),$=Array(m),v=y;for(let e=0;e<m;++e)$[m-1-e]=v,v*=c[r.batchDims+m-1-e];let w=(i=e,a=p[1],n=$,s=r.batchDims,o=c,l=[{type:12,data:u=g},{type:12,data:s},{type:12,data:o},{type:12,data:n},{type:12,data:g/b},{type:12,data:_},{type:12,data:m}],d=[u],l.push(...tZ(a.dims,d)),i.compute({name:"computeSliceOffsets",shaderCache:{hint:`${o.length}_${n.length}`,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:d,dataType:i.inputs[1].dataType}],dispatchGroup:{x:Math.ceil(u/64)},programUniforms:l}),getShaderSource:e=>{let r=t2("indices_data",a.dataType,a.dims.length),i=t3("input_slice_offsets_data",12,1,1),s=[{name:"output_size",type:"u32"},{name:"batch_dims",type:"u32"},{name:"input_dims",type:"u32",length:o.length},{name:"sizes_from_slice_dims_data",type:"u32",length:n.length},{name:"num_slices_per_batch",type:"u32"},{name:"input_batch_stride",type:"u32"},{name:"num_slice_dims",type:"u32"}];return`
+  ${e.registerUniforms(s).declareVariables(r,i)}
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    let batch_idx = global_idx / uniforms.num_slices_per_batch;
+    let base_offset = batch_idx * uniforms.input_batch_stride;
+
+    let slice_indices_base_offset = global_idx * uniforms.num_slice_dims;
+    var relative_slice_offset = 0;
+    for (var dim_idx = 0u; dim_idx < uniforms.num_slice_dims; dim_idx ++) {
+      var index = i32(indices_data[dim_idx + slice_indices_base_offset].x);
+      let input_dim_idx = uniforms.batch_dims + dim_idx;
+      if (index < 0) {
+        ${1===o.length?"index += i32(uniforms.input_dims);":"index += i32(uniforms.input_dims[input_dim_idx]);"}
+      }
+      ${1===n.length?"relative_slice_offset += index * i32(uniforms.sizes_from_slice_dims_data);":"relative_slice_offset += index * i32(uniforms.sizes_from_slice_dims_data[dim_idx]);"}
+    }
+
+    input_slice_offsets_data[global_idx] =  base_offset + u32(relative_slice_offset);
+  }`}},{inputs:[a],outputs:[-1]})[0]),x=r.batchDims+m;if(x>c.length)throw Error("last dimension of indices must not be larger than rank of input tensor");let k=f.slice(0,-1).concat(c.slice(x)),S=tg.size(k),T=[{type:12,data:S},{type:12,data:y},...tZ(p[0].dims,w.dims,k)];e.compute({name:"GatherND",shaderCache:{hint:r.cacheKey,inputDependencies:["rank","rank"]},getRunData:()=>({outputs:[{dims:k,dataType:h}],dispatchGroup:{x:Math.ceil(S/64)},programUniforms:T}),getShaderSource:e=>{let r=t2("data",p[0].dataType,p[0].dims.length),i=t2("slice_offsets",12,w.dims.length),a=t3("output",p[0].dataType,k.length);return`
+          ${e.registerUniform("output_size","u32").registerUniform("slice_size","u32").declareVariables(r,i,a)}
+            ${e.mainStart()}
+            ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+          let slice_offset = slice_offsets[global_idx / uniforms.slice_size];
+          output[global_idx] = data[u32(slice_offset) + global_idx % uniforms.slice_size];
+        }`}},{inputs:[p[0],w]})},ax=e=>({batchDims:e.batch_dims,cacheKey:""})}),sh=ed(()=>{nD(),nL(),nF(),nH(),ak=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h,f;((e,r)=>{if(e.length<3||e.length>4)throw Error("GatherBlockQuantized requires 3 or 4 inputs.");let i=tg.normalizeAxis(r.quantizeAxis,e[0].dims.length),a=r.blockSize,n=e[0],s=e[2],o=4===e.length?e[3]:void 0;if(s.dims.length!==n.dims.length||!n.dims.map((e,r)=>r===i?Math.ceil(e/a)===s.dims[r]:e===s.dims[r]).reduce((e,r)=>e&&r,!0))throw Error("Scales must have the same rank as the input tensor and the dims should match except on gatherAxis.");if(o){if(o.dataType!==n.dataType)throw Error("Zero point must have the same data type as the input tensor.");if(o.dims.length!==s.dims.length||!o.dims.map((e,r)=>e===s.dims[r]).reduce((e,r)=>e&&r,!0))throw Error("Zero point must have the same rank as the input tensor and the dims should match except on quantizeAxis.")}})(e.inputs,r),e.compute((i=e.inputs,a=r,n=i[0].dims,s=i[1].dims,o=n.length,u=tg.normalizeAxis(a.gatherAxis,o),l=tg.normalizeAxis(a.quantizeAxis,o),(d=n.slice(0)).splice(u,1,...s),p=tg.size(d),c=i[2].dataType,h=22===i[0].dataType,f=[{type:12,data:p},{type:12,data:l},{type:12,data:u},{type:12,data:a.blockSize},...tZ(...i.map((e,r)=>e.dims),d)],{name:"GatherBlockQuantized",shaderCache:{hint:`${a.cacheKey};${i.filter((e,r)=>1!==r).map(e=>e.dims.join("_")).join(";")}`,inputDependencies:Array.from({length:i.length},(e,r)=>"rank")},getRunData:()=>({outputs:[{dims:d,dataType:c}],dispatchGroup:{x:Math.ceil(p/64)},programUniforms:f}),getShaderSource:e=>{let r=t2("data",i[0].dataType,i[0].dims.length),a=t2("inputIndices",i[1].dataType,i[1].dims.length),o=t2("scales",i[2].dataType,i[2].dims.length),l=i.length>3?t2("zeroPoint",i[3].dataType,i[3].dims.length):void 0,p=t3("output",c,d.length),f=[r,a,o];return l&&f.push(l),`
+        ${e.registerUniforms([{name:"output_size",type:"u32"},{name:"quantize_axis",type:"u32"},{name:"gather_axis",type:"u32"},{name:"block_size",type:"u32"}]).declareVariables(...f,p)}
+        ${e.mainStart()}
+        let output_indices = ${p.offsetToIndices("global_idx")};
+        var indices_indices = ${a.type.indices}(0);
+        ${s.length>1?`
+          for (var i: u32 = 0; i < ${s.length}; i++) {
+            let index = ${p.indicesGet("output_indices","uniforms.gather_axis + i")};
+            ${a.indicesSet("indices_indices","i","index")};
+          }`:`indices_indices = ${p.indicesGet("output_indices","uniforms.gather_axis")};`};
+        var data_indices = ${r.type.indices}(0);
+        for (var i: u32 = 0; i < uniforms.gather_axis; i++) {
+          let index = ${p.indicesGet("output_indices","i")};
+          ${r.indicesSet("data_indices","i","index")};
+        }
+        var index_from_indices = ${a.getByIndices("indices_indices")};
+        if (index_from_indices < 0) {
+          index_from_indices += ${n[u]};
+        }
+        ${r.indicesSet("data_indices","uniforms.gather_axis","u32(index_from_indices)")};
+        for (var i = uniforms.gather_axis + 1; i < ${d.length}; i++) {
+          let index = ${p.indicesGet("output_indices",`i + ${s.length} - 1`)};
+          ${r.indicesSet("data_indices","i","index")};
+        }
+        let data_offset = ${r.indicesToOffset("data_indices")};
+        let data_index = data_offset % 8;
+        // Convert 4-bit packed data to 8-bit packed data.
+        let packed_4bit_quantized_data = ${r.getByOffset("data_offset / 8")};
+        let packed_8bit_quantized_data = (packed_4bit_quantized_data >> (4 * (data_index % 2))) & 0x0f0f0f0f;
+        let quantized_data_vec = ${h?"unpack4xI8":"unpack4xU8"}(u32(packed_8bit_quantized_data));
+        let quantized_data = quantized_data_vec[data_index / 2];
+        var scale_indices = data_indices;
+        let quantize_axis_index = ${o.indicesGet("data_indices","uniforms.quantize_axis")} / uniforms.block_size;
+        ${o.indicesSet("scale_indices","uniforms.quantize_axis","quantize_axis_index")};
+        var scale = ${o.getByIndices("scale_indices")};
+        ${l?`
+              let zero_point_indices = scale_indices;
+              let zero_point_offset = ${l.indicesToOffset("zero_point_indices")};
+              let zero_point_index = zero_point_offset % 8;
+              let packed_4bit_zero_points = ${l.getByOffset("zero_point_offset / 8")};
+              let packed_8bit_zero_points = (packed_4bit_zero_points >> (4 * (zero_point_index % 2))) & 0x0f0f0f0f;
+              let zero_point_vec = ${h?"unpack4xI8":"unpack4xU8"}(u32(packed_8bit_zero_points));
+              let zero_point = zero_point_vec[zero_point_index / 2];`:"var zero_point = 0"};
+        let dequantized_data = ${tK(c)}(quantized_data - zero_point) * scale;
+        ${p.setByOffset("global_idx","dequantized_data")};
+    }`}}))},aS=e=>tV({blockSize:e.blockSize,gatherAxis:e.gatherAxis,quantizeAxis:e.quantizeAxis})}),sf=ed(()=>{nD(),nL(),nF(),nH(),aT=e=>tV({axis:e.axis}),aI=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h,f,m,g,y;(e=>{if(!e||2!==e.length)throw Error("GatherElements requires 2 inputs.");if(e[0].dims.length<1)throw Error("GatherElements requires that the data input be rank >= 1.");if(e[0].dims.length!==e[1].dims.length)throw Error(`GatherElements requires that the data input and
+                     indices input tensors be of same rank.`)})(e.inputs),e.compute((i=e.inputs,a=r,n=i[0].dims,s=i[0].dataType,o=n.length,u=i[1].dims,l=i[1].dataType,p=n[d=tg.normalizeAxis(a.axis,o)],c=u.slice(0),h=tg.size(c),f=t2("input",s,o),m=t2("indicesInput",l,u.length),g=t3("output",s,c.length),(y=[{type:12,data:h},{type:6,data:p},{type:12,data:d}]).push(...tZ(n,u,c)),{name:"GatherElements",shaderCache:{inputDependencies:["rank","rank"]},getRunData:()=>({outputs:[{dims:c,dataType:i[0].dataType}],dispatchGroup:{x:Math.ceil(h/64)},programUniforms:y}),getShaderSource:e=>`
+      ${e.registerUniform("outputSize","u32").registerUniform("axisDimLimit","i32").registerUniform("axis","u32").declareVariables(f,m,g)}
+      ${e.mainStart()}
+      ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+
+      let outputIndices = ${g.offsetToIndices("global_idx")};
+
+      var idx = ${m.getByOffset("global_idx")};
+      if (idx < 0) {
+        idx = idx + uniforms.axisDimLimit;
+      }
+      var inputIndices = ${f.type.indices}(outputIndices);
+      ${f.indicesSet("inputIndices","uniforms.axis","u32(idx)")};
+      let value = ${f.getByIndices("inputIndices")};
+
+      ${g.setByOffset("global_idx","value")};
+  }`}))}}),sm=ed(()=>{nD(),nL(),nH(),aC=e=>({transA:e.transA,transB:e.transB,alpha:e.alpha,beta:e.beta,cacheKey:`${e.transA};${e.transB};${1===e.alpha}`}),aE=(e,r)=>{(e=>{if(!e)throw Error("Input is missing");if(e.length<2||e.length>3)throw Error("Invaid input number.");if(3===e.length&&e[2].dims.length>2)throw Error("Invalid input shape of C");if(e[0].dataType!==e[1].dataType||3===e.length&&e[0].dataType!==e[2].dataType)throw Error("Input types are mismatched")})(e.inputs),e.compute(((e,r)=>{let i=e[0].dims.slice(),a=e[1].dims.slice(),[n,s,o]=tb.getShapeOfGemmResult(i,r.transA,a,r.transB,3===e.length?e[2].dims:void 0),u=[n,s],l=Math.ceil(s/16),d=Math.ceil(n/16),p=(tg.size(u),[{type:12,data:l},{type:12,data:n},{type:12,data:s},{type:12,data:o},{type:1,data:r.alpha},{type:1,data:r.beta}]),c=["type","type"];return 3===e.length&&(p.push(...tZ(e[2].dims)),c.push("rank")),p.push(...tZ(u)),{name:"GemmShared",shaderCache:{hint:`${r.cacheKey}`,inputDependencies:c},getRunData:()=>({outputs:[{dims:u,dataType:e[0].dataType}],dispatchGroup:{x:l*d},programUniforms:p}),getShaderSource:i=>{let a=t2("a",e[0].dataType,e[0].dims),n=t2("b",e[1].dataType,e[1].dims),s=null,o=[a,n];3===e.length&&(s=t2("c",e[2].dataType,e[2].dims.length),o.push(s));let l=t3("output",e[0].dataType,u.length);o.push(l);let d="",p="";r.transA&&r.transB?(p=`
+      var col = tile_row_start + local_id.x;
+      var row = k_start + local_id.y;
+      if (col < uniforms.M && row < uniforms.K) {
+        tile_a[local_id.y][local_id.x] = a[row * uniforms.M + col];
+      } else {
+        tile_a[local_id.y][local_id.x] = ${a.type.value}(0);
+      }
+
+      col = k_start + local_id.x;
+      row = tile_col_start + local_id.y;
+      if (col < uniforms.K && row < uniforms.N) {
+        tile_b[local_id.y][local_id.x] = b[row * uniforms.K + col];
+      } else {
+        tile_b[local_id.y][local_id.x] = ${n.type.value}(0);
+      }
+      `,d="value += tile_a[k][local_id.y] * tile_b[local_id.x][k];"):r.transA&&!r.transB?(p=`
+      var col = tile_row_start + local_id.x;
+      var row = k_start + local_id.y;
+      if (col < uniforms.M && row < uniforms.K) {
+        tile_a[local_id.y][local_id.x] = a[row * uniforms.M + col];
+      } else {
+        tile_a[local_id.y][local_id.x] = ${a.type.value}(0);
+      }
+
+      col = tile_col_start + local_id.x;
+      row = k_start + local_id.y;
+      if (col < uniforms.N && row < uniforms.K) {
+        tile_b[local_id.y][local_id.x] = b[row * uniforms.N + col];
+      } else {
+        tile_b[local_id.y][local_id.x] = ${n.type.value}(0);
+      }
+      `,d="value += tile_a[k][local_id.y] * tile_b[k][local_id.x];"):!r.transA&&r.transB?(p=`
+      var col = k_start + local_id.x;
+      var row = tile_row_start + local_id.y;
+      if (col < uniforms.K && row < uniforms.M) {
+        tile_a[local_id.y][local_id.x] = a[row * uniforms.K + col];
+      } else {
+        tile_a[local_id.y][local_id.x] = ${a.type.value}(0);
+      }
+
+      col = k_start + local_id.x;
+      row = tile_col_start + local_id.y;
+      if (col < uniforms.K && row < uniforms.N) {
+        tile_b[local_id.y][local_id.x] = b[row * uniforms.K + col];
+      } else {
+        tile_b[local_id.y][local_id.x] = ${n.type.value}(0);
+      }
+      `,d="value += tile_a[local_id.y][k] * tile_b[local_id.x][k];"):r.transA||r.transB||(p=`
+      var col = k_start + local_id.x;
+      var row = tile_row_start + local_id.y;
+      if (col < uniforms.K && row < uniforms.M) {
+        tile_a[local_id.y][local_id.x] = a[row * uniforms.K + col];
+      } else {
+        tile_a[local_id.y][local_id.x] = ${a.type.value}(0);
+      }
+
+      col = tile_col_start + local_id.x;
+      row = k_start + local_id.y;
+      if (col < uniforms.N && row < uniforms.K) {
+        tile_b[local_id.y][local_id.x] = b[row * uniforms.N + col];
+      } else {
+        tile_b[local_id.y][local_id.x] = ${n.type.value}(0);
+      }
+      `,d="value += tile_a[local_id.y][k] * tile_b[k][local_id.x];");let c=1===r.alpha?"":"value *= uniforms.alpha;";return`
+  ${i.registerUniforms([{name:"num_tile_n",type:"u32"},{name:"M",type:"u32"},{name:"N",type:"u32"},{name:"K",type:"u32"},{name:"alpha",type:"f32"},{name:"beta",type:"f32"}]).declareVariables(...o)}
+  var<workgroup> tile_a: array<array<${a.type.storage}, 16>, 16>;
+  var<workgroup> tile_b: array<array<${n.type.storage}, 16>, 16>;
+  ${i.mainStart([16,16,1])}
+    let tile_col_start = (workgroup_index % uniforms.num_tile_n) * 16;
+    let tile_row_start = (workgroup_index / uniforms.num_tile_n) * 16;
+    let num_tiles = (uniforms.K - 1) / 16 + 1;
+    var k_start = 0u;
+    var value = ${l.type.value}(0);
+    for (var t: u32 = 0u; t < num_tiles; t++) {
+      ${p}
+      k_start = k_start + 16;
+      workgroupBarrier();
+
+      for (var k: u32 = 0u; k < 16; k++) {
+        ${d}
+      }
+      workgroupBarrier();
+    }
+
+    ${c}
+    let m = tile_row_start + local_id.y;
+    let n = tile_col_start + local_id.x;
+    ${null!=s?`let cOffset = ${s.broadcastedIndicesToOffset("vec2(m, n)",l)}; value += ${l.type.value}(uniforms.beta) * ${s.getByOffset("cOffset")};`:""}
+    if (m < uniforms.M && n < uniforms.N) {
+      output[m * uniforms.N + n] = value;
+    }
+  }`}}})(e.inputs,r))}}),sg=ed(()=>{nD(),nL(),nF(),nH(),[az,aA,aO,aM]=[0,1,2,3],aR=`
+  fn gs_get_cubic_coeffs(x: f32) -> vec4<f32> {
+    let cubic_alpha = -0.75f;
+    let x_abs = abs(x);
+    var coeffs: vec4<f32>;
+    coeffs[0] = (((cubic_alpha * (x_abs + 1) - 5 * cubic_alpha) * (x_abs + 1) + 8 * cubic_alpha) * (x_abs + 1) - 4 * cubic_alpha);
+    coeffs[1] = (((cubic_alpha + 2) * x_abs - (cubic_alpha + 3)) * x_abs * x_abs + 1);
+    coeffs[2] = (((cubic_alpha + 2) * (1 - x_abs) - (cubic_alpha + 3)) * (1 - x_abs) * (1 - x_abs) + 1);
+    coeffs[3] = (((cubic_alpha * (2 - x_abs) - 5 * cubic_alpha) * (2 - x_abs) + 8 * cubic_alpha) * (2 - x_abs) - 4 * cubic_alpha);
+    return coeffs;
+  }
+`,aN=(e,r)=>{var i,a;let n,s,o,u,l,d,p;(e=>{if(4!==e[0].dims.length)throw Error("only 4-D tensor is supported.");if(e[0].dims.length!==e[1].dims.length)throw Error("input dimensions must be equal to grid dimensions");if(e[0].dims.length-2!==e[1].dims[e[1].dims.length-1])throw Error(`last dimension of grid must be equal to ${e[0].dims.length-2}`);if(e[0].dims[0]!==e[1].dims[0])throw Error("grid batch size must match input batch size")})(e.inputs),e.compute((i=e.inputs,a=r,n=t2("x",i[0].dataType,i[0].dims.length),s=[i[1].dims[0],i[1].dims[1],i[1].dims[2]],o=t2("grid",i[1].dataType,s.length,2),u=[i[0].dims[0],i[0].dims[1],i[1].dims[1],i[1].dims[2]],"NHWC"===a.format&&(u=[i[0].dims[0],i[1].dims[1],i[1].dims[2],i[0].dims[3]],[az,aA,aO,aM]=[0,3,1,2]),l=t3("output",i[0].dataType,u.length),d=n.type.value,p=[{type:12,data:tg.size(u)},...tZ(i[0].dims,s,u)],{name:"GridSample",shaderCache:{hint:`${a.cacheKey}`,inputDependencies:["type","type"]},getRunData:e=>{let r=tg.size(u);return{outputs:[{dims:u,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(r/64)},programUniforms:p}},getShaderSource:e=>{let r,i,s,u,p,c,h,f,m;return`
+  ${e.registerUniform("output_size","u32").declareVariables(n,o,l)}
+  ${aR}
+  ${r=d,`
+  fn gs_bicubic_interpolate(p: mat4x4<${r}>, x: f32, y: f32) -> ${r} {
+    var v: vec4<f32>;
+    var coeffs = gs_get_cubic_coeffs(x);
+    for (var i = 0; i < 4; i++) {
+      v[i] = coeffs[0] * p[i][0] + coeffs[1] * p[i][1] + coeffs[2] * p[i][2] + coeffs[3] * p[i][3];
+    }
+    coeffs = gs_get_cubic_coeffs(y);
+    let pixel = ${r}(coeffs[0] * v[0] + coeffs[1] * v[1] + coeffs[2] * v[2] + coeffs[3] * v[3]);
+    return pixel;
+  }
+`}
+  ${i=a,`
+  fn gs_denormalize(n: f32, length: i32) -> f32 {
+    ${0===i.alignCorners?`
+    // alignCorners: false => [-1, 1] to [-0.5, length - 0.5]
+    return ((n + 1.0) * f32(length) - 1.0) / 2.0;
+    `:`
+    // alignCorners: true => [-1, 1] to [0, length - 1]
+    return (n + 1.0) / 2.0 * (f32(length - 1));
+    `}
+  }
+`}
+  ${s=a,`
+  ${"reflection"===s.paddingMode?`
+      fn gs_reflect(x: i32, x_min: f32, x_max: f32) -> u32 {
+        var dx = 0.0;
+        var fx = f32(x);
+        let range = x_max - x_min;
+        if (fx < x_min) {
+          dx = x_min - fx;
+          let n = u32(dx / range);
+          let r = dx - f32(n) * range;
+          if (n % 2 == 0) {
+            fx = x_min + r;
+          } else {
+            fx = x_max - r;
+          }
+        } else if (fx > x_max) {
+          dx = fx - x_max;
+          let n = u32(dx / range);
+          let r = dx - f32(n) * range;
+          if (n % 2 == 0) {
+            fx = x_max - r;
+          } else {
+            fx = x_min + r;
+          }
+        }
+        return u32(fx);
+      }`:""}
+`}
+  ${u=n,p=d,c=a,`
+  fn pixel_at_grid(r: i32, c: i32, H: i32, W: i32, batch: u32, channel: u32, border: vec4<f32>) -> ${p} {
+     var pixel = ${p}(0);
+     var indices = vec4<u32>(0);
+     indices[${az}] = batch;
+     indices[${aA}] = channel;`+(()=>{switch(c.paddingMode){case"zeros":return`
+          if (r >= 0 && r < H && c >=0 && c < W) {
+            indices[${aO}] = u32(r);
+            indices[${aM}] = u32(c);
+          } else {
+            return ${p}(0);
+          }
+        `;case"border":return`
+          indices[${aO}] = u32(clamp(r, 0, H - 1));
+          indices[${aM}] = u32(clamp(c, 0, W - 1));
+        `;case"reflection":return`
+          indices[${aO}] = gs_reflect(r, border[1], border[3]);
+          indices[${aM}] = gs_reflect(c, border[0], border[2]);
+        `;default:throw Error(`padding mode ${c.paddingMode} is not supported`)}})()+`
+    return ${u.getByIndices("indices")};
+  }
+`}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+      let H_in = i32(uniforms.x_shape[${aO}]);
+      let W_in = i32(uniforms.x_shape[${aM}]);
+
+      ${0===a.alignCorners?`
+      let x_min = -0.5;
+      let x_max = f32(W_in) - 0.5;
+      let y_min = -0.5;
+      let y_max = f32(H_in) - 0.5;
+      `:`
+      let x_min = 0.0;
+      let x_max = f32(W_in) - 1.0;
+      let y_min = 0.0;
+      let y_max = f32(H_in) - 1.0;
+      `};
+      let border = vec4<f32>(x_min, y_min, x_max, y_max);
+
+      let indices = ${l.offsetToIndices("global_idx")};
+      var grid_indices = vec3<u32>(indices[${az}], indices[${aO}], indices[${aM}]);
+      let nxy = ${o.getByIndices("grid_indices")};
+      var x = gs_denormalize(f32(nxy[0]), W_in);
+      var y = gs_denormalize(f32(nxy[1]), H_in);
+
+      ${h=l,f=d,m=a,(()=>{switch(m.mode){case"nearest":return`
+          let result = pixel_at_grid(i32(round(y)), i32(round(x)), H_in, W_in, indices[${az}], indices[${aA}], border);
+        `;case"bilinear":return`
+          let x1 = i32(floor(x));
+          let y1 = i32(floor(y));
+          let x2 = x1 + 1;
+          let y2 = y1 + 1;
+
+          let p11 = pixel_at_grid(y1, x1, H_in, W_in, indices[${az}], indices[${aA}], border);
+          let p12 = pixel_at_grid(y1, x2, H_in, W_in, indices[${az}], indices[${aA}], border);
+          let p21 = pixel_at_grid(y2, x1, H_in, W_in, indices[${az}], indices[${aA}], border);
+          let p22 = pixel_at_grid(y2, x2, H_in, W_in, indices[${az}], indices[${aA}], border);
+
+          let dx2 = ${f}(f32(x2) - x);
+          let dx1 = ${f}(x - f32(x1));
+          let dy2 = ${f}(f32(y2) - y);
+          let dy1 = ${f}(y - f32(y1));
+          let result = dy2 * (dx2 * p11 + dx1 * p12) + dy1 * (dx2 * p21 + dx1 * p22);
+        `;case"bicubic":return`
+          let x0 = i32(floor(x)) - 1;
+          let y0 = i32(floor(y)) - 1;
+          var p: mat4x4<${f}>;
+          for (var h = 0; h < 4; h++) {
+            for (var w = 0; w < 4; w++) {
+              p[h][w] = pixel_at_grid(h + y0, w + x0, H_in, W_in, indices[${az}], indices[${aA}], border);
+            }
+          }
+
+          let dx = x - f32(x0 + 1);
+          let dy = y - f32(y0 + 1);
+          let result = gs_bicubic_interpolate(p, dx, dy);
+        `;default:throw Error(`mode ${m.mode} is not supported`)}})()+`${h.setByOffset("global_idx","result")}`}
+  }`}}))},aB=e=>tV({alignCorners:e.align_corners,mode:e.mode,paddingMode:e.padding_mode,format:e.format})}),sy=ed(()=>{nD(),nL(),nF(),nV(),nY(),nH(),nK(),aD=(e,r)=>e.length>r&&e[r].dims.length>0?e[r]:void 0,aU=e=>tV({...e}),aP=tV({perm:[0,2,1,3]}),aL=(e,r,i,a,n,s,o,u)=>{var l,d,p,c,h,f,m;let g,y,b,_=s;if(!(o&&tg.size(o.dims)>0))return 3===s.dims.length&&(_=s.reshape([r,a,i,n])),1===i||1===a?_:e.compute(t7(_,aP.perm),{inputs:[_],outputs:[-1]})[0];if(1===a)throw Error("AddBiasReshape is not implemented. Please export your model with packed QKV or KV");return _=(l=e,d=s,p=o,c=r,h=a,f=i*n,m=u,g=[c,h,f],b=[{type:12,data:y=tg.size(g)},{type:12,data:m},{type:12,data:f}],_=l.compute({name:"MultiHeadAttentionAddBias",shaderCache:{inputDependencies:["type","type"]},getRunData:()=>({outputs:[{dims:g,dataType:d.dataType,gpuDataType:0}],dispatchGroup:{x:Math.ceil(y/64)},programUniforms:b}),getShaderSource:e=>{let r=t3("qkv_with_bias",d.dataType,g),i=t2("qkv",d.dataType,g),a=t2("bias",p.dataType,g);return`
+  ${e.registerUniforms([{name:"output_size",type:"u32"},{name:"bias_offset",type:"u32"},{name:"hidden_size",type:"u32"}]).declareVariables(i,a,r)}
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    let bias_offset_idx = (global_idx % uniforms.hidden_size) + uniforms.bias_offset;
+
+    qkv_with_bias[global_idx] = qkv[global_idx] + bias[bias_offset_idx];
+  }`}},{inputs:[d,p],outputs:[-1]})[0]).reshape([r,a,i,n]),1===i||1===a?_:e.compute(t7(_,aP.perm),{inputs:[_],outputs:[-1]})[0]},aq=(e,r)=>{let i=((e,r)=>{let i,a=e[0],n=aD(e,1),s=aD(e,2),o=aD(e,3),u=aD(e,4),l=aD(e,5),d=aD(e,6),p=aD(e,7);if(3!==a.dims.length&&5!==a.dims.length)throw Error("Input query is expected to have 3 or 5 dimensions");let c=a.dims[0],h=a.dims[1],f=3===a.dims.length?a.dims[2]:r.numHeads*a.dims[4],m=h,g=0,y=0,b=Math.floor(f/r.numHeads);if(d&&p&&tg.size(d.dims)&&tg.size(p.dims)){if(4!==d.dims.length)throw Error('Input "past_key" is expected to have 4 dimensions');if(d.dims[0]!==c||d.dims[1]!==r.numHeads||d.dims[3]!==b)throw Error('Input "past_key" shape (batch_size, num_heads, past_sequence_length, head_size)');if(p.dims[0]!==c||p.dims[1]!==r.numHeads||p.dims[3]!==b)throw Error('Input "past_value" shape (batch_size, num_heads, past_sequence_length, head_size)');if(d.dims[2]!==p.dims[2])throw Error('Input "past_key" and "past_value" shall have same dim 2 (past_sequence_length)');if(4!==p.dims.length)throw Error('Input "past_value" is expected to have 4 dimensions');g=d.dims[2],y=d.dims[2]}else if(d&&tg.size(d.dims)||p&&tg.size(p.dims))throw Error('Input "past_key" and "past_value" shall be both present or both absent');if(n&&tg.size(n.dims)>0){if(3!==a.dims.length)throw Error('Input "query" is expected to have 3 dimensions when key is given');if(n.dims.length<3||n.dims.length>5)throw Error('Input "key" is expected to have 3, 4, or 5 dimensions');if(a.dims[0]!==n.dims[0])throw Error('Input "query" and "key" shall have same dim 0 (batch size)');if(3===n.dims.length){if(n.dims[2]!==a.dims[2])throw Error('Input "query" and "key" shall have same dim 2 (hidden_size)');i=2,m=n.dims[1]}else if(5===n.dims.length){if(n.dims[2]!==r.numHeads||2!==n.dims[3]||n.dims[4]!==b)throw Error('Expect "key" shape (batch_size, kv_sequence_length, num_heads, 2, head_size) for packed kv');if(s)throw Error('Expect "value" be none when "key" has packed kv format.');i=5,m=n.dims[1]}else{if(n.dims[1]!==r.numHeads||n.dims[3]!==b)throw Error('Expect "key" shape (batch_size, num_heads, kv_sequence_length, head_size) for past_key');i=0,m=n.dims[2]}}else{if(5!==a.dims.length)throw Error('Input "query" is expected to have 5 dimensions when key is empty');if(a.dims[2]!==r.numHeads||3!==a.dims[3])throw Error('Expect "query" shape (batch_size, kv_sequence_length, num_heads, 3, head_size) for packed kv');i=3}if(o&&tg.size(o.dims)>0){if(1!==o.dims.length)throw Error('Input "bias" is expected to have 1 dimension');if(n&&5===n.dims.length&&2===n.dims[3])throw Error("bias is not allowed for packed kv.")}let _=g+m,$=0;if(u&&tg.size(u.dims)>0){$=8;let e=u.dims;throw 1===e.length?e[0]===c?$=1:e[0]===3*c+2&&($=3):2===e.length&&e[0]===c&&e[1]===_&&($=5),8===$?Error('Input "key_padding_mask" shape shall be (batch_size) or (batch_size, total_sequence_length)'):Error("Mask not supported")}let v=!1,w=f;if(s&&tg.size(s.dims)>0){if(3!==s.dims.length&&4!==s.dims.length)throw Error('Input "value" is expected to have 3 or 4 dimensions');if(a.dims[0]!==s.dims[0])throw Error('Input "query" and "value" shall have same dim 0 (batch_size)');if(3===s.dims.length){if(m!==s.dims[1])throw Error('Input "key" and "value" shall have the same dim 1 (kv_sequence_length)');w=s.dims[2]}else{if(m!==s.dims[2])throw Error('Input "key" and "value" shall have the same dim 2 (kv_sequence_length)');w=s.dims[1]*s.dims[3],v=!0}}if(u&&tg.size(u.dims)>0)throw Error("Key padding mask is not supported");if(l&&tg.size(l.dims)>0){if(4!==l.dims.length)throw Error('Input "attention_bias" is expected to have 4 dimensions');if(l.dims[0]!==c||l.dims[1]!==r.numHeads||l.dims[2]!==h||l.dims[3]!==_)throw Error('Expect "attention_bias" shape (batch_size, num_heads, sequence_length, total_sequence_length)')}return{batchSize:c,sequenceLength:h,pastSequenceLength:g,kvSequenceLength:m,totalSequenceLength:_,maxSequenceLength:y,inputHiddenSize:0,hiddenSize:f,vHiddenSize:w,headSize:b,vHeadSize:Math.floor(w/r.numHeads),numHeads:r.numHeads,isUnidirectional:!1,pastPresentShareBuffer:!1,maskFilterValue:r.maskFilterValue,maskType:$,scale:r.scale,broadcastResPosBias:!1,passPastInKv:v,qkvFormat:i}})(e.inputs,r),a=e.inputs[0],n=aD(e.inputs,1),s=aD(e.inputs,2),o=aD(e.inputs,3),u=aD(e.inputs,4),l=aD(e.inputs,5),d=aD(e.inputs,6),p=aD(e.inputs,7);if(5===a.dims.length)throw Error("Packed QKV is not implemented");if(n?.dims.length===5)throw Error("Packed KV is not implemented");let c=n&&s&&4===n.dims.length&&4===s.dims.length,h=aL(e,i.batchSize,i.numHeads,i.sequenceLength,i.headSize,a,o,0);if(c)return rU(e,h,n,s,u,void 0,d,p,l,i);if(!n||!s)throw Error("key and value must be provided");let f=aL(e,i.batchSize,i.numHeads,i.kvSequenceLength,i.headSize,n,o,i.hiddenSize),m=aL(e,i.batchSize,i.numHeads,i.kvSequenceLength,i.vHeadSize,s,o,2*i.hiddenSize);rU(e,h,f,m,u,void 0,d,p,l,i)}}),sb=ed(()=>{nD(),nL(),nF(),nH(),aW=(e,r)=>{let i=e[0].dims,a=tg.size(i),n=e[0].dataType,s=tg.normalizeAxis(r.axis,i.length),o=Array(r.numOutputs),u=t2("input",n,i.length),l=Array(r.numOutputs),d=[],p=[],c=0,h=[{type:12,data:a}];for(let a=0;a<r.numOutputs;a++){c+=r.splitSizes[a],l[a]=c;let u=i.slice();u[s]=r.splitSizes[a],p.push(u),o[a]=t3(`output${a}`,n,u.length),d.push({dims:p[a],dataType:e[0].dataType})}return h.push({type:12,data:l},...tZ(i,...p)),{name:"Split",shaderCache:{hint:r.cacheKey,inputDependencies:["rank"]},getShaderSource:e=>{let r;return`
+  ${e.registerUniform("input_size","u32").registerUniform("size_in_split_axis","u32",l.length).declareVariables(u,...o)}
+  ${r=l.length,`
+fn calculateOutputIndex(index: u32) -> u32 {
+    for (var i: u32 = 0u; i < ${r}u; i += 1u ) {
+    if (index < ${t0("uniforms.size_in_split_axis","i",r)}) {
+        return i;
+    }
+    }
+    return ${r}u;
+}`}
+  ${(e=>{let r=e.length,i=[];for(let a=0;a<r;++a){let n=e[a].setByIndices("indices","input[global_idx]");1===r?i.push(n):0===a?i.push(`if (output_number == ${a}u) { ${n} }`):a===r-1?i.push(`else { ${n} }`):i.push(`else if (output_number == ${a}) { ${n} }`)}return`
+      fn writeBufferData(output_number: u32, indices: ${e[0].type.indices}, global_idx: u32) {
+        ${i.join(`
+`)}
+      }`})(o)}
+
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.input_size")}
+
+    var indices = ${u.offsetToIndices("global_idx")};
+    var index = ${u.indicesGet("indices",s)};
+    let output_number = calculateOutputIndex(index);
+    if (output_number != 0) {
+      index -= ${t0("uniforms.size_in_split_axis","output_number - 1u",l.length)};
+      ${u.indicesSet("indices",s,"index")};
+    }
+    writeBufferData(output_number, indices, global_idx);
+  }`},getRunData:()=>({outputs:d,dispatchGroup:{x:Math.ceil(a/64)},programUniforms:h})}},aj=(e,r)=>{let i,a;var n,s,o=e.inputs;if(!o||o.length<1)throw Error("too few inputs");let u=1===e.inputs.length?r:(n=e.inputs,i=[],a=(s=r).numOutputs,n[1].dims[0]>0&&(n[1].getBigInt64Array().forEach(e=>i.push(Number(e))),a=i.length),tV({numOutputs:a,axis:s.axis,splitSizes:i}));e.compute(aW(e.inputs,u),{inputs:[0]})},aV=e=>{let r=e.axis,i=e.splitSizes,a=e.numOutputs<0?i.length:e.numOutputs;if(a!==i.length)throw Error("numOutputs and splitSizes length must be equal");return tV({axis:r,numOutputs:a,splitSizes:i})}}),s_=ed(()=>{nD(),nL(),nF(),nH(),aG=(e,r)=>{let{interleaved:i,numHeads:a,rotaryEmbeddingDim:n,scale:s}=r,o=e[0].dims[0],u=tg.sizeFromDimension(e[0].dims,1),l=e[0].dims[e[0].dims.length-2],d=u/l,p=e[2].dims[1],c=0===n?2*p:d/a,h=[o,l,d/c,c-p],f=tg.computeStrides(h),m=[{type:1,data:s},{type:12,data:h},{type:12,data:f},...3===e[0].dims.length?Array({type:12,data:[u,d,c,1]}):[],...4===e[0].dims.length?Array({type:12,data:[u,c,l*c,1]}):[],...tZ(e[0].dims,e[1].dims,e[2].dims,e[3].dims,e[0].dims)];return{name:"RotaryEmbedding",shaderCache:{hint:tV({interleaved:i}).cacheKey,inputDependencies:["rank","rank","rank","rank"]},getShaderSource:r=>{let a=t2("input",e[0].dataType,e[0].dims.length),n=t2("position_ids",e[1].dataType,e[1].dims.length),s=t2("cos_cache",e[2].dataType,e[2].dims.length),o=t2("sin_cache",e[3].dataType,e[3].dims.length),u=t3("output",e[0].dataType,e[0].dims.length);return r.registerUniforms([{name:"scale",type:"f32"},{name:"global_shape",type:"u32",length:h.length},{name:"global_strides",type:"u32",length:f.length},{name:"input_output_strides",type:"u32",length:f.length}]),`
+        ${r.declareVariables(a,n,s,o,u)}
+
+        ${r.mainStart(tG)}
+          let half_rotary_emb_dim = uniforms.${s.name}_shape[1];
+          let bsnh = global_idx / uniforms.global_strides % uniforms.global_shape;
+          let size = uniforms.global_shape[0] * uniforms.global_strides[0];
+          ${r.guardAgainstOutOfBoundsWorkgroupSizes("size")}
+
+          if (bsnh[3] < half_rotary_emb_dim) {
+            let position_ids_idx =
+                ${n.broadcastedIndicesToOffset("bsnh.xy",t3("",n.type.tensor,2))};
+            let position_id =
+                u32(${n.getByOffset("position_ids_idx")}) + select(0, bsnh[1], position_ids_idx == 0);
+            let i = dot(bsnh, uniforms.input_output_strides) + select(0, bsnh[3], ${i});
+            let j = i + select(half_rotary_emb_dim, 1, ${i});
+            let re = ${a.getByOffset("i")} * ${s.get("position_id","bsnh[3]")} -
+                ${a.getByOffset("j")} * ${o.get("position_id","bsnh[3]")};
+            ${u.setByOffset("i","re")}
+            let im = ${a.getByOffset("i")} * ${o.get("position_id","bsnh[3]")} +
+                ${a.getByOffset("j")} * ${s.get("position_id","bsnh[3]")};
+            ${u.setByOffset("j","im")}
+          } else {
+            let k = dot(bsnh, uniforms.input_output_strides) + half_rotary_emb_dim;
+            ${u.setByOffset("k",a.getByOffset("k"))}
+          }
+        }`},getRunData:()=>({outputs:[{dims:e[0].dims,dataType:e[0].dataType}],dispatchGroup:{x:Math.ceil(tg.size(h)/tG)},programUniforms:m})}},aF=(e,r)=>{((e,r)=>{let[i,a,n,s]=e,{numHeads:o,rotaryEmbeddingDim:u}=r;if(3!==i.dims.length&&4!==i.dims.length)throw Error(`Input 'x' is expected to have 3 or 4 dimensions, got ${i.dims.length}`);if(!tg.areEqual(a.dims,[])&&!tg.areEqual(a.dims,[1])&&2!==a.dims.length)throw Error(`Input 'position_ids' is expected to have 0, 1, or 2 dimensions, got ${a.dims.length}`);if(2!==n.dims.length)throw Error(`Input 'cos_cache' is expected to have 2 dimensions, got ${n.dims.length}`);if(2!==s.dims.length)throw Error(`Input 'sin_cache' is expected to have 2 dimensions, got ${s.dims.length}`);if(!tg.areEqual(n.dims,s.dims))throw Error("Inputs 'cos_cache' and 'sin_cache' are expected to have the same shape");if(u>0&&0===o)throw Error("num_heads must be provided if rotary_embedding_dim is specified");let l=i.dims[0],d=i.dims[i.dims.length-2],p=n.dims[0],c=tg.sizeFromDimension(i.dims,1)/d,h=0===u?2*n.dims[1]:c/o;if(u>h)throw Error("rotary_embedding_dim must be less than or equal to head_size");if(2===a.dims.length){if(l!==a.dims[0])throw Error(`Input 'position_ids' dimension 0 should be of size batch_size, got ${a.dims[0]}`);if(d!==a.dims[1])throw Error(`Input 'position_ids' dimension 1 should be of size sequence_length, got ${a.dims[1]}`)}if(d>p)throw Error("Updating cos_cache and sin_cache in RotaryEmbedding is not currently supported");if(h/2!==n.dims[1]&&u/2!==n.dims[1])throw Error(`Input 'cos_cache' dimension 1 should be same as head_size / 2 or rotary_embedding_dim / 2, got ${n.dims[1]}`)})(e.inputs,r),e.compute(aG(e.inputs,r))}}),s$=ed(()=>{nF(),nD(),nY(),sy(),sb(),nK(),s_(),nH(),aH=tV({perm:[0,2,1,3]}),aK=(e,r,i)=>{let a=r,n=i.kvNumHeads;return 3===r.dims.length&&0!==i.kvSequenceLength&&(a=r.reshape([i.batchSize,i.kvSequenceLength,n,i.headSize]),a=e.compute(t7(a,aH.perm),{inputs:[a],outputs:[-1]})[0]),a},aZ=(e,r)=>{let i=((e,r)=>{if(r.doRotary&&e.length<=7)throw Error("cos_cache and sin_cache inputs are required if do_rotary is specified");let i=e[0],a=e[1],n=e[2],s=e[3],o=e[4];if(0!==r.doRotary&&e.length<=7)throw Error("cos_cast and sin_cache are expected if do_rotary attribute is non-zero");if(-1!==r.localWindowSize)throw Error("Local attention is not supported");if(0!==r.softcap)throw Error("Softcap is not supported");if(0!==r.rotaryInterleaved)throw Error("Rotary interleaved is not supported");if(r.smoothSoftmax)throw Error("Smooth softmax is not supported");if(3!==i.dims.length&&5!==i.dims.length)throw Error("Input query is expected to have 3 or 5 dimensions");let u=i.dims[0],l=i.dims[1],d=3===i.dims.length?i.dims[2]:r.numHeads*i.dims[4],p=l,c=0,h=!a||0===a.dims.length,f=Math.floor(h?d/(r.numHeads+2*r.kvNumHeads):d/r.numHeads);h&&(d=f*r.numHeads);let m=s&&0!==s.dims.length,g=o&&0!==o.dims.length;if(m&&4===s.dims.length&&s.dims[0]===u&&s.dims[1]!==r.kvNumHeads&&s.dims[2]===r.kvNumHeads&&s.dims[3]===f)throw Error("BSNH pastKey/pastValue is not supported");if(m&&g){if(4!==s.dims.length)throw Error('Input "past_key" is expected to have 4 dimensions');if(4!==o.dims.length)throw Error('Input "past_value" is expected to have 4 dimensions');c=s.dims[2]}else if(m||g)throw Error('Input "past_key" and "past_value" shall be both present or both absent');let y=1;if(a&&a.dims.length>0){if(3!==i.dims.length)throw Error('Input "query" is expected to have 3 dimensions when key is given');if(a.dims.length<3||a.dims.length>5)throw Error('Input "key" is expected to have 3, 4, or 5 dimensions');if(i.dims[0]!==a.dims[0])throw Error('Input "query" and "key" shall have same dim 0 (batch size)');if(3===a.dims.length){if(i.dims[2]%a.dims[2]!=0)throw Error('Dimension 2 of "query" should be a multiple of "key"');p=a.dims[1]}else if(5===a.dims.length){if(a.dims[2]!==r.numHeads||2!==a.dims[3]||a.dims[4]!==f)throw Error('Expect "key" shape (batch_size, kv_sequence_length, num_heads, 2, head_size) for packed kv');if(n)throw Error('Expect "value" be none when "key" has packed kv format.');p=a.dims[1]}else{if(a.dims[1]!==r.numHeads||a.dims[3]!==f)throw Error('Expect "key" shape (batch_size, num_heads, kv_sequence_length, head_size) for past_key');p=a.dims[2]}}else{if(3!==i.dims.length&&5!==i.dims.length)throw Error('Input "query" is expected to have 3 or 5 dimensions when key is empty');if(5===i.dims.length&&(i.dims[2]!==r.numHeads||3!==i.dims[3]))throw Error('Expect "query" shape (batch_size, kv_sequence_length, num_heads, 3, head_size) for packed kv');y=3}let b=!1,_=r.kvNumHeads?f*r.kvNumHeads:d;if(n&&n.dims.length>0){if(3!==n.dims.length&&4!==n.dims.length)throw Error('Input "value" is expected to have 3 or 4 dimensions');if(i.dims[0]!==n.dims[0])throw Error('Input "query" and "value" shall have same dim 0 (batch_size)');if(3===n.dims.length){if(p!==n.dims[1])throw Error('Input "key" and "value" shall have the same dim 1 (kv_sequence_length)');_=n.dims[2]}else{if(p!==n.dims[2])throw Error('Input "past_key" and "past_value" shall have the same dim 2 (kv_sequence_length)');_=n.dims[1]*n.dims[3],b=!0}}let $=e.length>4?e[5]:void 0;if($){if(0===$.dims.length)throw Error("seqlens_k must be at least 1D, got scalar.");let e=$.dims.reduce((e,r)=>e*r,1);if(e!==u)throw Error(`seqlens_k must have batch_size (${u}) elements, got ${e}.`);for(let e=0;e<$.dims.length;e++)if(1!==$.dims[e]&&$.dims[e]!==u)throw Error(`seqlens_k has unexpected shape. Each dimension must be 1 or batch_size (${u}), got dims[${e}] = ${$.dims[e]}.`)}return{batchSize:u,sequenceLength:l,pastSequenceLength:c,kvSequenceLength:p,totalSequenceLength:-1,maxSequenceLength:-1,inputHiddenSize:0,hiddenSize:d,vHiddenSize:_,headSize:f,vHeadSize:Math.floor(_/r.kvNumHeads),numHeads:r.numHeads,kvNumHeads:r.kvNumHeads,nReps:r.numHeads/r.kvNumHeads,pastPresentShareBuffer:!1,maskType:0,scale:r.scale,broadcastResPosBias:!1,passPastInKv:b,qkvFormat:y}})(e.inputs,r);if(5===e.inputs[0].dims.length)throw Error("Packed QKV is not implemented");if(e.inputs[1]?.dims.length===5)throw Error("Packed KV is not implemented");let a=e.inputs[0],n=e.inputs[1]&&e.inputs[1].dims.length>0?e.inputs[1]:void 0,s=e.inputs[2]&&e.inputs[2].dims.length>0?e.inputs[2]:void 0,o=e.inputs[3]&&0!==e.inputs[3].dims.length?e.inputs[3]:void 0,u=e.inputs[4]&&0!==e.inputs[4].dims.length?e.inputs[4]:void 0,l=e.inputs.length>4?e.inputs[5]:void 0,d=e.inputs.length>5?e.inputs[6]:void 0,p=i.kvNumHeads?i.kvNumHeads:i.numHeads,c=tV({axis:2,numOutputs:3,splitSizes:[i.numHeads*i.headSize,p*i.headSize,p*i.headSize]}),[h,f,m]=n||s?[a,n,s]:e.compute(aW([a],c),{inputs:[a],outputs:[-1,-1,-1]}),g,y;if(r.doRotary){var b,_,$,v;let a,n,s,o=e.compute((b=i.batchSize,_=i.sequenceLength,$=l,v=d,a=[b*_],s=[{type:12,data:n=b*_},{type:12,data:_},{type:12,data:b}],{name:"GeneratePositionIds",shaderCache:{hint:`${b};${_}`,inputDependencies:["type","type"]},getRunData:()=>({outputs:[{dims:a,dataType:7}],dispatchGroup:{x:Math.ceil(n/64)},programUniforms:s}),getShaderSource:e=>{let r=t2("seq_lens",$.dataType,$.dims),i=t2("total_seq_lens",v.dataType,v.dims),n=t3("pos_ids",7,a);return`
+  ${e.registerUniforms([{name:"output_size",type:"u32"},{name:"sequence_length",type:"u32"},{name:"batch_size",type:"u32"}]).declareVariables(r,i,n)}
+  ${e.mainStart()}
+    ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+    let total_sequence_length = u32(${i.getByOffset("0")});
+    let is_subsequent_prompt = uniforms.sequence_length > 1 && uniforms.sequence_length != total_sequence_length;
+    let is_first_prompt = !is_subsequent_prompt && uniforms.sequence_length == total_sequence_length;
+    let batch_idx = global_idx / uniforms.sequence_length;
+    let sequence_idx = i32(global_idx % uniforms.sequence_length);
+    var pos_id: i32 = 0;
+    let seqlen = ${r.getByOffset("batch_idx")};
+    let total_seqlen = seqlen + 1;
+    if (is_first_prompt) {
+      if (sequence_idx < total_seqlen) {
+        pos_id = sequence_idx;
+      } else {
+        pos_id = 1;
+      }
+      ${n.setByOffset("global_idx","pos_id")}
+    } else if (is_subsequent_prompt) {
+      let past_seqlen = total_seqlen - i32(uniforms.sequence_length);
+      if (past_seqlen + sequence_idx < total_seqlen) {
+        pos_id = past_seqlen + sequence_idx;
+      } else {
+        pos_id = 1;
+      }
+      ${n.setByOffset("global_idx","pos_id")}
+    } else if (global_idx < uniforms.batch_size) {
+      ${n.setByOffset("global_idx","seqlen")}
+    };
+  }
+  `}}),{inputs:[l,d],outputs:[-1]})[0],u=e.inputs[7],p=e.inputs[8],c=tV({interleaved:0!==r.rotaryInterleaved,numHeads:i.numHeads,rotaryEmbeddingDim:0,scale:r.scale}),m=[h,o,u,p],w=[-1];g=e.compute(aG(m,c),{inputs:m,outputs:w})[0],m.splice(0,1,f);let x=tV({interleaved:0!==r.rotaryInterleaved,numHeads:i.kvNumHeads,rotaryEmbeddingDim:0,scale:r.scale});y=e.compute(aG(m,x),{inputs:m,outputs:w})[0]}let w=aL(e,i.batchSize,i.numHeads,i.sequenceLength,i.headSize,r.doRotary?g:h,void 0,0),x=aK(e,r.doRotary?y:f,i),k=aK(e,m,i);rU(e,w,x,k,void 0,void 0,o,u,void 0,i,l,d)}}),sv=ed(()=>{nD(),nL(),nK(),nH(),aX=(e,r,i,a,n,s,o,u)=>{let l=tX(s),d=1===l?"f32":`vec${l}f`,p=1===l?"vec2f":`mat2x${l}f`,c=n*o,h=64;1===c&&(h=256);let f=[n,o,s/l],m=[n,o,2],g=[];return g.push(...tZ(f,m)),e.compute({name:"InstanceNormComputeChannelScaleShift",shaderCache:{hint:`${l};${u};${h}`,inputDependencies:["rank","type","type"]},getRunData:()=>({outputs:[{dims:m,dataType:1}],dispatchGroup:{x:c},programUniforms:g}),getShaderSource:e=>{let n=t2("x",r.dataType,3,l),s=[n,t2("scale",i.dataType,i.dims),t2("bias",a.dataType,a.dims),t3("output",1,3,2)];return`
+  var<workgroup> workgroup_shared : array<${p}, ${h}>;
+  const workgroup_size = ${h}u;
+  ${e.declareVariables(...s)}
+  ${e.mainStart(h)}
+    let batch = workgroup_index / uniforms.x_shape[1];
+    let channel = workgroup_index % uniforms.x_shape[1];
+    let hight = uniforms.x_shape[2];
+    // initialize workgroup memory
+    var sum = ${d}(0);
+    var squared_sum = ${d}(0);
+    for (var h = local_idx; h < hight; h += workgroup_size) {
+      let value = ${d}(${n.get("batch","channel","h")});
+      sum += value;
+      squared_sum += value * value;
+    }
+    workgroup_shared[local_idx] = ${p}(sum, squared_sum);
+    workgroupBarrier();
+
+    for (var currSize = workgroup_size >> 1;  currSize > 0; currSize = currSize >> 1) {
+      if (local_idx < currSize) {
+        workgroup_shared[local_idx] = workgroup_shared[local_idx] + workgroup_shared[local_idx + currSize];
+      }
+      workgroupBarrier();
+    }
+    if (local_idx == 0) {
+      let sum_final = ${tJ("workgroup_shared[0][0]",l)} / f32(hight * ${l});
+      let squared_sum_final = ${tJ("workgroup_shared[0][1]",l)} / f32(hight * ${l});
+
+      let inv_std_dev = inverseSqrt(squared_sum_final - sum_final * sum_final + f32(${u}));
+      let channel_scale = inv_std_dev * f32(scale[channel]);
+      let channel_shift = f32(bias[channel]) - sum_final * channel_scale;
+      output[workgroup_index] = vec2f(channel_scale, channel_shift);
+    }
+  }`}},{inputs:[r,i,a],outputs:[-1]})[0]},aQ=(e,r)=>{var i,a,n;let s,o,u,l,d,p,c,h,f;"NHWC"===r.format?((e,r,i)=>{let a=r[0].dims,n=a[0],s=a[a.length-1],o=tg.sizeFromDimension(a,1)/s,u=tX(s),l=tg.size(a)/u,d=[{type:12,data:o},{type:12,data:Math.floor(s/u)}],p=!1,c=[0,a.length-1];for(let e=0;e<a.length-2;e++)p=p||1!==a[e+1],c.push(e+1);let h=(p=p&&1!==a[a.length-1])?e.compute(t7(e.inputs[0],c),{inputs:[e.inputs[0]],outputs:[-1]})[0]:e.inputs[0].reshape(Array.from({length:a.length},(e,r)=>a[c[r]])),f=aX(e,h,r[1],r[2],n,o,s,i.epsilon);e.compute({name:"InstanceNormalizationNHWC",shaderCache:{hint:`${u}`,inputDependencies:["type","type"]},getRunData:()=>({outputs:[{dims:a,dataType:r[0].dataType}],dispatchGroup:{x:Math.ceil(l/64)},programUniforms:d}),getShaderSource:e=>{let i=tH(r[0].dataType),n=1===u?"vec2f":`mat${u}x2f`,s=e=>{let r=0===e?"x":"y",a=1===u?"f32":`vec${u}f`;switch(u){case 1:return`${i}(${a}(scale.${r}))`;case 2:return`vec2<${i}>(${a}(scale[0].${r}, scale[1].${r}))`;case 4:return`vec4<${i}>(${a}(scale[0].${r}, scale[1].${r}, scale[2].${r}, scale[3].${r}))`;default:throw Error(`Not supported compoents ${u}`)}},o=t2("input",r[0].dataType,r[0].dims,u),l=t3("output",r[0].dataType,a,u);return`
+  @group(0) @binding(0) var<storage, read> input : array<${o.type.storage}>;
+  @group(0) @binding(1) var<storage, read> scale_input : array<${n}>;
+  @group(0) @binding(2) var<storage, read_write> output : array<${l.type.storage}>;
+  struct Uniforms {H: u32, C : u32};
+  @group(0) @binding(3) var<uniform> uniforms: Uniforms;
+
+  ${e.mainStart()}
+    let current_image_number = global_idx / (uniforms.C * uniforms.H);
+    let current_channel_number = global_idx % uniforms.C;
+
+    let scale_offset = current_image_number * uniforms.C + current_channel_number;
+    let scale = scale_input[scale_offset];
+    output[global_idx] = fma(input[global_idx], ${s(0)}, ${s(1)});
+  }`}},{inputs:[r[0],f]})})(e,e.inputs,r):(i=e,a=e.inputs,n=r,o=(s=a[0].dims)[0],u=s[1],l=tg.sizeFromDimension(s,2),d=tX(l),p=tg.size(s)/d,c=aX(i,a[0],a[1],a[2],o,l,u,n.epsilon),h=[o,u,l/d],f=[o,u],i.compute({name:"InstanceNormalization",shaderCache:{hint:`${d}`,inputDependencies:["type","none"]},getRunData:()=>({outputs:[{dims:s,dataType:a[0].dataType}],dispatchGroup:{x:Math.ceil(p/64)},programUniforms:[{type:12,data:p},...tZ(h,f,h)]}),getShaderSource:e=>{let r=t2("x",a[0].dataType,h.length,d),i=t2("scale_shift",1,f.length,2),n=t3("output",a[0].dataType,h.length,d),s=[r,i,n];return`
+  ${e.registerUniform("output_size","u32").declareVariables(...s)}
+  ${e.mainStart()}
+  ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+      let outputIndices = ${n.offsetToIndices("global_idx")};
+      let batch = outputIndices[0];
+      let channel = outputIndices[1];
+      let scale_shift = ${i.getByIndices("vec2<u32>(batch, channel)")};
+      let value = ${r.getByOffset("global_idx")} * ${n.type.value}(scale_shift.x) + ${n.type.value}(scale_shift.y);
+      ${n.setByOffset("global_idx","value")};
+  }`}},{inputs:[a[0],c]}))}}),sw=ed(()=>{nD(),nL(),nH(),aY=(e,r)=>{(e=>{if(!e||e.length<2)throw Error("layerNorm requires at least 2 inputs.")})(e.inputs),e.compute(((e,r,i)=>{let a=r.simplified,n=e[0].dims,s=e[1],o=!a&&e[2],u=tg.normalizeAxis(r.axis,n.length),l=tg.sizeToDimension(n,u),d=tg.sizeFromDimension(n,u),p=tg.size(s.dims),c=o?tg.size(o.dims):0;if(p!==d||o&&c!==d)throw Error(`Size of X.shape()[axis:] == ${d}.
+       Size of scale and bias (if provided) must match this.
+       Got scale size of ${p} and bias size of ${c}`);let h=[];for(let e=0;e<n.length;++e)e<u?h.push(n[e]):h.push(1);let f=tX(d),m=["type","type"],g=[{type:12,data:l},{type:1,data:d},{type:12,data:Math.floor(d/f)},{type:1,data:r.epsilon}];o&&m.push("type");let y=i>1,b=i>2,_=[{dims:n,dataType:e[0].dataType}];return y&&_.push({dims:h,dataType:1}),b&&_.push({dims:h,dataType:1}),{name:"LayerNormalization",shaderCache:{hint:`${f};${i};${a}`,inputDependencies:m},getRunData:()=>({outputs:_,dispatchGroup:{x:Math.ceil(l/64)},programUniforms:g}),getShaderSource:r=>{let i=tH(e[0].dataType),u=[t2("x",e[0].dataType,e[0].dims,f),t2("scale",s.dataType,s.dims,f)];return o&&u.push(t2("bias",o.dataType,o.dims,f)),u.push(t3("output",e[0].dataType,n,f)),y&&u.push(t3("mean_data_output",1,h)),b&&u.push(t3("inv_std_output",1,h)),`
+  ${r.registerUniforms([{name:"norm_count",type:"u32"},{name:"norm_size",type:"f32"},{name:"norm_size_vectorized",type:"u32"},{name:"epsilon",type:"f32"}]).declareVariables(...u)}
+  ${r.mainStart()}
+    ${r.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.norm_count")}
+    let offset = global_idx * uniforms.norm_size_vectorized;
+    var mean_vector = ${tQ("f32",f)};
+    var mean_square_vector = ${tQ("f32",f)};
+
+    for (var h: u32 = 0u; h < uniforms.norm_size_vectorized; h++) {
+      let value = ${tY(i,f,"x[h + offset]")};
+      mean_vector += value;
+      mean_square_vector += value * value;
+    }
+    let mean = ${tJ("mean_vector",f)} / uniforms.norm_size;
+    let inv_std_dev = inverseSqrt(${tJ("mean_square_vector",f)} / uniforms.norm_size ${a?"":"- mean * mean"} + uniforms.epsilon);
+
+    for (var j: u32 = 0; j < uniforms.norm_size_vectorized; j++) {
+      let f32input = ${tY(i,f,"x[j + offset]")};
+      let f32scale = ${tY(i,f,"scale[j]")};
+      output[j + offset] = ${u[0].type.value}((f32input ${a?"":"- mean"}) * inv_std_dev * f32scale
+        ${o?`+ ${tY(i,f,"bias[j]")}`:""}
+      );
+    }
+
+    ${y?"mean_data_output[global_idx] = mean":""};
+    ${b?"inv_std_output[global_idx] = inv_std_dev":""};
+  }`}}})(e.inputs,r,e.outputCount))}}),sx=ed(()=>{nL(),n9(),n7(),aJ=e=>{var r=e.inputs;if(!r||2!==r.length)throw Error("MatMul requires 2 inputs.");if(r[0].dims[r[0].dims.length-1]!==r[1].dims[r[1].dims.length-2])throw Error("shared dimension does not match.");let i=tm.calcShape(e.inputs[0].dims,e.inputs[1].dims,!0);if(!i)throw Error("Can't use matmul on the given tensors");let a=i[i.length-1],n=e.inputs[0].dims[e.inputs[0].dims.length-1];if(a<8&&n<8)e.compute(iV(e.inputs,{activation:""},i));else{let r=i[i.length-2],s=tg.size(e.inputs[0].dims.slice(0,-2)),o=tg.size(e.inputs[1].dims.slice(0,-2));if(1!==s&&1===r&&1===o){let r=e.inputs[0].reshape([1,s,n]),o=e.inputs[1].reshape([1,n,a]),u=[1,s,a],l=[r,o];e.compute(iK(l,{activation:""},i,u),{inputs:l})}else e.compute(iK(e.inputs,{activation:""},i))}}}),sk=ed(()=>{nD(),nL(),nF(),nH(),a0=(e,r)=>{var i,a,n,s;let o,u,l,d,p,c,h,f,m,g,y,b,_,$,v,w,x,k,S,T,I,C,E,z,A,O,M,R,N,B,D,U,P,L,q,W,j,V,G,F,H,K;((e,r)=>{if(e.length<3||e.length>4)throw Error("MatMulNBits requires 3 or 4 inputs");let i=e[0],a=i.dims.length;if(i.dims[a-1]!==r.k)throw Error("The last dim of input shape does not match the k value");let n=Math.floor((r.k+r.blockSize-1)/r.blockSize),s=r.blockSize/8*r.bits,o=e[1];if(!tg.areEqual(o.dims,[r.n,n,s]))throw Error("The second inputs must be 3D tensor with shape N X nBlocksPerCol X blobSize");let u=e[2].dims;if(tg.size(u)!==r.n*n)throw Error("scales input size error.");if(4===e.length){let i=e[3].dims,a=r.n*(8===r.bits?n:Math.floor((n*r.bits+7)/8));if(tg.size(i)!==a)throw Error("zeroPoints input size error.")}})(e.inputs,r),32===r.blockSize&&e.adapterInfo.isVendor("intel")&&e.adapterInfo.isArchitecture("gen-12lp")?e.compute((i=e.inputs,a=r,u=(o=i[0].dims).length,l=o[u-2],d=a.k,p=a.n,c=o.slice(0,u-2),h=tg.size(c),f=i[1].dims[2]/4,m=i[0].dataType,g=tX(a.k),y=tX(f),b=c.concat([l,p]),$=128/(_=p%8==0?8:p%4==0?4:1),x=(w=$*y*(v=Math.floor(32/a.bits)))/g,k=w/a.blockSize,S=tg.size(b)/_,T=[],I=[h,l,d/g],(C=tg.convertShape(i[1].dims).slice()).splice(-1,1,f/y),T.push(...tZ(I)),T.push(...tZ(C)),T.push(...tZ(i[2].dims)),4===i.length&&T.push(...tZ(tg.convertShape(i[3].dims))),E=[h,l,p],T.push(...tZ(E)),{name:"BlockwiseMatMulNBits32",shaderCache:{hint:`${a.blockSize};${g};${y};${$};${_}`,inputDependencies:Array(i.length).fill("rank")},getRunData:()=>({outputs:[{dims:b,dataType:m}],dispatchGroup:{x:S},programUniforms:T}),getShaderSource:e=>{let r=I.length,n=t2("a",i[0].dataType,r,g),s=t2("b",12,C.length,y),o=t2("scales",i[2].dataType,i[2].dims.length),u=[n,s,o],l=4===i.length?t2("zero_points",12,i[3].dims.length):void 0;l&&u.push(l);let d=E.length,p=t3("output",i[0].dataType,d),c=tH(i[0].dataType),h=()=>{switch(g){case 1:return`
+          let a_data0 = vec4<${c}>(sub_a[word_offset], sub_a[word_offset + 1], sub_a[word_offset + 2], sub_a[word_offset + 3]);
+          let a_data1 = vec4<${c}>(sub_a[word_offset + 4], sub_a[word_offset + 5], sub_a[word_offset + 6], sub_a[word_offset + 7]);`;case 2:return`
+          let a_data0 = vec4<${c}>(sub_a[word_offset], sub_a[word_offset + 1]);
+          let a_data1 = vec4<${c}>(sub_a[word_offset + 2], sub_a[word_offset + 3]);`;case 4:return`
+          let a_data0 = sub_a[word_offset];
+          let a_data1 = sub_a[word_offset + 1];`;default:throw Error(`${g}-component is not supported.`)}};return`
+        var<workgroup> sub_a: array<${n.type.value}, ${x}>;
+        var<workgroup> inter_results: array<array<${p.type.value}, ${$}>, ${_}>;
+        ${e.declareVariables(...u,p)}
+        ${e.mainStart([$,_,1])}
+          let output_indices = ${p.offsetToIndices(`workgroup_index * ${_}`)};
+          let col = output_indices[2];
+          let row = output_indices[1];
+          let batch = output_indices[0];
+          let n_blocks_per_col = uniforms.b_shape[1];
+          let num_tiles =  (n_blocks_per_col - 1) / ${k} + 1;
+
+          // Loop over shared dimension.
+          for (var tile: u32 = 0; tile < num_tiles; tile += 1) {
+            let a_col_start = tile * ${x};
+            // load one tile A data into shared memory.
+            for (var a_offset = local_idx; a_offset < ${x}; a_offset += 128)
+            {
+              let a_col = a_col_start + a_offset;
+              if (a_col < uniforms.a_shape[2])
+              {
+                sub_a[a_offset] = ${n.getByIndices(`${n.type.indices}(batch, row, a_col)`)};
+              } else {
+                sub_a[a_offset] = ${n.type.value}(0);
+              }
+            }
+            workgroupBarrier();
+
+            // each thread process one block
+            let b_row = col + local_id.y;
+            let block = tile * ${k} + local_id.x;
+            ${l?`
+            let zero_point_values_per_byte: u32 = ${Math.floor(8/a.bits)}u;
+            let zero_point_bytes_per_col = (n_blocks_per_col + zero_point_values_per_byte - 1u) / zero_point_values_per_byte;
+            let zero_point_byte_count = b_row * zero_point_bytes_per_col + (block / zero_point_values_per_byte);
+            let zero_point_word_index = zero_point_byte_count >> 0x2u;
+            let zero_point_byte_offset = zero_point_byte_count & 0x3u;
+            let zero_point_sub_offset: u32 = block % zero_point_values_per_byte;
+            let zero_point_bits_offset = (zero_point_byte_offset << 3) + (zero_point_sub_offset * ${a.bits}u);
+            let zero_point_word = ${l.getByOffset("zero_point_word_index")} >> zero_point_bits_offset;
+            let zero_point = ${c}((zero_point_word) & ${2===a.bits?"0x3u":"0xFu"});`:`
+            // The default zero point is ${Math.pow(2,a.bits-1)} for unsigned ${a.bits}-bit quantization.
+            let zero_point = ${c}(${Math.pow(2,a.bits-1).toFixed(1)});`}
+            let scale = ${o.getByOffset("b_row * n_blocks_per_col + block")};
+            let b_data = ${s.getByIndices(`${s.type.indices}(b_row, block, 0)`)};
+            var word_offset = local_id.x * ${a.blockSize/g};
+            for (var i: u32 = 0; i < ${y}; i++) {
+              let b_value = ${1===y?"b_data":"b_data[i]"};
+              ${(()=>{let e=Math.floor(v/8),r="";for(let i=0;i<e;i++){let e=i*a.bits*4,n=e+a.bits;r+=`
+              ${h()}
+              {${2===a.bits?`
+                let half_word = b_value >> ${16*i}u;
+                let byte_lo = half_word & 0xFFu;
+                let byte_hi = (half_word >> 8u) & 0xFFu;
+                let spread_word = (byte_lo & 0xFu) | ((byte_lo >> 4u) << 8u) | ((byte_hi & 0xFu) << 16u) | ((byte_hi >> 4u) << 24u);
+                let b_value_lower = unpack4xU8(spread_word & 0x03030303u);
+                let b_value_upper = unpack4xU8((spread_word >> 2u) & 0x03030303u);`:`
+                let b_value_lower = unpack4xU8((b_value >> ${e}u) & 0x0F0F0F0Fu);
+                let b_value_upper = unpack4xU8((b_value >> ${n}u) & 0x0F0F0F0Fu);`}
+                let b_quantized_values = mat2x4<${c}>(${Array.from({length:4},(e,r)=>`${c}(b_value_lower[${r}]), ${c}(b_value_upper[${r}])`).join(", ")});
+                let b_dequantized_values = (b_quantized_values - mat2x4<${c}>(${Array(8).fill("zero_point").join(",")})) * scale;
+                inter_results[local_id.y][local_id.x] += ${Array.from({length:2},(e,r)=>`dot(a_data${r}, b_dequantized_values[${r}])`).join(" + ")};
+              }
+              word_offset += ${8/g};`}return r})()}
+            }
+            workgroupBarrier();
+          }
+
+          if (local_idx < ${_}) {
+            var output_value: ${p.type.value} = ${p.type.value}(0);
+            for (var b = 0u; b < ${$}; b++) {
+              output_value += inter_results[local_idx][b];
+            }
+            if (col + local_idx < uniforms.output_shape[2])
+            {
+              ${p.setByIndices(`${p.type.indices}(batch, row, col + local_idx)`,"output_value")}
+            }
+          }
+        }`}})):e.compute((n=e.inputs,s=r,A=(z=n[0].dims).length,O=z[A-2],M=s.k,R=s.n,N=z.slice(0,A-2),B=tg.size(N),D=n[1].dims[2]/4,U=n[0].dataType,P=tX(s.k),L=tX(D),q=tX(R),W=N.concat([O,R]),j=O>1&&R/q%2==0?2:1,V=tg.size(W)/q/j,G=[],F=[B,O,M/P],(H=tg.convertShape(n[1].dims).slice()).splice(-1,1,D/L),G.push(...tZ(F)),G.push(...tZ(H)),G.push(...tZ(n[2].dims)),4===n.length&&G.push(...tZ(tg.convertShape(n[3].dims))),K=[B,O,R/q],G.push(...tZ(K)),{name:"MatMulNBits",shaderCache:{hint:`${s.blockSize};${s.bits};${P};${L};${q};${j};64`,inputDependencies:Array(n.length).fill("rank")},getRunData:()=>({outputs:[{dims:W,dataType:U}],dispatchGroup:{x:V},programUniforms:G}),getShaderSource:e=>{let r=F.length,i=t2("a",n[0].dataType,r,P),a=t2("b",12,H.length,L),o=t2("scales",n[2].dataType,n[2].dims.length),u=[i,a,o],l=4===n.length?t2("zero_points",12,n[3].dims.length):void 0;l&&u.push(l);let d=K.length,p=t3("output",n[0].dataType,d,q),c=tH(n[0].dataType),h=(()=>{switch(P){case 1:return`array<${c}, 8>`;case 2:return`mat4x2<${c}>`;case 4:return`mat2x4<${c}>`;default:throw Error(`${P}-component is not supported.`)}})(),f=Math.floor(32/s.bits),m=Math.floor(f/8);return`
+        var<workgroup> workgroup_shared: array<${p.type.value}, ${64*j}>;
+        ${e.declareVariables(...u,p)}
+        ${e.mainStart([64,1,1])}
+          let output_indices = ${p.offsetToIndices(`(global_idx / 64) * ${j}`)};
+          let col = output_indices[2];
+          let row = output_indices[1];
+          let batch = output_indices[0];
+          let nBlocksPerCol = uniforms.b_shape[1];
+
+          for (var block = local_id.x; block < nBlocksPerCol; block += 64) {
+            //process one block
+            var word_offset: u32 = block * ${s.blockSize/P};
+            ${(()=>{let e=`
+            var col_index = col * ${q};
+            ${l?`
+            let zero_point_values_per_byte: u32 = ${Math.floor(8/s.bits)}u;
+            let zero_point_bytes_per_col = (nBlocksPerCol + zero_point_values_per_byte - 1u) / zero_point_values_per_byte;
+            var zero_point_byte_count: u32;
+            var zero_point_word_index: u32;
+            var zero_point_byte_offset: u32;
+            let zero_point_sub_offset: u32 = block % zero_point_values_per_byte;
+            var zero_point_bits_offset: u32;
+            var zero_point_word: u32;`:`
+            // The default zero point is ${Math.pow(2,s.bits-1)} for unsigned ${s.bits}-bit quantization.
+            let zero_point = ${c}(${Math.pow(2,s.bits-1).toFixed(1)});`}
+            `;for(let r=0;r<q*j;r++)e+=`
+            let scale${r} = ${o.getByOffset("col_index * nBlocksPerCol + block")};
+            ${l?`
+            zero_point_byte_count = col_index * zero_point_bytes_per_col + (block / zero_point_values_per_byte);
+            zero_point_word_index = zero_point_byte_count >> 0x2u;
+            zero_point_byte_offset = zero_point_byte_count & 0x3u;
+            zero_point_bits_offset = (zero_point_byte_offset << 3) + (zero_point_sub_offset * ${s.bits}u);
+            zero_point_word = ${l.getByOffset("zero_point_word_index")} >> zero_point_bits_offset;
+            let zero_point${r} = ${c}((zero_point_word) & ${2===s.bits?"0x3u":"0xFu"});`:""}
+            col_index += 1;`;return e})()}
+            for (var word: u32 = 0; word < ${D}; word += ${L}) {
+              ${(()=>{let e=`col_index = col * ${q};`;for(let r=0;r<q*j;r++)e+=`
+            let b${r}_data = ${a.getByIndices(`${a.type.indices}(col_index, block, word)`)};
+            col_index += 1;`;return e+`
+            var b_value: u32;
+            let b_mask: u32 = ${2===s.bits?"0x03030303u":"0x0F0F0F0Fu"};
+            var b_value_lower: vec4<u32>;
+            var b_value_upper: vec4<u32>;
+            var b_quantized_values: ${h};
+            var b_dequantized_values: ${h};`})()}
+              for (var i: u32 = 0; i < ${L}; i++) {
+                ${(()=>{let e="";for(let r=0;r<m;r++){let a=r*s.bits*4,n=a+s.bits;e+=`
+          // reuse a data (pass ${r})
+            var input_offset${r>0?r:""} = ${0===r?i.indicesToOffset(`${i.type.indices}(batch, row, word_offset)`):"input_offset"};
+            var a_data${r>0?r:""}: ${h};
+            for (var j${r>0?r:""}: u32 = 0; j${r>0?r:""} < ${8/P}; j${r>0?r:""}++) {
+              a_data${r>0?r:""}[j${r>0?r:""}] = ${i.getByOffset(`input_offset${r>0?r:""}`)};
+              input_offset${r>0?r:""}++;
+            }
+          `;for(let i=0;i<q*j;i++)e+=`
+            b_value = ${1===L?`b${i}_data`:`b${i}_data[i]`};
+            ${2===s.bits?`{
+              let half_word = b_value >> ${16*r}u;
+              let byte_lo = half_word & 0xFFu;
+              let byte_hi = (half_word >> 8u) & 0xFFu;
+              let spread_word = (byte_lo & 0xFu) | ((byte_lo >> 4u) << 8u) | ((byte_hi & 0xFu) << 16u) | ((byte_hi >> 4u) << 24u);
+              b_value_lower = unpack4xU8(spread_word & b_mask);
+              b_value_upper = unpack4xU8((spread_word >> 2u) & b_mask);
+            }`:`b_value_lower = unpack4xU8((b_value >> ${a}u) & b_mask);
+            b_value_upper = unpack4xU8((b_value >> ${n}u) & b_mask);`}
+            b_quantized_values = ${h}(${Array.from({length:4},(e,r)=>`${c}(b_value_lower[${r}]), ${c}(b_value_upper[${r}])`).join(", ")});
+            b_dequantized_values = ${1===P?`${h}(${Array.from({length:8},(e,r)=>`(b_quantized_values[${r}] - ${l?`zero_point${i}`:"zero_point"}) * scale${i}`).join(", ")});`:`(b_quantized_values - ${h}(${Array(8).fill(`${l?`zero_point${i}`:"zero_point"}`).join(",")})) * scale${i};`};
+            workgroup_shared[local_id.x * ${j} + ${Math.floor(i/q)}]${q>1?`[${i%q}]`:""} += ${Array.from({length:8/P},(e,i)=>`${1===P?`a_data${r>0?r:""}[${i}] * b_dequantized_values[${i}]`:`dot(a_data${r>0?r:""}[${i}], b_dequantized_values[${i}])`}`).join(" + ")};
+          `}return e})()}
+                word_offset += ${f/P};
+              }
+            }
+          }
+          workgroupBarrier();
+
+          if (local_id.x < ${j}) {
+            var output_value: ${p.type.value} = ${p.type.value}(0);
+            var workgroup_shared_offset: u32 = local_id.x;
+            for (var b: u32 = 0u; b < 64u; b++) {
+              output_value += workgroup_shared[workgroup_shared_offset];
+              workgroup_shared_offset += ${j};
+            }
+            ${p.setByIndices(`${p.type.indices}(batch, row, col + local_id.x)`,"output_value")};
+          }
+        }`}}))},a1=e=>tV(e)}),sS=ed(()=>{nD(),nL(),nH(),a2=(e,r)=>{let i,a,n,s;var o,u,l=e.inputs;if(!l||l.length<1)throw Error("Too few inputs");if(1!==l[0].dataType&&10!==l[0].dataType)throw Error("Input type must be float or float16.");if(l.length>=2){let e=2*l[0].dims.length===l[1].dims[0];if(4===l.length&&(e=2*l[3].dims[0]===l[1].dims[0]),!e)throw Error("The pads should be a 1D tensor of shape [2 * input_rank] or [2 * num_axes].")}let d=((e,r)=>{if(!(e.length>1))return r;{let i=e[1].getBigInt64Array(),a=e.length>=3&&e[2].data?10===e[2].dataType?e[2].getUint16Array()[0]:e[2].getFloat32Array()[0]:0,n=e[0].dims.length,s=new Int32Array(2*n).fill(0);if(e.length>=4){let r=e[3].getBigInt64Array();for(let e=0;e<r.length;e++)s[Number(r[e])]=Number(i[e]),s[Number(r[e])+n]=Number(i[e+r.length])}else i.forEach((e,r)=>s[Number(r)]=Number(e));let o=[];return s.forEach(e=>o.push(e)),{mode:r.mode,value:a,pads:o}}})(e.inputs,r);e.compute((o=e.inputs,u=d,i=tg.padShape(o[0].dims.slice(),u.pads),a=o[0].dims,n=[{type:12,data:tg.size(i)},{type:6,data:u.pads}],s=o.length>=3&&o[2].data,0===u.mode&&n.push({type:s?o[2].dataType:1,data:u.value}),n.push(...tZ(o[0].dims,i)),{name:"Pad",shaderCache:{hint:`${u.mode}${s}`,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:i,dataType:o[0].dataType}],dispatchGroup:{x:Math.ceil(tg.size(i)/64)},programUniforms:n}),getShaderSource:e=>{let r=t3("output",o[0].dataType,i.length),n=t2("x",o[0].dataType,a.length),l=n.type.value,d=((e,r,i)=>{switch(i.mode){case 0:var a=e,n=r,s=i.pads.length;let o="";for(let e=n-1;e>=0;--e)o+=`
+            k = i32(${a.indicesGet("indices",e)}) - ${t0("uniforms.pads",e,s)};
+            if (k < 0) {
+              break;
+            }
+            if (k >= i32(${t0("uniforms.x_shape",e,n)})) {
+              break;
+            }
+            offset += k * i32(${t0("uniforms.x_strides",e,n)});
+        `;return`
+          value = ${a.type.value}(uniforms.constant_value);
+          for (var i = 0; i < 1; i++) {
+            var offset = 0;
+            var k = 0;
+            ${o}
+            value = x[offset];
+          }
+      `;case 1:var u=e,l=r,d=i.pads.length;let p="";for(let e=l-1;e>=0;--e)p+=`
+                k = i32(${u.indicesGet("indices",e)}) - ${t0("uniforms.pads",e,d)};
+                if (k < 0) {
+                  k = -k;
+                }
+                {
+                  let _2n_1 = 2 * (i32(${t0("uniforms.x_shape",e,l)}) - 1);
+                  k = k % _2n_1;
+                  if(k >= i32(${t0("uniforms.x_shape",e,l)})) {
+                    k = _2n_1 - k;
+                  }
+                }
+                offset += k * i32(${t0("uniforms.x_strides",e,l)});
+            `;return`
+              var offset = 0;
+              var k = 0;
+              ${p}
+              value = x[offset];
+          `;case 2:var c=e,h=r,f=i.pads.length;let m="";for(let e=h-1;e>=0;--e)m+=`
+                k = i32(${c.indicesGet("indices",e)}) - ${t0("uniforms.pads",e,f)};
+                if (k < 0) {
+                  k = 0;
+                }
+                if (k >= i32(${t0("uniforms.x_shape",e,h)})) {
+                  k = i32(${t0("uniforms.x_shape",e,h)}) - 1;
+                }
+                offset += k * i32(${t0("uniforms.x_strides",e,h)});
+            `;return`
+              var offset = 0;
+              var k = 0;
+              ${m}
+              value = x[offset];
+          `;case 3:var g=e,y=r,b=i.pads.length;let _="";for(let e=y-1;e>=0;--e)_+=`
+                k = i32(${g.indicesGet("indices",e)}) - ${t0("uniforms.pads",e,b)};
+                if (k < 0)  {
+                  k += i32(${t0("uniforms.x_shape",e,y)}]);
+                }
+                if (k >= i32(${t0("uniforms.x_shape",e,y)})) {
+                  k -= i32(${t0("uniforms.x_shape",e,y)});
+                }
+                offset += k * i32(${t0("uniforms.x_strides",e,y)});
+            `;return`
+              var offset = 0;
+              var k = 0;
+              ${_}
+              value = x[offset];
+          `;default:throw Error("Invalid mode")}})(r,a.length,u),p=[{name:"output_size",type:"u32"},{name:"pads",type:"i32",length:u.pads.length}];return 0===u.mode&&p.push({name:"constant_value",type:s?l:"f32"}),`
+            ${e.registerUniforms(p).declareVariables(n,r)}
+            ${e.mainStart()}
+            ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+
+            let indices = ${r.offsetToIndices("global_idx")};
+
+            var value = ${l}(0);
+            ${d}
+            output[global_idx] = value;
+        }`}}),{inputs:[0]})}}),sT=ed(()=>{eA(),nD(),nL(),nH(),a3=e=>{if(R.webgpu.validateInputContent&&(!e||1!==e.length))throw Error("Pool ops requires 1 input.")},a4=(e,r,i)=>{let a="NHWC"===r.format,n=e.dims.slice();a&&n.splice(1,0,n.pop());let s=Object.hasOwnProperty.call(r,"dilations"),o=r.kernelShape.slice(),u=r.strides.slice(),l=s?r.dilations.slice():[],d=r.pads.slice();ty.adjustPoolAttributes(i,n,o,u,l,d);let p=ty.computePoolOutputShape(i,n,u,l,o,d,r.autoPad),c=Object.assign({},r);s?Object.assign(c,{kernelShape:o,strides:u,pads:d,dilations:l,cacheKey:r.cacheKey}):Object.assign(c,{kernelShape:o,strides:u,pads:d,cacheKey:r.cacheKey});let h=p.slice();return h.push(h.splice(1,1)[0]),[c,a?h:p]},a6=(e,r)=>{let i="NHWC"===r.format,a=[{type:12,data:tg.size(e)},{type:12,data:tg.size(r.kernelShape)}],n=[{name:"outputSize",type:"u32"},{name:"kernelSize",type:"u32"}];if(r.kernelShape.length<=2){let e=r.kernelShape[r.kernelShape.length-1],i=r.strides[r.strides.length-1],s=r.pads[r.pads.length/2-1],o=r.pads[r.pads.length-1],u=!!(s+o);a.push({type:12,data:e},{type:12,data:i},{type:12,data:s},{type:12,data:o}),n.push({name:"kw",type:"u32"},{name:"sw",type:"u32"},{name:"pwStart",type:"u32"},{name:"pwEnd",type:"u32"});let l=!1;if(2===r.kernelShape.length){let e=r.kernelShape[r.kernelShape.length-2],i=r.strides[r.strides.length-2],s=r.pads[r.pads.length/2-2],o=r.pads[r.pads.length-2];l=!!(s+o),a.push({type:12,data:e},{type:12,data:i},{type:12,data:s},{type:12,data:o}),n.push({name:"kh",type:"u32"},{name:"sh",type:"u32"},{name:"phStart",type:"u32"},{name:"phEnd",type:"u32"})}return[a,n,!0,u,l]}{if(i)throw Error("Pooling with kernelShape.length > 2 is not supported for NHWC format.");let e=tg.computeStrides(r.kernelShape);return a.push({type:12,data:e},{type:12,data:r.pads},{type:12,data:r.strides}),n.push({name:"kernelStrides",type:"u32",length:e.length},{name:"pads",type:"u32",length:r.pads.length},{name:"strides",type:"u32",length:r.strides.length}),[a,n,!!r.pads.reduce((e,r)=>e+r),!1,!1]}},a8=(e,r,i,a,n,s,o,u,l,d,p,c)=>{let h="NHWC"===n.format,f=r.type.value,m=t3("output",r.type.tensor,a);if(n.kernelShape.length<=2){let a="",d="",g="",y=i-(h?2:1);if(a=p?`
+                for (var i: u32 = 0u; i < uniforms.kw; i++) {
+                  xIndices[${y}] = indices[${y}] * uniforms.sw - uniforms.pwStart + i;
+                  if (xIndices[${y}] < 0 || xIndices[${y}]
+                      >= uniforms.x_shape[${y}]) {
+                    pad++;
+                    continue;
+                  }
+                  let x_val = x[${r.indicesToOffset("xIndices")}];
+                  ${s}
+                }`:`
+                for (var i: u32 = 0u; i < uniforms.kw; i++) {
+                  xIndices[${y}] = indices[${y}] * uniforms.sw - uniforms.pwStart + i;
+                  let x_val = x[${r.indicesToOffset("xIndices")}];
+                  ${s}
+                }`,2===n.kernelShape.length){let e=i-(h?3:2);d=c?`
+                for (var j: u32 = 0u; j < uniforms.kh; j++) {
+                  xIndices[${e}] = indices[${e}] * uniforms.sh - uniforms.phStart + j;
+                  if (xIndices[${e}] < 0 || xIndices[${e}] >= uniforms.x_shape[${e}]) {
+                    pad += i32(uniforms.kw);
+                    continue;
+                  }
+              `:`
+                for (var j: u32 = 0u; j < uniforms.kh; j++) {
+                  xIndices[${e}] = indices[${e}] * uniforms.sh - uniforms.phStart + j;
+                `,g=`
+              }
+            `}return`
+            ${e.registerUniforms(l).declareVariables(r,m)}
+
+            ${e.mainStart()}
+              ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+
+              let indices = ${m.offsetToIndices("global_idx")};
+              var xIndices = ${m.offsetToIndices("global_idx")};
+
+              var value = ${f}(${u});
+              var pad = 0;
+              ${d}
+              ${a}
+              ${g}
+              ${o}
+
+              output[global_idx] = value;
+            }`}{if(h)throw Error("Pooling with kernelShape.length > 2 is not supported for NHWC format.");let a=n.kernelShape.length,p=n.pads.length,c="";return c=d?`
+                if (xIndices[j] >= uniforms.x_shape[j]) {
+                  pad++;
+                  isPad = true;
+                  break;
+                }
+              }
+              if (!isPad) {
+                let x_val = x[${r.indicesToOffset("xIndices")}];
+                ${s}
+              }`:`
+              }
+              let x_val = x[${r.indicesToOffset("xIndices")}];
+              ${s}
+            `,`
+            ${e.registerUniforms(l).declareVariables(r,m)}
+
+            ${e.mainStart()}
+              ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+              let indices = ${m.offsetToIndices("global_idx")};
+              var xIndices = ${m.offsetToIndices("global_idx")};
+
+              var offsets: array<u32, ${a}>;
+
+              var value = ${f}(${u});
+              var pad = 0;
+              var isPad = false;
+
+              for (var i: u32 = 0u; i < uniforms.kernelSize; i++) {
+                var offset = i;
+                for (var j = 0u; j < ${a-1}u; j++) {
+                  offsets[j] = offset / ${t0("uniforms.kernelStrides","j",a)};
+                  offset -= offsets[j] * ${t0("uniforms.kernelStrides","j",a)};
+                }
+                offsets[${a-1}] = offset;
+
+                isPad = false;
+                for (var j = ${i-a}u; j < ${i}u; j++) {
+                  xIndices[j] = indices[j] * ${t0("uniforms.strides",`j - ${i-a}u`,a)}
+                    + offsets[j - ${i-a}u] - ${t0("uniforms.pads","j - 2u",p)};
+                  ${c}
+              }
+              ${o}
+
+              output[global_idx] = value;
+            }`}},a5=e=>`${e.format};${e.ceilMode};${e.autoPad};${e.kernelShape.length}`,a9=e=>({format:e.format,autoPad:["NOTSET","VALID","SAME_UPPER","SAME_LOWER"][e.auto_pad],ceilMode:e.ceil_mode,kernelShape:e.kernel_shape,strides:e.strides,pads:e.pads}),a7=(e,r,i,a)=>{let[n,s]=a4(r,a,i),o=t2("x",r.dataType,r.dims.length),u=o.type.value,l="";n.countIncludePad?l+=`value /= ${u}(uniforms.kernelSize);`:l+=`value /= ${u}(i32(uniforms.kernelSize) - pad);`;let[d,p,c,h,f]=a6(s,n);return d.push(...tZ(r.dims,s)),{name:e,shaderCache:{hint:`${a.cacheKey};${c};${h};${f}`,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:s,dataType:r.dataType}],dispatchGroup:{x:Math.ceil(tg.size(s)/64)},programUniforms:d}),getShaderSource:e=>a8(e,o,r.dims.length,s.length,n,"value += x_val;",l,0,p,c,h,f)}},ne=e=>{let r,i=0!==e.count_include_pad,a=a9(e);if(0!==a.ceilMode)throw Error("using ceil() in shape computation is not yet supported for AveragePool");let n={countIncludePad:i,...a,cacheKey:""};return{...n,cacheKey:(r=n,`${a5(r)};${r.countIncludePad}`)}},nt=(e,r)=>{a3(e.inputs),e.compute(a7("AveragePool",e.inputs[0],!1,r))},nr={autoPad:"",ceilMode:0,countIncludePad:!1,kernelShape:[],strides:[],pads:[],storageOrder:0,dilations:[]},ni=e=>{let r=e.format;return{format:r,...nr,cacheKey:r}},na=(e,r)=>{a3(e.inputs),e.compute(a7("GlobalAveragePool",e.inputs[0],!0,r))},nn=(e,r,i,a)=>{let[n,s]=a4(r,a,i),o=`
+      value = max(x_val, value);
+    `,u=t2("x",r.dataType,r.dims.length),[l,d,p,c,h]=a6(s,n);return l.push(...tZ(r.dims,s)),{name:e,shaderCache:{hint:`${a.cacheKey};${p};${c};${h}`,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:s,dataType:r.dataType}],dispatchGroup:{x:Math.ceil(tg.size(s)/64)},programUniforms:l}),getShaderSource:e=>a8(e,u,r.dims.length,s.length,n,o,"",10===r.dataType?-65504:-1e5,d,p,c,h)}},ns=(e,r)=>{a3(e.inputs),e.compute(nn("MaxPool",e.inputs[0],!1,r))},no=e=>{let r,i=e.storage_order,a=e.dilations,n=a9(e);if(0!==i)throw Error("column major storage order is not yet supported for MaxPool");if(0!==n.ceilMode)throw Error("using ceil() in shape computation is not yet supported for MaxPool");let s={storageOrder:i,dilations:a,...n,cacheKey:""};return{...s,cacheKey:(r=s,`${a5(r)};${r.storageOrder};${r.dilations}`)}},nu=e=>{let r=e.format;return{format:r,...nr,cacheKey:r}},nl=(e,r)=>{a3(e.inputs),e.compute(nn("GlobalMaxPool",e.inputs[0],!0,r))}}),sI=ed(()=>{nD(),nL(),nF(),nH(),nd=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h,f,m,g,y,b,_,$,v,w,x,k,S,T,I;((e,r)=>{if(e.length<2||e.length>3)throw Error("DequantizeLinear requires 2 or 3 inputs.");if(3===e.length&&e[1].dims===e[2].dims)throw Error("x-scale and x-zero-point must have the same shape.");if(3===e.length&&e[0].dataType!==e[2].dataType)throw Error("x and x-zero-point must have the same data type.");if(0!==e[1].dims.length&&1!==e[1].dims.length&&e[1].dims.length!==e[0].dims.length)throw Error("scale input must be a scalar, a 1D tensor, or have the same rank as the input tensor.");if(e.length>2){if(e[0].dataType!==e[2].dataType)throw Error("x and x-zero-point must have the same data type.");if(e[1].dims.length!==e[2].dims.length)throw Error("scale and zero-point inputs must have the same rank.");if(!e[1].dims.map((r,i)=>r===e[2].dims[i]).reduce((e,r)=>e&&r,!0))throw Error("scale and zero-point inputs must have the same shape.")}if(r.blockSize>0){if(0===e[1].dims.length||1===e[1].dims.length&&1===e[1].dims[0])throw Error("blockSize must be set only for block quantization.");if(!e[1].dims.map((i,a)=>a===r.axis||i===e[0].dims[a]).reduce((e,r)=>e&&r,!0))throw Error("For block qunatization, scale input shape to match the input shape except for the axis");if(e[1].dims.length!==e[0].dims.length)throw Error("For block qunatization the scale input rank must be the same as the x rank.");let i=e[0].dims[r.axis],a=e[1].dims[r.axis];if(r.blockSize<Math.ceil(i/a)||r.blockSize>Math.ceil(i/(a-1)-1))throw Error("blockSize must be with in the range [ceil(dI / Si), ceil(dI / (Si - 1) - 1)].")}})(e.inputs,r),e.compute((i=e.inputs,a=r,n=tg.normalizeAxis(a.axis,i[0].dims.length),o=3===(s=i[0].dataType),u=i[0].dims,l=i[1].dataType,d=tg.size(u),c=(p=3===s||2===s)?[Math.ceil(tg.size(i[0].dims)/4)]:i[0].dims,h=i[1].dims,m=(f=i.length>2?i[2]:void 0)?p?[Math.ceil(tg.size(f.dims)/4)]:f.dims:void 0,y=!1==(g=0===h.length||1===h.length&&1===h[0])&&1===h.length,b=tX(d),$=(_=g&&(!p||4===b))?b:1,v=t2("input",p?12:s,c.length,_&&!p?b:1),w=t2("scale",l,h.length),x=f?t2("zero_point",p?12:s,m.length):void 0,k=t3("output",l,u.length,$),S=[v,w],x&&S.push(x),T=[c,h],f&&T.push(m),I=[{type:12,data:d/$},{type:12,data:n},{type:12,data:a.blockSize},...tZ(...T,u)],{name:"DequantizeLinear",shaderCache:{hint:a.cacheKey,inputDependencies:x?["rank","rank","rank"]:["rank","rank"]},getShaderSource:e=>`
+      ${e.registerUniforms([{name:"output_size",type:"u32"},{name:"axis",type:"u32"},{name:"block_size",type:"u32"}]).declareVariables(...S,k)}
+      ${e.mainStart()}
+          ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+          let output_indices = ${k.offsetToIndices("global_idx")};
+
+          // Set input x
+          ${p?`
+            let input = ${v.getByOffset("global_idx / 4")};
+            let x_vec = ${o?"unpack4xI8(input)":"unpack4xU8(input)"};
+            let x_value = ${1===$?"x_vec[global_idx % 4]":"x_vec"};`:`let x_value = ${v.getByOffset("global_idx")};`};
+
+          // Set scale input
+          ${g?`let scale_value= ${w.getByOffset("0")}`:y?`
+            let scale_index = ${k.indicesGet("output_indices","uniforms.axis")};
+            let scale_value= ${w.getByOffset("scale_index")};`:`
+            var scale_indices: ${w.type.indices} = output_indices;
+            let index = ${w.indicesGet("scale_indices","uniforms.axis")} / uniforms.block_size;
+            ${w.indicesSet("scale_indices","uniforms.axis","index")};
+            let scale_value= ${w.getByIndices("scale_indices")};`};
+
+          // Set zero-point input
+          ${x?g?p?`
+                let zero_point_input = ${x.getByOffset("0")};
+                let zero_point_vec =  ${o?"unpack4xI8(zero_point_input)":"unpack4xU8(zero_point_input)"};
+                let zero_point_value= zero_point_vec[0]`:`let zero_point_value = ${x.getByOffset("0")}`:y?p?`
+                let zero_point_index = ${k.indicesGet("output_indices","uniforms.axis")};
+                let zero_point_input = ${x.getByOffset("zero_point_index / 4")};
+                let zero_point_vec =  ${o?"unpack4xI8(zero_point_input)":"unpack4xU8(zero_point_input)"};
+                let zero_point_value = zero_point_vec[zero_point_index % 4]`:`
+                let zero_point_index = ${k.indicesGet("output_indices","uniforms.axis")};
+                let zero_point_value = ${x.getByOffset("zero_point_index")};`:p?`
+                let zero_point_offset = ${w.indicesToOffset("scale_indices")};
+                let zero_point_input = ${x.getByOffset("zero_point_offset / 4")};
+                let zero_point_vec = ${o?"unpack4xI8(zero_point_input)":"unpack4xU8(zero_point_input)"};
+                let zero_point_value = zero_point_vec[zero_point_offset % 4];`:`let zero_point_value = ${x.getByIndices("scale_indices")};`:`let zero_point_value = ${p?o?"i32":"u32":v.type.value}(0);`};
+      // Compute and write output
+      ${k.setByOffset("global_idx",`${k.type.value}(x_value - zero_point_value) * scale_value`)};
+      }`,getRunData:()=>({outputs:[{dims:u,dataType:l}],dispatchGroup:{x:Math.ceil(d/$/64),y:1,z:1},programUniforms:I})}))},np=e=>tV({axis:e.axis,blockSize:e.blockSize})}),sC=ed(()=>{eA(),nD(),nH(),nc=e=>{var r,i,a,n;let s,o,u,l=0,d=0,p=0;6===e.inputs[0].dataType?(l=e.inputs[0].getInt32Array()[0],d=e.inputs[1].getInt32Array()[0],p=e.inputs[2].getInt32Array()[0]):1===e.inputs[0].dataType&&(l=e.inputs[0].getFloat32Array()[0],d=e.inputs[1].getFloat32Array()[0],p=e.inputs[2].getFloat32Array()[0]),R.webgpu.validateInputContent&&((e,r,i)=>{if(e===r||e<r&&i<0||e>r&&i>0)throw Error("Range these inputs' contents are invalid.")})(l,d,p),e.compute((r=l,i=d,a=p,n=e.inputs[0].dataType,o=[s=Math.abs(Math.ceil((i-r)/a))],u=[{type:12,data:s},{type:n,data:r},{type:n,data:a},...tZ(o)],{name:"Range",shaderCache:{hint:`${n}`},getShaderSource:e=>{let r=t3("output",n,o.length),i=r.type.value;return`
+        ${e.registerUniforms([{name:"outputSize",type:"u32"},{name:"start",type:i},{name:"delta",type:i}]).declareVariables(r)}
+        ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+        output[global_idx] = uniforms.start + ${i}(global_idx) * uniforms.delta;
+      }`},getRunData:()=>({outputs:[{dims:o,dataType:n}],dispatchGroup:{x:Math.ceil(s/64)},programUniforms:u})}),{inputs:[]})}}),sE=ed(()=>{nD(),nL(),nF(),nH(),nh=e=>tV({reduction:e.reduction}),nf=(e,r)=>{var i,a;let n,s,o,u,l,d;e.compute((i=e.inputs,a=r,n=i[0].dims,s=i[1].dims,o=Math.ceil(tg.sizeToDimension(s,s.length-1)/1),u=s[s.length-1],l=tg.sizeFromDimension(n,u),d=[{type:12,data:o},{type:12,data:u},{type:12,data:l},...tZ(i[1].dims,i[2].dims,n)],{name:"ScatterND",shaderCache:{hint:`${a.cacheKey}_${a.reduction}`,inputDependencies:["rank","rank"]},getRunData:()=>({outputs:[{dims:n,dataType:i[0].dataType}],dispatchGroup:{x:Math.ceil(o/64)},programUniforms:d}),getShaderSource:e=>{let r=t2("indices",i[1].dataType,i[1].dims.length),s=t2("updates",i[2].dataType,i[2].dims.length,1),o="none"!==a.reduction&&""!==a.reduction?t4("output",i[0].dataType,n.length):t3("output",i[0].dataType,n.length,1);return`
+      ${e.registerUniform("output_size","u32").registerUniform("last_index_dimension","u32").registerUniform("num_updates_elements","u32").declareVariables(r,s,o)}
+      ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+  var data_offset = 0u;
+  let indices_start = uniforms.last_index_dimension * global_idx;
+  let indices_end = indices_start + uniforms.last_index_dimension;
+  for (var i = indices_start; i < indices_end; i++) {
+    var index = i32(indices[i].x);
+    ${1===i[0].dims.length?`
+    let element_count_dim = uniforms.output_strides;
+    let dim_value = uniforms.output_shape;`:`
+    let element_count_dim = uniforms.output_strides[i - indices_start];
+    let dim_value = uniforms.output_shape[i - indices_start];`}
+    if (index >= 0) {
+      if (index >= i32(dim_value)) {
+        index = i32(dim_value - 1);
+      }
+    } else {
+      if (index < -i32(dim_value)) {
+        index = 0;
+      } else {
+        index += i32(dim_value);
+      }
+    }
+    data_offset += u32((u32(index) * element_count_dim));
+  }
+
+  for (var i = 0u; i < uniforms.num_updates_elements; i++) {
+    let value = updates[uniforms.num_updates_elements * global_idx + i];
+    ${((e,r,i,a)=>{if("none"!==e&&"i32"!==a&&"u32"!==a&&"f32"!==a)throw Error(`Input ${a} is not supported with reduction ${e}.`);let n=`{
+                var oldValue = 0;
+                loop {
+                  let newValueF32 =`,s=`;
+                  let newValue = bitcast<i32>(newValueF32);
+                  let res = atomicCompareExchangeWeak(&${r}, oldValue, newValue);
+                  if res.exchanged {
+                    break;
+                  }
+                  oldValue = res.old_value;
+                }
+              }`;switch(e){case"none":return`${r}=${i};`;case"add":return"i32"===a||"u32"===a?`atomicAdd(&${r}, bitcast<${a}>(${i}));`:`
+              ${n}bitcast<${a}>(oldValue) + (${i})${s}`;case"max":return"i32"===a||"u32"===a?`atomicMax(&${r}, bitcast<${a}>(${i}));`:`
+                ${n}max(bitcast<f32>(oldValue), (${i}))${s}`;case"min":return"i32"===a||"u32"===a?`atomicMin(&${r}, bitcast<${a}>(${i}));`:`${n}min(bitcast<${a}>(oldValue), (${i}))${s}`;case"mul":return`${n}(bitcast<${a}>(oldValue) * (${i}))${s}`;default:throw Error(`Reduction ${e} is not supported.`)}})(a.reduction,"output[data_offset + i]","value",o.type.value)}
+  }
+
+      }`}}),{inputs:[e.inputs[1],e.inputs[2]],outputs:[]})}}),sz=ed(()=>{nD(),nL(),nF(),nH(),nm=(e,r,i,a)=>`
+  // The whole part and the fractional part are calculated separately due to inaccuracy of floating
+  // point division. As an example, f32(21) / f32(7) may evaluate to 2.99... instead of 3, causing an
+  // offset-by-one error later in floor().
+  let big = (${e}) * (${r});
+  let whole = ${a}(big / (${i}));
+  let fract = ${a}(big % (${i})) / ${a}(${i});
+  return whole + fract;
+`,ng=(e,r,i,a)=>e.rank>a?`
+    ${e.indicesSet("input_indices",r,"channel")};
+    ${e.indicesSet("input_indices",i,"batch")};
+`:"",ny=(e,r)=>{var i,a,n,s,o,u,l,d,p,c,h,f;let m,g,y,b,_,$,v,w,x,k,S,T,I,C,E,z,A=[],O=[],M=[],R=new Uint32Array(m=e.customDataBuffer,m.byteOffset,1)[0];if(0!==r.antialias)throw Error("Only default value (0) for Antialias attribute is supported");((e,r,i,a,n,s)=>{let[o,u,l]=i>10?[1,2,3]:[-1,e.length>1?1:-1,-1],d=e[0].dims.length;if(o>0&&e.length>o&&e[o].dims.length>0)e[o].getFloat32Array().forEach(e=>s.push(e));else if("tf_crop_and_resize"===r.coordinateTransformMode)throw Error("Resize requires RoI input to be specified when coordinateTransformMode is tfCropAndResize");if(u>0&&e.length>u&&1===e[u].dims.length&&e[u].dims[0]>0){var p,c,h;let n;if(e[u].getFloat32Array().forEach(e=>a.push(e)),0!==a.length&&a.length!==d&&i>=18&&a.length!==r.axes.length)throw Error("Resize requires scales input size to be same as input rank or axes size for opset 18 and up");((e,r)=>{if(e.every(e=>e>0||(()=>{throw Error("Resize requires scales input values to be positive")})),e.length>0){if("linear"===r.mode){if(2!==e.length&&3!==e.length&&(4!==e.length||1!==e[0]||1!==e[1])&&(4!==e.length||1!==e[0]||1!==e[3])&&(5!==e.length||1!==e[0]||1!==e[1]))throw Error(`For linear mode, Resize requires scales to be 2D, 3D, 4D with either two outermost or one innermost and
+            one outermost scale values equal to 1, or 5D with two outermost scale values equal to 1`)}else if("cubic"===r.mode&&2!==e.length&&(4!==e.length||1!==e[0]||1!==e[1])&&(4!==e.length||1!==e[0]||1!==e[3]))throw Error("Resize requires scales input size to be 2 or 4 for cubic mode")}})(a,r),r.axes.length>0&&(p=a,c=r.axes,h=d,c.every(e=>e>=0&&e<h||(()=>{throw Error("Resize requires axes input values to be positive and less than rank")})),n=Array(h).fill(1),c.forEach((e,r)=>n[e]=p[r]),n).forEach((e,r)=>a[r]=e)}if(l>0&&e.length>l&&1===e[l].dims.length&&e[l].dims[0]>0&&(e[l].getBigInt64Array().forEach(e=>n.push(Number(e))),0!==n.length&&n.length!==d&&i>=18&&n.length!==r.axes.length))throw Error("Resize requires sizes input size to be same as input rank or axes size for opset 18 and up");if(r.axes.length>0){if(0!==a.length&&a.length!==r.axes.length)throw Error('Resize requires "scales" input size to be of axes rank when axes attributes is specified');if(0!==n.length&&n.length!==r.axes.length)throw Error('Resize requires "sizes" input size to be of rank axes rank when axes attributes is specified')}if("u">typeof a&&"u">typeof n&&a.length>0&&n.length>d)throw Error("Resize requires only of scales or sizes to be specified")})(e.inputs,r,R,A,O,M),e.compute((i=e.inputs[0],a=r,n=R,s=A,o=O,u=M,b=i.dims,_=(l=u,d=a.axes,g=Array(p=b.length).fill(0).concat(Array(p).fill(1)),y=0===l.length?g:l.slice(),d.length>0?(d.forEach((e,r)=>{g[e]=y[r],g[r+p]=y[d.length+r]}),g):y),$=((e,r,i,a)=>{let n=[];if(i.length>0)if(a.length>0){if(e.forEach(e=>n.push(e)),Math.max(...a)>e.length)throw Error("axes is out of bound");a.forEach((e,r)=>n[e]=i[r])}else i.forEach(e=>n.push(e));else{if(0===r.length)throw Error("Resize requires either scales or sizes.");n=e.map((e,i)=>Math.round(e*r[i]))}return n})(b,s,o,a.axes),v=s.slice(),0===s.length&&(v=b.map((e,r)=>0===e?1:$[r]/e),"stretch"!==a.keepAspectRatioPolicy&&(c=b,h=v,f=a,w=(()=>{switch(f.keepAspectRatioPolicy){case"not_larger":return f.axes.length>0?Math.min(...f.axes.map(e=>h[e]),Number.MAX_VALUE):Math.min(...h,Number.MAX_VALUE);case"not_smaller":return f.axes.length>0?Math.max(...f.axes.map(e=>h[e]),5e-324):Math.max(...h,5e-324);default:throw Error(`Keep aspect ratio policy ${f.keepAspectRatioPolicy} is not supported`)}})(),h.fill(1,0,h.length),x=c.slice(),f.axes.length>0?(f.axes.forEach(e=>h[e]=w),f.axes.forEach(e=>x[e]=Math.round(c[e]*h[e]))):(h.fill(w,0,h.length),x.forEach((e,r)=>x[r]=Math.round(e*h[r]))),$=x)),k=t3("output",i.dataType,$.length),S=t2("input",i.dataType,b.length),T=tg.size($),I=b.length===$.length&&b.every((e,r)=>e===$[r]),C="tf_crop_and_resize"===a.coordinateTransformMode,E=a.extrapolationValue,z=S.type.value,{name:"Resize",shaderCache:{hint:`${a.cacheKey}|${n}|${v.length>0?"cubic"===a.mode?v:v.length:""}|${o.length>0?o:""}|${_.length>0?_:""}|${I}|${"nearest"===a.mode?b.length:b}`,inputDependencies:["rank"]},getShaderSource:e=>{let r,i;return`
+      ${I?"":`
+      ${r=a.coordinateTransformMode,i=z,`fn getOriginalCoordinateFromResizedCoordinate(xResized: u32, xScale: f32, lengthResized: u32,
+     lengthOriginal: u32, roiStart: f32, roiEnd: f32) -> ${i} { `+(()=>{switch(r){case"asymmetric":return`
+          if (xScale < 1.0 || floor(xScale) != xScale) {
+            return ${i}(xResized) / ${i}(xScale);
+          } else {
+            ${nm("xResized","lengthOriginal","lengthResized",i)}
+          }
+        `;case"pytorch_half_pixel":return`if (lengthResized > 1) {
+                    return (${i}(xResized) + 0.5) / ${i}(xScale) - 0.5;
+                  } else {
+                    return 0.0;
+                  }`;case"tf_half_pixel_for_nn":return`return (${i}(xResized) + 0.5) / ${i}(xScale);`;case"align_corners":return`if (lengthResized == 1) {
+                    return 0.0;
+                  } else {
+                    ${nm("xResized","lengthOriginal - 1","lengthResized - 1",i)}
+                  }`;case"tf_crop_and_resize":return`if (lengthResized > 1) {
+                    return ${i}(roiStart) * ${i}(lengthOriginal - 1) +
+                        (${i}(xResized) * ${i}(roiEnd - roiStart) * ${i}(lengthOriginal - 1)) /
+                        ${i}(lengthResized - 1);
+                  } else {
+                    return 0.5 * ${i}(roiStart + roiEnd) * ${i}(lengthOriginal - 1);
+                  }`;case"half_pixel_symmetric":return`const outputWidth = ${i}xScale * ${i}(lengthResized);
+                  const adjustment = ${i}(lengthResized) / outputWidth;
+                  const center = ${i}(lengthOriginal) / 2;
+                  const offset = center * (1 - adjustment);
+                  return offset + ((${i}(xResized) + 0.5) / ${i}(xScale)) - 0.5;`;case"half_pixel":return`return ((${i}(xResized) + 0.5) / ${i}(xScale)) - 0.5;`;default:throw Error(`Coordinate transform mode ${r} is not supported`)}})()+"}"};
+      ${(()=>{switch(a.mode){case"nearest":let e,r,i,s,o,u,l,d,p,c,h,f;return`
+              ${e=S,r=b,`
+    fn checkInputIndices(input_indices: ${e.type.indices}) -> bool {
+      for (var i:u32 = 0; i < ${r.length}; i++) {
+        var input_index = ${e.indicesGet("input_indices","i")};
+        if (input_index < 0 || input_index >= ${t0("uniforms.input_shape","i",r.length)}) {
+          return false;
+        }
+      }
+      return true;
+    }`};
+              ${i=a.nearestMode,s=n,o=z,`fn getNearestPixelFromOriginal(xOriginal: ${o}, isDownSample: bool) -> ${o} {`+(()=>{switch(i){case"round_prefer_ceil":return"if (fract(xOriginal) == 0.5) {             return ceil(xOriginal);           } else {             return round(xOriginal);           }";case"floor":return"return floor(xOriginal);";case"ceil":return"return ceil(xOriginal);";case"round_prefer_floor":return"if (fract(xOriginal) == 0.5) {                     return floor(xOriginal);                   } else {                     return round(xOriginal);                   }";default:if(s<11)return"if (isDownSample)                     {                       return ceil(xOriginal);                     } else {                       return xOriginal;                     }";throw Error(`Nearest mode ${i} is not supported`)}})()+"}"};
+              ${u=S,l=k,d=b,p=$,c=v.length,h=_.length,f=C,`
+    fn calculateInputIndicesFromOutputIndices(output_indices: ${l.type.indices}) -> ${u.type.indices} {
+      var input_indices: ${u.type.indices};
+      for (var i:u32 = 0; i < ${p.length}; i++) {
+        var output_index = ${l.indicesGet("output_indices","i")};
+        var input_index: u32;
+        var scale = ${t0("uniforms.scales","i",c)};
+        if (scale == 1.0) {
+          input_index = output_index;
+        } else {
+          var roi_low = ${t0("uniforms.roi","i",h)};
+          var roi_hi = ${t0("uniforms.roi",`i + ${d.length}`,h)};
+          var input_shape_i = ${t0("uniforms.input_shape","i",d.length)};
+          var output_shape_i = ${t0("uniforms.output_shape","i",p.length)};
+          var original_idx = getOriginalCoordinateFromResizedCoordinate(output_index, scale, output_shape_i,
+                                                                        input_shape_i, roi_low, roi_hi);
+          if (!${f} || (original_idx >= 0 && original_idx < ${l.type.value}(input_shape_i))) {
+            if (original_idx < 0) {
+              input_index = 0;
+            } else if (original_idx > ${l.type.value}(input_shape_i - 1)) {
+              input_index = input_shape_i - 1;
+            } else {
+              input_index = u32(getNearestPixelFromOriginal(original_idx, scale < 1));
+            }
+          } else {
+            input_index = u32(original_idx);
+          }
+        }
+        ${u.indicesSet("input_indices","i","input_index")}
+      }
+      return input_indices;
+    }`};
+              `;case"linear":let m,g,y,w,x;return`
+              ${m=k,g=b,y=$,w=v.length,x=_.length,`
+    fn calculateOriginalIndicesFromOutputIndices(output_indices: ${m.type.indices}) -> array<${m.type.value}, ${y.length}> {
+      var original_indices: array<${m.type.value}, ${y.length}>;
+      for (var i:u32 = 0; i < ${y.length}; i++) {
+        var output_index = ${m.indicesGet("output_indices","i")};
+        var scale = ${t0("uniforms.scales","i",w)};
+        var roi_low = ${t0("uniforms.roi","i",x)};
+        var roi_hi = ${t0("uniforms.roi",`i + ${g.length}`,x)};
+        if (scale == 1.0) {
+          original_indices[i] = ${m.type.value}(output_index);
+        } else {
+          var input_shape_i = ${t0("uniforms.input_shape","i",g.length)};
+          var output_shape_i = ${t0("uniforms.output_shape","i",y.length)};
+          original_indices[i] = getOriginalCoordinateFromResizedCoordinate(output_index, scale, output_shape_i,
+                                                                           input_shape_i, roi_low, roi_hi);
+        }
+      }
+      return original_indices;
+    }`};
+              ${(()=>{if(2===b.length||4===b.length)return`${((e,r,i,a,n)=>{let[s,o,u,l]=2===i.length?[-1,0,1,-1]:[0,2,3,1],d=e.type.value;return`
+    fn getInputValue(batch: u32, channel: u32, row: u32, col: u32) -> ${d} {
+      var input_indices: ${e.type.indices};
+      ${e.indicesSet("input_indices",o,`max(0, min(row, ${i[o]} - 1))`)};
+      ${e.indicesSet("input_indices",u,`max(0, min(col, ${i[u]} - 1))`)};
+      ${ng(e,l,s,2)}
+      return ${e.getByIndices("input_indices")};
+    }
+
+    fn bilinearInterpolation(output_indices: ${r.type.indices}) -> ${d} {
+      var originalIndices = calculateOriginalIndicesFromOutputIndices(output_indices);
+      var row:${d} = originalIndices[${o}];
+      var col:${d} = originalIndices[${u}];
+      ${a?`if (row < 0 || row > (${i[o]} - 1) || col < 0 || col > (${i[u]} - 1)) {
+        return ${n};
+      }`:""};
+      row = max(0, min(row, ${i[o]} - 1));
+      col = max(0, min(col, ${i[u]} - 1));
+      var row1: u32 = u32(row);
+      var col1: u32 = u32(col);
+      var row2: u32 = u32(row + 1);
+      var col2: u32 = u32(col + 1);
+      var channel: u32 = ${i.length>2?`u32(originalIndices[${l}])`:"0"};
+      var batch: u32 =  ${i.length>2?`u32(originalIndices[${s}])`:"0"};
+      var x11: ${d} = getInputValue(batch, channel, row1, col1);
+      var x12: ${d} = getInputValue(batch, channel, row1, col2);
+      var x21: ${d} = getInputValue(batch, channel, row2, col1);
+      var x22: ${d} = getInputValue(batch, channel, row2, col2);
+      var dx1: ${d} = abs(row - ${d}(row1));
+      var dx2: ${d} = abs(${d}(row2) - row);
+      var dy1: ${d} = abs(col - ${d}(col1));
+      var dy2: ${d} = abs(${d}(col2) - col);
+      if (row1 == row2) {
+        dx1 = 0.5;
+        dx2 = 0.5;
+      }
+      if (col1 == col2) {
+        dy1 = 0.5;
+        dy2 = 0.5;
+      }
+      return (x11 * dx2 * dy2 + x12 * dx2 * dy1 + x21 * dx1 * dy2 + x22 * dx1 * dy1);
+    }`})(S,k,b,C,E)}`;if(3===b.length||5===b.length)return`${((e,r,i,a,n)=>{let[s,o,u,l,d]=3===i.length?[-1,0,1,2,-1]:[0,2,3,4,1],p=e.type.value;return`
+    fn getInputValue(batch: u32, channel: u32, depth:u32, height: u32, width: u32) -> ${p} {
+      var input_indices: ${e.type.indices};
+      ${e.indicesSet("input_indices",o,`max(0, min(depth, ${i[o]} - 1))`)};
+      ${e.indicesSet("input_indices",u,`max(0, min(height, ${i[u]} - 1))`)};
+      ${e.indicesSet("input_indices",l,`max(0, min(width, ${i[l]} - 1))`)};
+      ${ng(e,d,s,3)}
+      return ${e.getByIndices("input_indices")};
+    }
+
+    fn trilinearInterpolation(output_indices: ${r.type.indices}) -> ${p} {
+      var originalIndices = calculateOriginalIndicesFromOutputIndices(output_indices);
+      var depth:${p} = originalIndices[${o}];
+      var height:${p} = originalIndices[${u}];
+      var width:${p} = originalIndices[${l}];
+      ${a?`if (depth < 0 || depth > (${i[o]} - 1) || height < 0 || height > (${i[u]} - 1) || width < 0 || (width > ${i[l]} - 1)) {
+      return ${n};
+        }`:""};
+
+    depth = max(0, min(depth, ${i[o]} - 1));
+      height = max(0, min(height, ${i[u]} - 1));
+      width = max(0, min(width, ${i[l]} - 1));
+      var depth1: u32 = u32(depth);
+      var height1: u32 = u32(height);
+      var width1: u32 = u32(width);
+      var depth2: u32 = u32(depth + 1);
+      var height2: u32 = u32(height + 1);
+      var width2: u32 = u32(width + 1);
+      var channel: u32 = ${i.length>3?`u32(originalIndices[${d}])`:"0"};
+      var batch: u32 =  ${i.length>3?`u32(originalIndices[${s}])`:"0"};
+
+      var x111: ${p} = getInputValue(batch, channel, depth1, height1, width1);
+      var x112: ${p} = getInputValue(batch, channel, depth1, height1, width2);
+      var x121: ${p} = getInputValue(batch, channel, depth1, height2, width1);
+      var x122: ${p} = getInputValue(batch, channel, depth1, height2, width2);
+      var x211: ${p} = getInputValue(batch, channel, depth2, height1, width1);
+      var x212: ${p} = getInputValue(batch, channel, depth2, height1, width2);
+      var x221: ${p} = getInputValue(batch, channel, depth2, height2, width1);
+      var x222: ${p} = getInputValue(batch, channel, depth2, height2, width2);
+      var dx1: ${p} = abs(depth - ${p}(depth1));
+      var dx2: ${p} = abs(${p}(depth2) - depth);
+      var dy1: ${p} = abs(height - ${p}(height1));
+      var dy2: ${p} = abs(${p}(height2) - height);
+      var dz1: ${p} = abs(width - ${p}(width1));
+      var dz2: ${p} = abs(${p}(width2) - width);
+      if (depth1 == depth2) {
+        dx1 = 0.5;
+        dx2 = 0.5;
+      }
+      if (height1 == height2) {
+        dy1 = 0.5;
+        dy2 = 0.5;
+      }
+      if (width1 == width2) {
+        dz1 = 0.5;
+        dz2 = 0.5;
+      }
+      return (x111 * dx2 * dy2 * dz2 + x112 * dx2 * dy2 * dz1 + x121 * dx2 * dy1 *dz2 + x122 * dx2 * dy1 * dz1 +
+              x211 * dx1 * dy2 * dz2 + x212 * dx1 * dy2 * dz1 + x221 * dx1 * dy1 *dz2 + x222 * dx1 * dy1 * dz1);
+    }`})(S,k,b,C,E)}`;throw Error("Linear mode only supports input dims 2, 3, 4 and 5 are supported in linear mode.")})()};
+            `;case"cubic":return`
+            ${(()=>{if(2===b.length||4===b.length)return`${((e,r,i,a,n,s,o,u,l,d)=>{let[p,c]=2===i.length?[0,1]:[2,3],h=e.type.value,f=o=>{let c=o===p?"row":"col";return`
+      fn ${c}CubicInterpolation(input_indices: ${e.type.indices}, output_indices: ${r.type.indices}) -> ${h} {
+        var output_index = ${r.indicesGet("output_indices",o)};
+        var originalIdx: ${h} = getOriginalCoordinateFromResizedCoordinate(output_index, ${n[o]},
+        ${a[o]}, ${i[o]}, ${s[o]}, ${s[o]} + ${i.length});
+        var fractOriginalIdx: ${h} = originalIdx - floor(originalIdx);
+        var coefs = getCubicInterpolationCoefs(fractOriginalIdx);
+
+        if (${u} && (originalIdx < 0 || originalIdx > (${i[o]} - 1))) {
+          return ${l};
+        }
+        var data: array<${h}, 4> = array<${h}, 4>(0.0, 0.0, 0.0, 0.0);
+        for (var i: i32 = -1; i < 3; i++) {
+          var ${c}: ${h} = originalIdx + ${h}(i);
+          if (${c} < 0 || ${c} >= ${i[o]}) {
+            ${d?`coefs[i + 1] = 0.0;
+                        continue;`:u?`return ${l};`:`${c} = max(0, min(${c}, ${i[o]} - 1));`};
+          }
+        var input_indices_copy: ${e.type.indices} = input_indices;
+          ${e.indicesSet("input_indices_copy",o,`u32(${c})`)};
+          data[i + 1] = ${o===p?e.getByIndices("input_indices_copy"):"rowCubicInterpolation(input_indices_copy, output_indices)"};
+        }
+        return cubicInterpolation1D(data, coefs);
+      }`};return`
+    ${f(p)};
+    ${f(c)};
+  fn getCubicInterpolationCoefs(s: ${h}) -> array<${h}, 4> {
+    var absS = abs(s);
+    var coeffs: array<${h}, 4> = array<${h}, 4>(0.0, 0.0, 0.0, 0.0);
+    var oneMinusAbsS: ${h} = 1.0 - absS;
+    var twoMinusAbsS: ${h} = 2.0 - absS;
+    var onePlusAbsS: ${h} = 1.0 + absS;
+    coeffs[0] = ((${o} * onePlusAbsS - 5 * ${o}) * onePlusAbsS + 8 * ${o}) * onePlusAbsS - 4 * ${o};
+    coeffs[1] = ((${o} + 2) * absS - (${o} + 3)) * absS * absS + 1;
+    coeffs[2] = ((${o} + 2) * oneMinusAbsS - (${o} + 3)) * oneMinusAbsS * oneMinusAbsS + 1;
+    coeffs[3] = ((${o} * twoMinusAbsS - 5 * ${o}) * twoMinusAbsS + 8 * ${o}) * twoMinusAbsS - 4 * ${o};
+    return coeffs;
+  }
+
+  fn cubicInterpolation1D(x: array<${h}, 4>, coefs: array<${h}, 4>) -> ${h} {
+    var coefsSum: ${h} = coefs[0] + coefs[1] + coefs[2] + coefs[3];
+    return (x[0] * coefs[0] + x[1] * coefs[1]+ x[2] * coefs[2]+ x[3] * coefs[3]) / coefsSum;
+  }
+
+  fn bicubicInterpolation(output_indices: ${r.type.indices}) -> ${h} {
+    var input_indices: ${e.type.indices} = output_indices;
+    return colCubicInterpolation(input_indices, output_indices);
+  }
+    `})(S,k,b,$,v,_,a.cubicCoeffA,C,a.extrapolationValue,a.excludeOutside)}`;throw Error("Cubic mode only supports input dims 2 and 4 are supported in linear mode.")})()};
+            `;default:throw Error("Invalid resize mode")}})()};
+      `}
+      ${e.registerUniform("output_size","u32").registerUniform("scales","f32",v.length).registerUniform("roi","f32",_.length).declareVariables(S,k)}
+      ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+        ${I?"output[global_idx] = input[global_idx];":`
+        let output_indices = ${k.offsetToIndices("global_idx")};
+        var input_indices: ${S.type.indices};
+        ${(()=>{switch(a.mode){case"nearest":return`input_indices = calculateInputIndicesFromOutputIndices(output_indices);
+                if (checkInputIndices(input_indices)) {
+                  output[global_idx] = ${S.getByIndices("input_indices")};
+                } else {
+                  output[global_idx] = ${a.extrapolationValue};
+                }`;case"linear":return`output[global_idx] = ${2===b.length||4===b.length?"bilinearInterpolation":"trilinearInterpolation"}(output_indices);`;case"cubic":return"output[global_idx] = bicubicInterpolation(output_indices);";default:throw Error(`Unsupported resize mode: ${a.mode}`)}})()};
+`}
+      }`},getRunData:()=>({outputs:[{dims:$,dataType:i.dataType}],dispatchGroup:{x:Math.ceil(T/64)},programUniforms:[{type:12,data:T},{type:1,data:v},{type:1,data:_},...tZ(b,$)]})}),{inputs:[0]})},nb=e=>{let r=e.antialias,i=e.axes,a=e.coordinateTransformMode,n=e.cubicCoeffA,s=0!==e.excludeOutside,o=e.extrapolationValue,u=e.keepAspectRatioPolicy,l=e.mode,d=""===e.nearestMode?"simple":e.nearestMode;return tV({antialias:r,axes:i,coordinateTransformMode:a,cubicCoeffA:n,excludeOutside:s,extrapolationValue:o,keepAspectRatioPolicy:u,mode:l,nearestMode:d})}}),sA=ed(()=>{nD(),nL(),nH(),n_=(e,r)=>{var i,a,n,s;let o,u,l,d,p,c,h,f,m,g,y,b,_;(e=>{if(!e||e.length<3)throw Error("layerNorm requires at least 3 inputs.");let r=e[0],i=e[1],a=e[2];if(r.dataType!==i.dataType||r.dataType!==a.dataType)throw Error("All inputs must have the same data type");if(3!==r.dims.length&&2!==r.dims.length)throw Error("Input must be 2D or 3D");if(3!==i.dims.length&&2!==i.dims.length)throw Error("Skip must be 2D or 3D");let n=r.dims[r.dims.length-1],s=r.dims[r.dims.length-2];if(i.dims[i.dims.length-1]!==n)throw Error("Skip must have the same hidden size as input");if(i.dims[i.dims.length-2]!==s)throw Error("Skip must have the same sequence length as input");if(1!==a.dims.length)throw Error("Gamma must be 1D");if(a.dims[a.dims.length-1]!==n)throw Error("Gamma must have the same hidden size as input");if(e.length>3){let r=e[3];if(1!==r.dims.length)throw Error("Beta must be 1D");if(r.dims[r.dims.length-1]!==n)throw Error("Beta must have the same hidden size as input")}if(e.length>4){let r=e[4];if(1!==r.dims.length)throw Error("Bias must be 1D");if(r.dims[r.dims.length-1]!==n)throw Error("Bias must have the same hidden size as input")}})(e.inputs);let $=[0];e.outputCount>1&&$.push(-3),e.outputCount>2&&$.push(-3),e.outputCount>3&&$.push(3),e.compute((i=e.inputs,a=r,n=e.outputCount,s=!1,o=a.simplified,u=i[0].dims,l=tg.size(u),d=u.slice(-1)[0],p=s?u.slice(0,-1).concat(1):[],c=!o&&i.length>3,h=i.length>4,f=s&&n>1,m=s&&n>2,g=n>3,b=[{type:12,data:l},{type:12,data:y=tX(d)},{type:12,data:d},{type:1,data:a.epsilon}],_=[{dims:u,dataType:i[0].dataType}],n>1&&_.push({dims:p,dataType:1}),n>2&&_.push({dims:p,dataType:1}),n>3&&_.push({dims:u,dataType:i[0].dataType}),{name:"SkipLayerNormalization",shaderCache:{hint:`${y};${f};${m};${g}`,inputDependencies:i.map((e,r)=>"type")},getShaderSource:e=>{let r=[t2("x",i[0].dataType,i[0].dims,y),t2("skip",i[1].dataType,i[1].dims,y),t2("gamma",i[2].dataType,i[2].dims,y)];c&&r.push(t2("beta",i[3].dataType,i[3].dims,y)),h&&r.push(t2("bias",i[4].dataType,i[4].dims,y)),r.push(t3("output",i[0].dataType,u,y)),f&&r.push(t3("mean_output",1,p)),m&&r.push(t3("inv_std_output",1,p)),g&&r.push(t3("input_skip_bias_sum",i[0].dataType,u,y));let a=tH(i[0].dataType),n=tH(1,y);return`
+
+      ${e.registerUniforms([{name:"output_size",type:"u32"},{name:"components",type:"u32"},{name:"hidden_size",type:"u32"},{name:"epsilon",type:"f32"}]).declareVariables(...r)}
+      var<workgroup> sum_shared : array<${n}, 64>;
+      var<workgroup> sum_squared_shared : array<${n}, 64>;
+
+      ${e.mainStart([64,1,1])}
+        let ix = local_id.x;
+        let iy = global_id.x / 64;
+
+        let hidden_size_vectorized: u32 = uniforms.hidden_size / uniforms.components;
+        var stride = hidden_size_vectorized / 64;
+        let offset = ix * stride + iy * hidden_size_vectorized;
+        let offset1d = stride * ix;
+        if (ix == 63) {
+          stride = hidden_size_vectorized - stride * ix;
+        }
+        for (var i: u32 = 0; i < stride; i++) {
+          let skip_value = skip[offset + i];
+          let bias_value = ${h?"bias[offset1d + i]":a+"(0.0)"};
+          let input_value = x[offset + i];
+          let value = input_value + skip_value + bias_value;
+          ${g?"input_skip_bias_sum[offset + i] = value;":""}
+          output[offset + i] = value;
+          let f32_value = ${tY(a,y,"value")};
+          sum_shared[ix] += f32_value;
+          sum_squared_shared[ix] += f32_value * f32_value;
+        }
+        workgroupBarrier();
+
+        var reduce_size : u32 = 64;
+        for (var curr_size = reduce_size >> 1;  curr_size > 0; curr_size = reduce_size >> 1) {
+          reduce_size = curr_size + (reduce_size & 1);
+          if (ix < curr_size) {
+            sum_shared[ix] += sum_shared[ix + reduce_size];
+            sum_squared_shared[ix] += sum_squared_shared[ix + reduce_size];
+          }
+          workgroupBarrier();
+        }
+
+        let sum = sum_shared[0];
+        let square_sum = sum_squared_shared[0];
+        let mean = ${tJ("sum",y)} / f32(uniforms.hidden_size);
+        let inv_std_dev = inverseSqrt(${tJ("square_sum",y)} / f32(uniforms.hidden_size) ${o?"":"- mean * mean"} + uniforms.epsilon);
+        ${f?"mean_output[global_idx] = mean;":""}
+        ${m?"inv_std_output[global_idx] = inv_std_dev;":""}
+
+        for (var i: u32 = 0; i < stride; i++) {
+          output[offset + i] = (output[offset + i] ${o?"":`- ${a}(mean)`}) *
+            ${a}(inv_std_dev) * gamma[offset1d + i]
+            ${c?"+ beta[offset1d + i]":""};
+        }
+      }`},getRunData:()=>({outputs:_,dispatchGroup:{x:Math.ceil(l/d)},programUniforms:b})}),{outputs:$})}}),sO=ed(()=>{nD(),nL(),nF(),nH(),n$=(e,r)=>{let i=[];if(e.length>r)if(7===e[r].dataType)e[r].getBigInt64Array().forEach(e=>i.push(Number(e)));else if(6===e[r].dataType)e[r].getInt32Array().forEach(e=>i.push(Number(e)));else throw Error(`Input ${r} must be an array of int32 or int64`);return i},nv=(e,r,i,a,n)=>{let s=e;return e<0&&(s+=i[a[r]]),n[r]<0?Math.max(0,Math.min(s,i[a[r]]-1)):Math.max(0,Math.min(s,i[a[r]]))},nw=(e,r)=>{var i=e.inputs,a=r;if(!i||i.length<1)throw Error("too few inputs");if(0!==a.axes.length){if(a.axes.length!==a.starts.length||a.axes.length!==a.ends.length)throw Error("axes, starts and ends must have the same length")}else if(a.starts.length!==a.ends.length)throw Error("starts and ends must have the same length");i.slice(1).forEach((e,r)=>{if(6!==i[r+1].dataType&&7!==i[r+1].dataType)throw Error(`Input ${r} must be an array of int32 or int64`)});let n=((e,r)=>{if(!(e.length>1))return r;{let r=n$(e,1),i=n$(e,2),a=n$(e,3);return 0===a.length&&(a=[...Array(e[0].dims.length).keys()]),tV({starts:r,ends:i,axes:a})}})(e.inputs,r);e.compute(((e,r)=>{let i=e[0].dims,a=tg.size(i),n=r.axes.length>0?tg.normalizeAxes(r.axes,i.length):[...Array(i.length).keys()],s=n$(e,4);s.forEach(e=>0!==e||(()=>{throw Error("step cannot be 0")})),0===s.length&&(s=Array(n.length).fill(1));let o=r.starts.map((e,r)=>nv(e,r,i,n,s)),u=r.ends.map((e,r)=>nv(e,r,i,n,s));if(n.length!==o.length||n.length!==u.length)throw Error("start, ends and axes should have the same number of elements");if(n.length!==i.length)for(let e=0;e<i.length;++e)n.includes(e)||(o.splice(e,0,0),u.splice(e,0,i[e]),s.splice(e,0,1));let l=s.map(e=>Math.sign(e));s.forEach((e,r,i)=>{if(e<0){let a=(u[r]-o[r])/e,n=o[r],l=n+a*s[r];o[r]=l,u[r]=n,i[r]=-e}});let d=i.slice(0);n.forEach((e,r)=>{d[e]=Math.ceil((u[e]-o[e])/s[e])});let p={dims:d,dataType:e[0].dataType},c=t3("output",e[0].dataType,d.length),h=t2("input",e[0].dataType,e[0].dims.length),f=tg.size(d),m=[{name:"outputSize",type:"u32"},{name:"starts",type:"u32",length:o.length},{name:"signs",type:"i32",length:l.length},{name:"steps",type:"u32",length:s.length}],g=[{type:12,data:f},{type:12,data:o},{type:6,data:l},{type:12,data:s},...tZ(e[0].dims,d)];return{name:"Slice",shaderCache:{hint:`${l.length}_${o.length}_${s.length}`,inputDependencies:["rank"]},getShaderSource:e=>{let r,a,n;return`
+      ${e.registerUniforms(m).declareVariables(h,c)}
+        ${r=h,a=c,n=i,`fn calculateInputIndices(output_indices: ${a.type.indices}) -> ${r.type.indices} {
+          var input_indices: ${r.type.indices};
+          var carry = 0u;
+          for (var i = ${n.length-1}; i >= 0; i--) {
+            let input_shape_i = ${t0("uniforms.input_shape","i",n.length)};
+            let steps_i = ${t0("uniforms.steps","i",n.length)};
+            let signs_i = ${t0("uniforms.signs","i",n.length)};
+            let starts_i = ${t0("uniforms.starts","i",n.length)};
+            var output_index = ${a.indicesGet("output_indices","i")};
+            var input_index = output_index * steps_i + starts_i + carry;
+            carry = input_index / input_shape_i;
+            input_index = input_index % input_shape_i;
+            if (signs_i < 0) {
+              input_index = input_shape_i - input_index - 1u + starts_i;
+            }
+            ${r.indicesSet("input_indices","i","input_index")};
+          }
+          return input_indices;
+      }`}
+        ${e.mainStart()}
+          ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.outputSize")}
+          let output_indices = ${c.offsetToIndices("global_idx")};
+          let input_indices = calculateInputIndices(output_indices);
+          ${c.setByOffset("global_idx",h.getByIndices("input_indices"))}
+      }`},getRunData:()=>({outputs:[p],dispatchGroup:{x:Math.ceil(a/64)},programUniforms:g})}})(e.inputs,n),{inputs:[0]})},nx=e=>{let r=e.starts,i=e.ends,a=e.axes;return tV({starts:r,ends:i,axes:a})}}),sM=ed(()=>{nD(),nL(),nF(),nK(),nH(),nk=(e,r)=>{var i,a;let n,s,o,u,l,d,p,c,h,f,m,g,y,b,_,$,v,w,x;(e=>{if(!e||1!==e.length)throw Error("Softmax op requires 1 input.")})(e.inputs),i=e,a=r,s=(n=i.inputs[0]).dims,o=tg.size(s),u=s.length,d=(l=tg.normalizeAxis(a.axis,u))<s.length-1,c=[],d?((c=Array.from({length:u},(e,r)=>r))[l]=u-1,c[u-1]=l,p=i.compute(t7(n,c),{inputs:[n],outputs:[-1]})[0]):p=n,m=o/(f=(h=p.dims)[u-1]),g=tX(f),y=f/g,b=64,1===m&&(b=256),_=t2("x",p.dataType,p.dims,g),$=t3("result",p.dataType,p.dims,g),v=_.type.value,w="f32"===tH(p.dataType)?`var threadMax = ${v}(-3.4028234663852886e+38f);`:`var threadMax = ${v}(-65504.0h);`,x=i.compute({name:"Softmax",shaderCache:{hint:`${g};${b}`,inputDependencies:["type"]},getRunData:()=>({outputs:[{dims:h,dataType:p.dataType}],dispatchGroup:{x:m},programUniforms:[{type:6,data:y}]}),getShaderSource:e=>{let r;return`
+      var<workgroup> rowMaxShared : ${v};
+      var<workgroup> rowSumShared : ${v};
+      var<workgroup> threadShared : array<${v}, ${b}>;
+
+      fn getValue(row: i32, col: i32, row_stride: i32) -> ${v} {
+        let index = row * row_stride + col;
+        return x[index];
+      }
+
+      fn setValue(row: i32, col: i32, row_stride: i32, value: ${v}) {
+        let index = row * row_stride + col;
+        result[index] = value;
+      }
+      ${e.registerUniform("packedCols","i32").declareVariables(_,$)}
+      ${e.mainStart(b)}
+        let gindex = i32(global_idx);
+        let lindex = i32(local_idx);
+        const wg = ${b};
+        let row = gindex / wg;
+        let cols = uniforms.packedCols;
+        let row_stride : i32 = uniforms.packedCols;
+
+        // find the rows max
+        ${w}
+        for (var col = lindex; col < cols; col += wg) {
+          let value = getValue(row, col, row_stride);
+          threadMax = max(threadMax, value);
+        }
+        if (lindex < cols) {
+          threadShared[lindex] = threadMax;
+        }
+        workgroupBarrier();
+
+        var reduceSize = min(cols, wg);
+        for (var currSize = reduceSize >> 1;  currSize > 0; currSize = reduceSize >> 1) {
+          reduceSize = currSize + (reduceSize & 1);
+          if (lindex < currSize) {
+            threadShared[lindex] = max(threadShared[lindex], threadShared[lindex + reduceSize]);
+          }
+          workgroupBarrier();
+        }
+        if (lindex == 0) {
+          rowMaxShared = ${v}(${r="threadShared[0]",4===g?`max(max(${r}.x, ${r}.y), max(${r}.z, ${r}.w))`:2===g?`max(${r}.x, ${r}.y)`:3===g?`max(max(${r}.x, ${r}.y), ${r}.z)`:r});
+        }
+        workgroupBarrier();
+
+        // find the rows sum
+        var threadSum = ${v}(0.0);
+        for (var col = lindex; col < cols; col += wg) {
+          let subExp = exp(getValue(row, col, row_stride) - rowMaxShared);
+          threadSum += subExp;
+        }
+        threadShared[lindex] = threadSum;
+        workgroupBarrier();
+
+        for (var currSize = wg >> 1;  currSize > 0; currSize = currSize >> 1) {
+          if (lindex < currSize) {
+            threadShared[lindex] = threadShared[lindex] + threadShared[lindex + currSize];
+          }
+          workgroupBarrier();
+        }
+        if (lindex == 0) {
+          rowSumShared = ${v}(${tJ("threadShared[0]",g)});
+        }
+        workgroupBarrier();
+
+        // calculate final value for each element in the row
+        for (var col = lindex; col < cols; col += wg) {
+          var value = exp(getValue(row, col, row_stride) - rowMaxShared) / rowSumShared;
+          // max operation protects against NaN since all values should be >=0
+          value = max(value, ${v}(0.0));
+          setValue(row, col, row_stride, value);
+        }
+      }`}},{inputs:[p],outputs:[d?-1:0]})[0],d&&i.compute(t7(x,c),{inputs:[x]})},nS=e=>tV({axis:e.axis})}),sR=ed(()=>{nD(),nL(),nH(),nT=e=>Array.from(e.getBigInt64Array(),Number),nI=e=>{var r,i;let a,n,s,o,u,l,d;(e=>{if(!e||2!==e.length)throw Error("Tile requires 2 inputs.");if(1!==e[0].dataType&&10!==e[0].dataType&&6!==e[0].dataType&&12!==e[0].dataType)throw Error("Tile only support float, float16, int32, and uint32 data types");if(7!==e[1].dataType)throw Error("Tile `repeats` input should be of int64 data type");if(1!==e[1].dims.length)throw Error("Tile `repeats` input should be 1-D");if(nT(e[1]).length!==e[0].dims.length)throw Error("Tile `repeats` input should have same number of elements as rank of input data tensor")})(e.inputs),e.compute((a=(r=e.inputs)[0].dims,s=((e,r)=>{let i=[];for(let a=0;a<e.length;++a)i.push(e[a]*r[a]);return i})(a,n=i??nT(r[1])),o=tg.size(s),u=r[0].dataType,l=t2("input",u,a.length),d=t3("output",u,s.length),{name:"Tile",shaderCache:{hint:`${n}`,inputDependencies:["rank"]},getRunData:()=>({outputs:[{dims:s,dataType:r[0].dataType}],dispatchGroup:{x:Math.ceil(o/64)},programUniforms:[{type:12,data:o},...tZ(r[0].dims,s)]}),getShaderSource:e=>`
+      const inputShape = ${l.indices(...a)};
+      ${e.registerUniform("output_size","u32").declareVariables(l,d)}
+      ${e.mainStart()}
+      ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.output_size")}
+      let output_indices = ${d.offsetToIndices("global_idx")};
+      var input_indices: ${l.type.indices};
+      for (var i = 0; i < ${a.length}; i++) {
+        let input_dim_i = ${l.indicesGet("uniforms.input_shape","i")};
+        let input_dim_value = ${d.indicesGet("output_indices","i")}  % input_dim_i;
+
+        ${l.indicesSet("input_indices","i","input_dim_value")}
+      }
+      ${d.setByOffset("global_idx",l.getByIndices("input_indices"))}
+    }`}),{inputs:[0]})}}),sN=ed(()=>{nD(),nL(),nH(),nC=e=>{e.compute((e=>{let r=e[1].dims,i=e[2].dims,a=e[0].dims,n=e[1].dataType,s=!(tg.areEqual(r,i)&&tg.areEqual(i,a)),o=r,u=tg.size(r);if(s){let e=tm.calcShape(tm.calcShape(r,i,!1),a,!1);if(!e)throw Error("Can't perform where op on the given tensors");o=e,u=tg.size(o)}let l=Math.ceil(u/4);return{name:"Where",shaderCache:{inputDependencies:["rank","rank","rank"]},getShaderSource:r=>((e,r,i,a,n)=>{let s=t3("output_data",n,i.length,4),o=t2("a_data",r[1].dataType,r[1].dims.length,4),u=t2("b_data",r[2].dataType,r[2].dims.length,4),l=t2("c_data",r[0].dataType,r[0].dims.length,4),d,p=(e,r,i)=>`select(${r}, ${e}, ${i})`;if(a){let e=(e,r,i="")=>{let a=`a_data[index_a${r}][component_a${r}]`,n=`b_data[index_b${r}][component_b${r}]`,d=`bool(c_data[index_c${r}] & (0xffu << (component_c${r} * 8)))`;return`
+            let output_indices${r} = ${s.offsetToIndices(`global_idx * 4u + ${r}u`)};
+            let offset_a${r} = ${o.broadcastedIndicesToOffset(`output_indices${r}`,s)};
+            let offset_b${r} = ${u.broadcastedIndicesToOffset(`output_indices${r}`,s)};
+            let offset_c${r} = ${l.broadcastedIndicesToOffset(`output_indices${r}`,s)};
+            let index_a${r} = offset_a${r} / 4u;
+            let index_b${r} = offset_b${r} / 4u;
+            let index_c${r} = offset_c${r} / 4u;
+            let component_a${r} = offset_a${r} % 4u;
+            let component_b${r} = offset_b${r} % 4u;
+            let component_c${r} = offset_c${r} % 4u;
+            ${e}[${r}] = ${i}(${p(a,n,d)});
+          `};d=9===n?`
+            var data = vec4<u32>(0);
+            ${e("data",0,"u32")}
+            ${e("data",1,"u32")}
+            ${e("data",2,"u32")}
+            ${e("data",3,"u32")}
+            output_data[global_idx] = dot(vec4<u32>(0x1, 0x100, 0x10000, 0x1000000), vec4<u32>(data));`:`
+            ${e("output_data[global_idx]",0)}
+            ${e("output_data[global_idx]",1)}
+            ${e("output_data[global_idx]",2)}
+            ${e("output_data[global_idx]",3)}
+          `}else d=s.setByOffset("global_idx",p(o.getByOffset("global_idx"),u.getByOffset("global_idx"),l.getByOffset("global_idx")));return`
+        ${e.registerUniform("vec_size","u32").declareVariables(l,o,u,s)}
+        ${e.mainStart()}
+        ${e.guardAgainstOutOfBoundsWorkgroupSizes("uniforms.vec_size")}
+        ${d}
+      }`})(r,e,o,s,n),getRunData:()=>({outputs:[{dims:o,dataType:n}],dispatchGroup:{x:Math.ceil(u/64/4)},programUniforms:[{type:12,data:l},...tZ(a,r,i,o)]})}})(e.inputs))}}),sB=ed(()=>{nQ(),nY(),nJ(),n0(),n2(),n3(),n4(),si(),sn(),ss(),so(),su(),sl(),sd(),sp(),sc(),sh(),sf(),sm(),sg(),s$(),sv(),sw(),sx(),sk(),sy(),sS(),sT(),sI(),sC(),sE(),nX(),sz(),s_(),sA(),sO(),sM(),sb(),sR(),nK(),n1(),sN(),nE=new Map([["Abs",[rj]],["Acos",[rV]],["Acosh",[rG]],["Add",[ik]],["ArgMax",[rN,rB]],["ArgMin",[rR,rB]],["Asin",[rF]],["Asinh",[rH]],["Atan",[rK]],["Atanh",[rZ]],["Attention",[rP]],["AveragePool",[nt,ne]],["BatchNormalization",[rL]],["BiasAdd",[rq]],["BiasSplitGelu",[iw]],["Cast",[rQ,rX]],["Ceil",[rJ]],["Clip",[rY]],["Concat",[iR,iN]],["Conv",[i5,i6]],["ConvTranspose",[aa,ar]],["Cos",[r0]],["Cosh",[r1]],["CumSum",[an,as]],["DepthToSpace",[ao,au]],["DequantizeLinear",[nd,np]],["Div",[iS]],["Einsum",[am,ag]],["Elu",[r3,r2]],["Equal",[iT]],["Erf",[r6]],["Exp",[r8]],["Expand",[ab]],["FastGelu",[a_]],["Floor",[r5]],["FusedConv",[i5,i6]],["Gather",[av,a$]],["GatherElements",[aI,aT]],["GatherBlockQuantized",[ak,aS]],["GatherND",[aw,ax]],["Gelu",[r9]],["Gemm",[aE,aC]],["GlobalAveragePool",[na,ni]],["GlobalMaxPool",[nl,nu]],["Greater",[iz]],["GreaterOrEqual",[iO]],["GridSample",[aN,aB]],["GroupQueryAttention",[aZ]],["HardSigmoid",[io,is]],["InstanceNormalization",[aQ]],["LayerNormalization",[aY]],["LeakyRelu",[r7,r2]],["Less",[iA]],["LessOrEqual",[iM]],["Log",[i_]],["MatMul",[aJ]],["MatMulNBits",[a0,a1]],["MaxPool",[ns,no]],["Mul",[iI]],["MultiHeadAttention",[aq,aU]],["Neg",[it]],["Not",[ie]],["Pad",[a2]],["Pow",[iC]],["QuickGelu",[iv,r2]],["Range",[nc]],["Reciprocal",[ir]],["ReduceMin",[rC]],["ReduceMean",[rx]],["ReduceMax",[rI]],["ReduceSum",[rz]],["ReduceProd",[rE]],["ReduceL1",[rk]],["ReduceL2",[rS]],["ReduceLogSum",[rO]],["ReduceLogSumExp",[rT]],["ReduceSumSquare",[rA]],["Relu",[ii]],["Resize",[ny,nb]],["RotaryEmbedding",[aF]],["ScatterND",[nf,nh]],["Sigmoid",[ia]],["Sin",[iu]],["Sinh",[il]],["Slice",[nw,nx]],["SkipLayerNormalization",[n_]],["Split",[aj,aV]],["Sqrt",[id]],["Softmax",[nk,nS]],["Sub",[iE]],["Tan",[ip]],["Tanh",[ih]],["ThresholdedRelu",[ib,r2]],["Tile",[nI]],["Transpose",[re,rt]],["Where",[nC]]])}),sD=ed(()=>{eA(),nP(),nH(),nz=class{constructor(e){this.backend=e,this.repo=new Map,this.attributesBound=!1}getArtifact(e){return this.repo.get(e)}setArtifact(e,r){this.repo.set(e,r)}run(e,r,i,a,n){J(e.programInfo.name);let s=this.backend.device,o=this.backend.getComputePassEncoder();this.backend.writeTimestamp(2*this.backend.pendingDispatchNumber);let u=[];for(let e of r)u.push({binding:u.length,resource:{buffer:e.buffer}});for(let e of i)u.push({binding:u.length,resource:{buffer:e.buffer}});n&&u.push({binding:u.length,resource:n});let l=s.createBindGroup({layout:e.computePipeline.getBindGroupLayout(0),entries:u,label:e.programInfo.name});if("capturing"===this.backend.sessionStatus){let r={kernelId:this.backend.currentKernelId,computePipeline:e.computePipeline,bindGroup:l,dispatchGroup:a};this.backend.capturedCommandList.get(this.backend.currentSessionId).push(r)}o.setPipeline(e.computePipeline),o.setBindGroup(0,l),o.dispatchWorkgroups(...a),this.backend.writeTimestamp(2*this.backend.pendingDispatchNumber+1),this.backend.pendingDispatchNumber++,(this.backend.pendingDispatchNumber>=this.backend.maxDispatchNumber||"at-passes"===this.backend.queryType)&&this.backend.endComputePass(),this.backend.pendingDispatchNumber>=this.backend.maxDispatchNumber&&this.backend.flush(),ee(e.programInfo.name)}dispose(){}build(e,r){J(e.name);let i=this.backend.device,a=[];[{feature:"shader-f16",extension:"f16"},{feature:"subgroups",extension:"subgroups"}].forEach(e=>{i.features.has(e.feature)&&a.push(`enable ${e.extension};`)});let n=t5(r,this.backend.device.limits),s=e.getShaderSource(n),o=`${a.join(`
+`)}
+${n.additionalImplementations}
+${s}`,u=i.createShaderModule({code:o,label:e.name});th("verbose",()=>`[WebGPU] ${e.name} shader code: ${o}`);let l=i.createComputePipeline({compute:{module:u,entryPoint:"main"},layout:"auto",label:e.name});return ee(e.name),{programInfo:e,computePipeline:l,uniformVariablesInfo:n.variablesInfo}}normalizeDispatchGroupSize(e){let r="number"==typeof e?e:e.x,i="number"==typeof e?1:e.y||1,a="number"==typeof e?1:e.z||1,n=this.backend.device.limits.maxComputeWorkgroupsPerDimension;if(r<=n&&i<=n&&a<=n)return[r,i,a];let s=r*i*a,o=Math.ceil(Math.sqrt(s));if(!(o>n))return[o,o,1];if((o=Math.ceil(Math.cbrt(s)))>n)throw Error("Total dispatch size exceeds WebGPU maximum.");return[o,o,o]}}}),sU={};ep(sU,{WebGpuBackend:()=>sL});var sP,sL,sq=ed(()=>{eA(),nD(),nP(),nq(),nG(),sB(),sD(),sP=class{constructor(e){e&&(this.architecture=e.architecture,this.vendor=e.vendor)}isArchitecture(e){return this.architecture===e}isVendor(e){return this.vendor===e}},sL=class{constructor(){this.currentSessionId=null,this.currentKernelId=null,this.commandEncoder=null,this.computePassEncoder=null,this.maxDispatchNumber=16,this.pendingDispatchNumber=0,this.pendingKernels=[],this.pendingQueries=new Map,this.sessionStatus="default",this.capturedCommandList=new Map,this.capturedPendingKernels=new Map,this.sessionExternalDataMapping=new Map}get currentKernelCustomData(){if(null===this.currentKernelId)throw Error("currentKernelCustomData(): currentKernelId is null. (should not happen)");let e=this.kernelCustomData.get(this.currentKernelId);return e||(e={},this.kernelCustomData.set(this.currentKernelId,e)),e}async initialize(e,r){this.env=e;let i=[],a={requiredLimits:{maxComputeWorkgroupStorageSize:r.limits.maxComputeWorkgroupStorageSize,maxComputeWorkgroupsPerDimension:r.limits.maxComputeWorkgroupsPerDimension,maxStorageBufferBindingSize:r.limits.maxStorageBufferBindingSize,maxBufferSize:r.limits.maxBufferSize,maxComputeInvocationsPerWorkgroup:r.limits.maxComputeInvocationsPerWorkgroup,maxComputeWorkgroupSizeX:r.limits.maxComputeWorkgroupSizeX,maxComputeWorkgroupSizeY:r.limits.maxComputeWorkgroupSizeY,maxComputeWorkgroupSizeZ:r.limits.maxComputeWorkgroupSizeZ},requiredFeatures:i},n=e=>r.features.has(e)&&i.push(e)&&!0;n("chromium-experimental-timestamp-query-inside-passes")||n("timestamp-query"),n("shader-f16"),n("subgroups"),this.device=await r.requestDevice(a),this.adapterInfo=new sP(r.info||await r.requestAdapterInfo()),this.gpuDataManager=tW(this),this.programManager=new nz(this),this.kernels=new Map,this.kernelPersistentData=new Map,this.kernelCustomData=new Map,tc(e.logLevel,!!e.debug),this.device.onuncapturederror=e=>{e.error instanceof GPUValidationError&&console.error(`An uncaught WebGPU validation error was raised: ${e.error.message}`)},Object.defineProperty(this.env.webgpu,"device",{value:this.device,writable:!1,enumerable:!0,configurable:!0}),Object.defineProperty(this.env.webgpu,"adapter",{value:r,writable:!1,enumerable:!0,configurable:!1}),this.setQueryType()}dispose(){"u">typeof this.querySet&&this.querySet.destroy(),this.gpuDataManager.dispose(),this.device&&this.env?.webgpu&&this.device.lost.then(()=>{delete this.env.webgpu.device})}getCommandEncoder(){return this.commandEncoder||(this.commandEncoder=this.device.createCommandEncoder()),this.commandEncoder}getComputePassEncoder(){if(!this.computePassEncoder){let e=this.getCommandEncoder(),r={};"at-passes"===this.queryType&&(r.timestampWrites={querySet:this.querySet,beginningOfPassWriteIndex:2*this.pendingDispatchNumber,endOfPassWriteIndex:2*this.pendingDispatchNumber+1}),this.computePassEncoder=e.beginComputePass(r)}return this.computePassEncoder}endComputePass(){this.computePassEncoder&&(this.computePassEncoder.end(),this.computePassEncoder=null)}flush(){let e;this.commandEncoder&&(J(),this.endComputePass(),"none"!==this.queryType&&(this.commandEncoder.resolveQuerySet(this.querySet,0,2*this.pendingDispatchNumber,this.queryResolveBuffer,0),e=this.device.createBuffer({size:2*this.pendingDispatchNumber*8,usage:GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST}),this.pendingQueries.set(e,this.pendingKernels),this.pendingKernels=[],this.commandEncoder.copyBufferToBuffer(this.queryResolveBuffer,0,e,0,2*this.pendingDispatchNumber*8)),this.device.queue.submit([this.commandEncoder.finish()]),this.gpuDataManager.refreshPendingBuffers(),this.commandEncoder=null,this.pendingDispatchNumber=0,"none"!==this.queryType&&e.mapAsync(GPUMapMode.READ).then(()=>{let r=new BigUint64Array(e.getMappedRange()),i=this.pendingQueries.get(e);for(let e=0;e<r.length/2;e++){let a=i[e],n=a.kernelId,s=this.kernels.get(n),o=s.kernelType,u=s.kernelName,l=a.programName,d=a.inputTensorViews,p=a.outputTensorViews,c=r[2*e],h=r[2*e+1];typeof this.queryTimeBase>"u"&&(this.queryTimeBase=c);let f=Number(c-this.queryTimeBase),m=Number(h-this.queryTimeBase);if(!Number.isSafeInteger(f)||!Number.isSafeInteger(m))throw RangeError("incorrect timestamp range");if(this.env.webgpu.profiling?.ondata)this.env.webgpu.profiling.ondata({version:1,inputsMetadata:d.map(e=>({dims:e.dims,dataType:tt(e.dataType)})),outputsMetadata:p.map(e=>({dims:e.dims,dataType:tt(e.dataType)})),kernelId:n,kernelType:o,kernelName:u,programName:l,startTime:f,endTime:m});else{let e="";d.forEach((r,i)=>{e+=`input[${i}]: [${r.dims}] | ${tt(r.dataType)}, `});let r="";p.forEach((e,i)=>{r+=`output[${i}]: [${e.dims}] | ${tt(e.dataType)}, `}),console.log(`[profiling] kernel "${n}|${o}|${u}|${l}" ${e}${r}start time: ${f} ns, execution time: ${m-f} ns`)}Q("GPU",`${l}::${c}::${h}`)}e.unmap(),this.pendingQueries.delete(e)}),ee())}run(e,r,i,a,n,s){var o,u,l;let d,p;J(e.name);let c=[];for(let e=0;e<r.length;++e){let i=r[e].data;if(0===i)continue;let a=this.gpuDataManager.get(i);if(!a)throw Error(`no GPU data for input: ${i}`);c.push(a)}let{outputs:h,dispatchGroup:f,programUniforms:m}=e.getRunData(r),g=0===i.length?h.map((e,r)=>r):i;if(g.length!==h.length)throw Error(`Output size ${g.length} must be equal to ${h.length}.`);let y=[],b=[];for(let e=0;e<h.length;++e){if(!Number.isInteger(g[e])||g[e]<-3||g[e]>=s)throw Error(`Invalid output index: ${g[e]}`);if(-3===g[e])continue;let r=-1===g[e],i=-2===g[e],o=r||i?n(h[e].dataType,h[e].dims):a(g[e],h[e].dataType,h[e].dims);if(y.push(o),0===o.data)continue;let u=this.gpuDataManager.get(o.data);if(!u)throw Error(`no GPU data for output: ${o.data}`);if(r&&this.temporaryData.push(u),i){let e=this.kernelPersistentData.get(this.currentKernelId);e||(e=[],this.kernelPersistentData.set(this.currentKernelId,e)),e.push(u)}b.push(u)}if(c.length!==r.length||b.length!==y.length){if(0===b.length)return ee(e.name),y;throw Error(`Program ${e.name} has zero-sized tensor(s) in inputs or outputs. This is not supported now.`)}if(m){let e=0,r=[];m.forEach(i=>{let a="number"==typeof i.data?[i.data]:i.data;if(0===a.length)return;let n=10===i.type?2:4,s,o;10===i.type?(o=a.length>4?16:a.length>2?8:a.length*n,s=a.length>4?16:n*a.length):(o=a.length<=2?a.length*n:16,s=16),e=Math.ceil(e/o)*o,r.push(e);let u=10===i.type?8:4;e+=a.length>4?Math.ceil(a.length/u)*s:a.length*n});let i=new ArrayBuffer(e=16*Math.ceil(e/16));m.forEach((e,a)=>{let n=r[a],s="number"==typeof e.data?[e.data]:e.data;if(6===e.type)new Int32Array(i,n,s.length).set(s);else if(12===e.type)new Uint32Array(i,n,s.length).set(s);else if(10===e.type)new Uint16Array(i,n,s.length).set(s);else if(1===e.type)new Float32Array(i,n,s.length).set(s);else throw Error(`Unsupported uniform type: ${tt(e.type)}`)});let a=this.gpuDataManager.create(e,GPUBufferUsage.COPY_DST|GPUBufferUsage.UNIFORM);this.device.queue.writeBuffer(a.buffer,0,i,0,e),this.gpuDataManager.release(a.id),d={offset:0,size:e,buffer:a.buffer}}let _=this.programManager.normalizeDispatchGroupSize(f),$=(o=e,u=r,l=1===_[1]&&1===_[2],p=o.name,o.shaderCache?.hint&&(p+="["+o.shaderCache.hint+"]"),p+=":"+l+`:${((e,r)=>{if(r.length!==e.length)throw Error(`inputDependencies length ${r.length} is not equal to inputTensors length ${e.length}.`);let i=[];for(let a=0;a<e.length;++a){let n=e[a].dataType;switch(r[a]){case"none":i.push("");break;case"type":i.push(`${n}`);break;case"rank":{let r=e[a].dims.length;i.push(`${n};${r}`);break}case"dims":{let r=e[a].dims.join(",");i.push(`${n};${r}`);break}default:throw Error(`unsupported input dependency: ${r[a]}`)}}return i.join("|")})(u,o.shaderCache?.inputDependencies??Array(u.length).fill("dims"))}`),v=this.programManager.getArtifact($);if(v||(v=this.programManager.build(e,_),this.programManager.setArtifact($,v),th("info",()=>`[artifact] key: ${$}, programName: ${e.name}`)),m&&v.uniformVariablesInfo){if(m.length!==v.uniformVariablesInfo.length)throw Error(`Uniform variables count mismatch: expect ${v.uniformVariablesInfo.length}, got ${m.length} in program "${v.programInfo.name}".`);for(let e=0;e<m.length;e++){let r=m[e],i=r.type,a="number"==typeof r.data?1:r.data.length,[n,s]=v.uniformVariablesInfo[e];if(i!==n||a!==s)throw Error(`Uniform variable ${e} mismatch: expect type ${n} with size ${s}, got type ${i} with size ${a} in program "${v.programInfo.name}".`)}}if(th("info",()=>`[ProgramManager] run "${e.name}" (key=${$}) with ${_[0]}x${_[1]}x${_[2]}`),"none"!==this.queryType||"capturing"===this.sessionStatus){let e={kernelId:this.currentKernelId,programName:v.programInfo.name,inputTensorViews:r,outputTensorViews:y};this.pendingKernels.push(e),"capturing"===this.sessionStatus&&this.capturedPendingKernels.get(this.currentSessionId).push(e)}return this.programManager.run(v,c,b,_,d),ee(e.name),y}upload(e,r){this.gpuDataManager.upload(e,r)}memcpy(e,r){this.gpuDataManager.memcpy(e,r)}async download(e,r){await this.gpuDataManager.download(e,r)}alloc(e){return this.gpuDataManager.create(e).id}free(e){return this.gpuDataManager.release(e)}createKernel(e,r,i,a){let n=nE.get(e);if(!n)throw Error(`kernel not implemented: ${e}`);let s={kernelType:e,kernelName:a,kernelEntry:n[0],attributes:[n[1],i]};this.kernels.set(r,s)}releaseKernel(e){let r=this.kernelPersistentData.get(e);if(r){for(let e of r)this.gpuDataManager.release(e.id);this.kernelPersistentData.delete(e)}this.kernelCustomData.delete(e),this.kernels.delete(e)}computeKernel(e,r,i){let a=this.kernels.get(e);if(!a)throw Error(`kernel not created: ${e}`);let n=a.kernelType,s=a.kernelName,o=a.kernelEntry,u=a.attributes;if(null!==this.currentKernelId)throw Error(`kernel "[${n}] ${s}" is not allowed to be called recursively`);this.currentKernelId=e,u[0]&&(u[1]=u[0](u[1]),u[0]=void 0),th("info",()=>`[WebGPU] Start to run kernel "[${n}] ${s}"...`);let l=this.env.debug;this.temporaryData=[];try{return l&&this.device.pushErrorScope("validation"),o(r,u[1]),0}catch(e){return i.push(Promise.resolve(`[WebGPU] Kernel "[${n}] ${s}" failed. ${e}`)),1}finally{for(let e of(l&&i.push(this.device.popErrorScope().then(e=>e?`GPU validation error for kernel "[${n}] ${s}": ${e.message}`:null)),this.temporaryData))this.gpuDataManager.release(e.id);this.temporaryData=[],this.currentKernelId=null}}registerBuffer(e,r,i,a){let n=this.sessionExternalDataMapping.get(e);n||(n=new Map,this.sessionExternalDataMapping.set(e,n));let s=n.get(r),o=this.gpuDataManager.registerExternalBuffer(i,a,s);return n.set(r,[o,i]),o}unregisterBuffers(e){let r=this.sessionExternalDataMapping.get(e);r&&(r.forEach(e=>this.gpuDataManager.unregisterExternalBuffer(e[0])),this.sessionExternalDataMapping.delete(e))}getBuffer(e){let r=this.gpuDataManager.get(e);if(!r)throw Error(`no GPU data for buffer: ${e}`);return r.buffer}createDownloader(e,r,i){return async()=>{let a=await tL(this,e,r);return tv(a.buffer,i)}}writeTimestamp(e){"inside-passes"===this.queryType&&this.computePassEncoder.writeTimestamp(this.querySet,e)}setQueryType(){this.queryType="none",(this.env.webgpu.profiling?.mode==="default"||(typeof this.env.trace>"u"?this.env.wasm.trace:this.env.trace))&&(this.device.features.has("chromium-experimental-timestamp-query-inside-passes")?this.queryType="inside-passes":this.device.features.has("timestamp-query")&&(this.queryType="at-passes"),"none"!==this.queryType&&typeof this.querySet>"u"&&(this.querySet=this.device.createQuerySet({type:"timestamp",count:2*this.maxDispatchNumber}),this.queryResolveBuffer=this.device.createBuffer({size:2*this.maxDispatchNumber*8,usage:GPUBufferUsage.COPY_SRC|GPUBufferUsage.QUERY_RESOLVE})))}captureBegin(){th("info","captureBegin"),this.capturedCommandList.get(this.currentSessionId)||this.capturedCommandList.set(this.currentSessionId,[]),this.capturedPendingKernels.get(this.currentSessionId)||this.capturedPendingKernels.set(this.currentSessionId,[]),this.flush(),this.sessionStatus="capturing"}captureEnd(){th("info","captureEnd"),this.flush(),this.sessionStatus="default"}replay(){th("info","replay"),this.sessionStatus="replaying";let e=this.capturedCommandList.get(this.currentSessionId),r=this.capturedPendingKernels.get(this.currentSessionId),i=e.length;this.pendingKernels=[];for(let a=0;a<i;a++){let i=this.getComputePassEncoder(),n=e[a];this.writeTimestamp(2*this.pendingDispatchNumber),i.setPipeline(n.computePipeline),i.setBindGroup(0,n.bindGroup),i.dispatchWorkgroups(...n.dispatchGroup),this.writeTimestamp(2*this.pendingDispatchNumber+1),this.pendingDispatchNumber++,"none"!==this.queryType&&this.pendingKernels.push(r[a]),(this.pendingDispatchNumber>=this.maxDispatchNumber||"at-passes"===this.queryType)&&this.endComputePass(),this.pendingDispatchNumber>=this.maxDispatchNumber&&this.flush()}this.flush(),this.sessionStatus="default"}onCreateSession(){this.gpuDataManager.onCreateSession()}onReleaseSession(e){this.unregisterBuffers(e),this.capturedCommandList.has(e)&&this.capturedCommandList.delete(e),this.capturedPendingKernels.has(e)&&this.capturedPendingKernels.delete(e),this.gpuDataManager.onReleaseSession(e)}onRunStart(e){this.currentSessionId=e,this.setQueryType()}}}),sW={};ep(sW,{init:()=>sG});var sj,sV,sG,sF,sH,sK,sZ,sX,sQ,sY,sJ,s0,s1,s2,s3,s4,s6,s8,s5,s9,s7,oe,ot,or,oi,oa,on,os,oo,ou,ol,od,op,oc,oh,of=ed(()=>{nD(),nP(),nL(),nj(),sj=class e{constructor(e,r,i,a){this.module=e,this.dataType=r,this.data=i,this.dims=a}getFloat32Array(){if(1!==this.dataType)throw Error("Invalid data type");let e=tg.size(this.dims);return 0===e?new Float32Array:new Float32Array(this.module.HEAP8.buffer,this.data,e)}getBigInt64Array(){if(7!==this.dataType)throw Error("Invalid data type");let e=tg.size(this.dims);return 0===e?new BigInt64Array:new BigInt64Array(this.module.HEAP8.buffer,this.data,e)}getInt32Array(){if(6!==this.dataType)throw Error("Invalid data type");let e=tg.size(this.dims);return 0===e?new Int32Array:new Int32Array(this.module.HEAP8.buffer,this.data,e)}getUint16Array(){if(10!==this.dataType&&4!==this.dataType)throw Error("Invalid data type");let e=tg.size(this.dims);return 0===e?new Uint16Array:new Uint16Array(this.module.HEAP8.buffer,this.data,e)}reshape(r){if(tg.size(r)!==tg.size(this.dims))throw Error("Invalid new shape");return new e(this.module,this.dataType,this.data,r)}},sV=class{constructor(e,r,i){this.module=e,this.backend=r,this.customDataOffset=0,this.customDataSize=0,this.adapterInfo=r.adapterInfo;let a=e.PTR_SIZE,n=i/e.PTR_SIZE,s=4===a?"i32":"i64";this.opKernelContext=Number(e.getValue(a*n++,s));let o=Number(e.getValue(a*n++,s));this.outputCount=Number(e.getValue(a*n++,s)),this.customDataOffset=Number(e.getValue(a*n++,"*")),this.customDataSize=Number(e.getValue(a*n++,s));let u=[];for(let r=0;r<o;r++){let r=Number(e.getValue(a*n++,s)),i=Number(e.getValue(a*n++,"*")),o=Number(e.getValue(a*n++,s)),l=[];for(let r=0;r<o;r++)l.push(Number(e.getValue(a*n++,s)));u.push(new sj(e,r,i,l))}this.inputs=u}get kernelCustomData(){return this.backend.currentKernelCustomData}get customDataBuffer(){return this.module.HEAPU8.subarray(this.customDataOffset,this.customDataOffset+this.customDataSize)}compute(e,r){let i=r?.inputs?.map(e=>"number"==typeof e?this.inputs[e]:e)??this.inputs,a=r?.outputs??[],n=(e,r,i)=>new sj(this.module,r,this.output(e,i),i),s=(e,r)=>{let i=tr(e,r);if(!i)throw Error(`Unsupported data type: ${e}`);let a=i>0?this.backend.gpuDataManager.create(i).id:0;return new sj(this.module,e,a,r)};return this.backend.run(e,i,a,n,s,this.outputCount)}output(e,r){let i=this.module.stackSave();try{let i=this.module.PTR_SIZE,a=4===i?"i32":"i64",n=this.module.stackAlloc((1+r.length)*i);this.module.setValue(n,r.length,a);for(let e=0;e<r.length;e++)this.module.setValue(n+i*(e+1),r[e],a);return this.module._JsepOutput(this.opKernelContext,e,n)}catch(i){throw Error(`Failed to generate kernel's output[${e}] with dims [${r}]. If you are running with pre-allocated output, please make sure the output type/dims are correct. Error: ${i}`)}finally{this.module.stackRestore(i)}}},sG=async(e,r,i,a)=>{let n=r.jsepInit;if(!n)throw Error("Failed to initialize JSEP. The WebAssembly module is not built with JSEP support.");if("webgpu"===e){let e=new(sq(),ec(sU)).WebGpuBackend;await e.initialize(i,a),n("webgpu",[e,r=>e.alloc(Number(r)),r=>e.free(r),(i,a,n,s=!1)=>{if(s)th("verbose",()=>`[WebGPU] jsepCopyGpuToGpu: src=${Number(i)}, dst=${Number(a)}, size=${Number(n)}`),e.memcpy(Number(i),Number(a));else{th("verbose",()=>`[WebGPU] jsepCopyCpuToGpu: dataOffset=${Number(i)}, gpuDataId=${Number(a)}, size=${Number(n)}`);let s=r.HEAPU8.subarray(Number(i>>>0),Number(i>>>0)+Number(n));e.upload(Number(a),s)}},async(i,a,n)=>{th("verbose",()=>`[WebGPU] jsepCopyGpuToCpu: gpuDataId=${i}, dataOffset=${a}, size=${n}`),await e.download(Number(i),()=>r.HEAPU8.subarray(Number(a)>>>0,Number(a+n)>>>0))},(i,a,n)=>e.createKernel(i,Number(a),n,r.UTF8ToString(r._JsepGetNodeName(Number(a)))),r=>e.releaseKernel(r),(i,a,n,s)=>{th("verbose",()=>`[WebGPU] jsepRun: sessionHandle=${n}, kernel=${i}, contextDataOffset=${a}`);let o=new sV(r,e,Number(a));return e.computeKernel(Number(i),o,s)},()=>e.captureBegin(),()=>e.captureEnd(),()=>e.replay()])}else{let e=new tR(i);n("webnn",[e,()=>e.reserveTensorId(),r=>e.releaseTensorId(r),async(r,i,a,n,s)=>e.ensureTensor(r,i,a,n,s),(r,i)=>{e.uploadTensor(r,i)},async(r,i)=>e.downloadTensor(r,i),(r,i)=>e.registerMLContext(r,i),!!i.trace])}}}),om=ed(()=>{eA(),nN(),nB(),nD(),nM(),nR(),nU(),sF=async e=>{var r,i;r=e.wasm.numThreads,i=ta(e.logLevel),0!==e2()._OrtInit(r,i)&&e6("Can't initialize onnxruntime.")},sH=async(e,r)=>{e2().asyncInit?.();let i=e.webgpu.adapter;if("webgpu"===r){if(typeof navigator>"u"||!navigator.gpu)throw Error("WebGPU is not supported in current environment");if(i){if("object"!=typeof i.limits||"object"!=typeof i.features||"function"!=typeof i.requestDevice)throw Error("Invalid GPU adapter set in `env.webgpu.adapter`. It must be a GPUAdapter object.")}else{let r=e.webgpu.powerPreference;if(void 0!==r&&"low-power"!==r&&"high-performance"!==r)throw Error(`Invalid powerPreference setting: "${r}"`);let a=e.webgpu.forceFallbackAdapter;if(void 0!==a&&"boolean"!=typeof a)throw Error(`Invalid forceFallbackAdapter setting: "${a}"`);if(!(i=await navigator.gpu.requestAdapter({powerPreference:r,forceFallbackAdapter:a})))throw Error('Failed to get GPU adapter. You may need to enable flag "--enable-unsafe-webgpu" if you are using Chrome.')}}if("webnn"===r&&(typeof navigator>"u"||!navigator.ml))throw Error("WebNN is not supported in current environment");{let a=(of(),ec(sW)).init;"webgpu"===r&&await a("webgpu",e2(),e,i),"webnn"===r&&await a("webnn",e2(),e)}},sK=new Map,sZ=(e,r)=>{let i=e2(),a=i.stackSave(),n=0;try{let a=i.PTR_SIZE,s=i.stackAlloc(2*a);0!==i._OrtGetInputOutputMetadata(e,r,s,s+a)&&e6("Can't get session input/output metadata.");let o=Number(i.getValue(s,"*"));n=Number(i.getValue(s+a,"*"));let u=i.HEAP32[n/4];if(0===u)return[o,0];let l=i.HEAPU32[n/4+1],d=[];for(let e=0;e<l;e++){let r=Number(i.getValue(n+8+e*a,"*"));d.push(0!==r?i.UTF8ToString(r):Number(i.getValue(n+8+(e+l)*a,"*")))}return[o,u,d]}finally{i.stackRestore(a),0!==n&&i._OrtFree(n)}},sX=e=>{let r=e2(),i=r._malloc(e.byteLength);if(0===i)throw Error(`Can't create a session. failed to allocate a buffer of size ${e.byteLength}.`);return r.HEAPU8.set(e,i),[i,e.byteLength]},sQ=async(e,r)=>{let i,a,n=e2();Array.isArray(e)?[i,a]=e:e.buffer===n.HEAPU8.buffer?[i,a]=[e.byteOffset,e.byteLength]:[i,a]=sX(e);let s=0,o=0,u=0,l=[],d=[],p=[];try{if([o,l]=await e7(r),r?.externalData&&n.mountExternalData){let e=[];for(let i of r.externalData){let r="string"==typeof i?i:i.path;e.push(tu("string"==typeof i?i:i.data).then(e=>{n.mountExternalData(r,e)}))}await Promise.all(e)}for(let e of r?.executionProviders??[])if(("string"==typeof e?e:e.name)==="webnn"){if(n.shouldTransferToMLTensor=!1,"string"!=typeof e){let r=e?.context,i=e?.gpuDevice,a=e?.deviceType,s=e?.powerPreference;r?n.currentContext=r:i?n.currentContext=await n.webnnCreateMLContext(i):n.currentContext=await n.webnnCreateMLContext({deviceType:a,powerPreference:s})}else n.currentContext=await n.webnnCreateMLContext();break}s=await n._OrtCreateSession(i,a,o),n.webgpuOnCreateSession?.(s),0===s&&e6("Can't create a session."),n.jsepOnCreateSession?.(),n.currentContext&&(n.webnnRegisterMLContext(s,n.currentContext),n.currentContext=void 0,n.shouldTransferToMLTensor=!0);let[e,c]=(e=>{let r=e2(),i=r.stackSave();try{let i=r.PTR_SIZE,a=r.stackAlloc(2*i);0!==r._OrtGetInputOutputCount(e,a,a+i)&&e6("Can't get session input/output count.");let n=4===i?"i32":"i64";return[Number(r.getValue(a,n)),Number(r.getValue(a+i,n))]}finally{r.stackRestore(i)}})(s),h=!!r?.enableGraphCapture,f=[],m=[],g=[],y=[],b=[];for(let r=0;r<e;r++){let[e,i,a]=sZ(s,r);0===e&&e6("Can't get an input name."),d.push(e);let o=n.UTF8ToString(e);f.push(o),g.push(0===i?{name:o,isTensor:!1}:{name:o,isTensor:!0,type:tt(i),shape:a})}for(let i=0;i<c;i++){let[a,o,u]=sZ(s,i+e);0===a&&e6("Can't get an output name."),p.push(a);let l=n.UTF8ToString(a);m.push(l),y.push(0===o?{name:l,isTensor:!1}:{name:l,isTensor:!0,type:tt(o),shape:u});{if(h&&r?.preferredOutputLocation===void 0){b.push("gpu-buffer");continue}let e="string"==typeof r?.preferredOutputLocation?r.preferredOutputLocation:r?.preferredOutputLocation?.[l]??"cpu",i=n.webnnIsGraphOutput;if("cpu"===e&&i&&i(s,l)){b.push("ml-tensor-cpu-output");continue}if("cpu"!==e&&"cpu-pinned"!==e&&"gpu-buffer"!==e&&"ml-tensor"!==e)throw Error(`Not supported preferred output location: ${e}.`);if(h&&"gpu-buffer"!==e)throw Error(`Not supported preferred output location: ${e}. Only 'gpu-buffer' location is supported when enableGraphCapture is true.`);b.push(e)}}let _=null;return b.some(e=>"gpu-buffer"===e||"ml-tensor"===e||"ml-tensor-cpu-output"===e)&&(u=n._OrtCreateBinding(s),0===u&&e6("Can't create IO binding."),_={handle:u,outputPreferredLocations:b,outputPreferredLocationsEncoded:b.map(e=>"ml-tensor-cpu-output"===e?"ml-tensor":e).map(e=>to(e))}),sK.set(s,[s,d,p,_,h,!1]),[s,f,m,g,y]}catch(e){throw d.forEach(e=>n._OrtFree(e)),p.forEach(e=>n._OrtFree(e)),0!==u&&0!==n._OrtReleaseBinding(u)&&e6("Can't release IO binding."),0!==s&&0!==n._OrtReleaseSession(s)&&e6("Can't release session."),e}finally{n._free(i),0!==o&&0!==n._OrtReleaseSessionOptions(o)&&e6("Can't release session options."),l.forEach(e=>n._free(e)),n.unmountExternalData?.()}},sY=e=>{let r=e2(),i=sK.get(e);if(!i)throw Error(`cannot release session. invalid session id: ${e}`);let[a,n,s,o,u]=i;o&&(u&&0!==r._OrtClearBoundOutputs(o.handle)&&e6("Can't clear bound outputs."),0!==r._OrtReleaseBinding(o.handle)&&e6("Can't release IO binding.")),r.jsepOnReleaseSession?.(e),r.webnnOnReleaseSession?.(e),r.webgpuOnReleaseSession?.(e),n.forEach(e=>r._OrtFree(e)),s.forEach(e=>r._OrtFree(e)),0!==r._OrtReleaseSession(a)&&e6("Can't release session."),sK.delete(e)},sJ=async(e,r,i,a,n,s,o=!1)=>{if(!e)return void r.push(0);let u=e2(),l=u.PTR_SIZE,d=e[0],p=e[1],c=e[3],h=c,f,m;if("string"===d&&("gpu-buffer"===c||"ml-tensor"===c))throw Error("String tensor is not supported on GPU.");if(o&&"gpu-buffer"!==c)throw Error(`External buffer must be provided for input/output index ${s} when enableGraphCapture is true.`);if("gpu-buffer"===c){let r=e[2].gpuBuffer;m=tr(te(d),p);{let e=u.jsepRegisterBuffer;if(!e)throw Error('Tensor location "gpu-buffer" is not supported without using WebGPU.');f=e(a,s,r,m)}}else if("ml-tensor"===c){let r=e[2].mlTensor;m=tr(te(d),p);let i=u.webnnRegisterMLTensor;if(!i)throw Error('Tensor location "ml-tensor" is not supported without using WebNN.');f=i(a,r,te(d),p)}else{let r=e[2];if(Array.isArray(r)){m=l*r.length,f=u._malloc(m),i.push(f);for(let e=0;e<r.length;e++){if("string"!=typeof r[e])throw TypeError(`tensor data at index ${e} is not a string`);u.setValue(f+e*l,e3(r[e],i),"*")}}else{let e=u.webnnIsGraphInput,s=u.webnnIsGraphOutput;if("string"!==d&&e&&s){let o=u.UTF8ToString(n);if(e(a,o)||s(a,o)){let e=te(d);m=tr(e,p),h="ml-tensor";let i=u.webnnCreateTemporaryTensor,n=u.webnnUploadTensor;if(!i||!n)throw Error('Tensor location "ml-tensor" is not supported without using WebNN.');let s=await i(a,e,p);n(s,new Uint8Array(r.buffer,r.byteOffset,r.byteLength)),f=s}else m=r.byteLength,f=u._malloc(m),i.push(f),u.HEAPU8.set(new Uint8Array(r.buffer,r.byteOffset,m),f)}else m=r.byteLength,f=u._malloc(m),i.push(f),u.HEAPU8.set(new Uint8Array(r.buffer,r.byteOffset,m),f)}}let g=u.stackSave(),y=u.stackAlloc(4*p.length);try{p.forEach((e,r)=>u.setValue(y+r*l,e,4===l?"i32":"i64"));let e=u._OrtCreateTensor(te(d),f,m,y,p.length,to(h));0===e&&e6(`Can't create tensor for input/output. session=${a}, index=${s}.`),r.push(e)}finally{u.stackRestore(g)}},s0=async(e,r,i,a,n,s)=>{let o=e2(),u=o.PTR_SIZE,l=sK.get(e);if(!l)throw Error(`cannot run inference. invalid session id: ${e}`);let d=l[0],p=l[1],c=l[2],h=l[3],f=l[4],m=l[5],g=r.length,y=a.length,b=0,_=[],$=[],v=[],w=[],x=[],k=o.stackSave(),S=o.stackAlloc(g*u),T=o.stackAlloc(g*u),I=o.stackAlloc(y*u),C=o.stackAlloc(y*u);try{let l;[b,_]=e8(s),et("wasm prepareInputOutputTensor");for(let a=0;a<g;a++)await sJ(i[a],$,w,e,p[r[a]],r[a],f);for(let r=0;r<y;r++)await sJ(n[r],v,w,e,c[a[r]],g+a[r],f);er("wasm prepareInputOutputTensor");for(let e=0;e<g;e++)o.setValue(S+e*u,$[e],"*"),o.setValue(T+e*u,p[r[e]],"*");for(let e=0;e<y;e++)o.setValue(I+e*u,v[e],"*"),o.setValue(C+e*u,c[a[e]],"*");if(h&&!m){let{handle:i,outputPreferredLocations:s,outputPreferredLocationsEncoded:u}=h;if(p.length!==g)throw Error(`input count from feeds (${g}) is expected to be always equal to model's input count (${p.length}).`);et("wasm bindInputsOutputs");for(let a=0;a<g;a++){let n=r[a];await o._OrtBindInput(i,p[n],$[a])!==0&&e6(`Can't bind input[${a}] for session=${e}.`)}for(let r=0;r<y;r++){let l=a[r];n[r]?.[3]?(x.push(v[r]),0!==o._OrtBindOutput(i,c[l],v[r],0)&&e6(`Can't bind pre-allocated output[${r}] for session=${e}.`)):0!==o._OrtBindOutput(i,c[l],0,u[l])&&e6(`Can't bind output[${r}] to ${s[r]} for session=${e}.`)}er("wasm bindInputsOutputs"),sK.set(e,[d,p,c,h,f,!0])}o.jsepOnRunStart?.(d),o.webnnOnRunStart?.(d),l=h?await o._OrtRunWithBinding(d,h.handle,y,I,b):await o._OrtRun(d,T,S,g,C,y,I,b),0!==l&&e6("failed to call OrtRun().");let k=[],E=[];et("wasm ProcessOutputTensor");for(let r=0;r<y;r++){let i=Number(o.getValue(I+r*u,"*"));if(i===v[r]||x.includes(v[r])){k.push(n[r]),i!==v[r]&&0!==o._OrtReleaseTensor(i)&&e6("Can't release tensor.");continue}let s=o.stackSave(),l=o.stackAlloc(4*u),d=!1,p,c=0;try{0!==o._OrtGetTensorData(i,l,l+u,l+2*u,l+3*u)&&e6(`Can't access output tensor data on index ${r}.`);let n=4===u?"i32":"i64",s=Number(o.getValue(l,n));c=o.getValue(l+u,"*");let f=o.getValue(l+2*u,"*"),m=Number(o.getValue(l+3*u,n)),g=[];for(let e=0;e<m;e++)g.push(Number(o.getValue(f+e*u,n)));0!==o._OrtFree(f)&&e6("Can't free memory for tensor dims.");let y=g.reduce((e,r)=>e*r,1);p=tt(s);let b=h?.outputPreferredLocations[a[r]];if("string"===p){if("gpu-buffer"===b||"ml-tensor"===b)throw Error("String tensor is not supported on GPU.");let e=[];for(let r=0;r<y;r++){let i=o.getValue(c+r*u,"*"),a=o.getValue(c+(r+1)*u,"*"),n=r===y-1?void 0:a-i;e.push(o.UTF8ToString(i,n))}k.push([p,g,e,"cpu"])}else if("gpu-buffer"===b&&y>0){let e=o.jsepGetBuffer;if(!e)throw Error('preferredLocation "gpu-buffer" is not supported without using WebGPU.');let r=e(c),a=tr(s,y);if(void 0===a||!tn(p))throw Error(`Unsupported data type: ${p}`);d=!0,k.push([p,g,{gpuBuffer:r,download:o.jsepCreateDownloader(r,a,p),dispose:()=>{0!==o._OrtReleaseTensor(i)&&e6("Can't release tensor.")}},"gpu-buffer"])}else if("ml-tensor"===b&&y>0){let r=o.webnnEnsureTensor,a=o.webnnIsGraphInputOutputTypeSupported;if(!r||!a)throw Error('preferredLocation "ml-tensor" is not supported without using WebNN.');if(void 0===tr(s,y)||!ts(p))throw Error(`Unsupported data type: ${p}`);if(!a(e,p,!1))throw Error(`preferredLocation "ml-tensor" for ${p} output is not supported by current WebNN Context.`);let n=await r(e,c,s,g,!1);d=!0,k.push([p,g,{mlTensor:n,download:o.webnnCreateMLTensorDownloader(c,p),dispose:()=>{o.webnnReleaseTensorId(c),o._OrtReleaseTensor(i)}},"ml-tensor"])}else if("ml-tensor-cpu-output"===b&&y>0){let e=o.webnnCreateMLTensorDownloader(c,p)(),r=k.length;d=!0,E.push((async()=>{let a=[r,await e];return o.webnnReleaseTensorId(c),o._OrtReleaseTensor(i),a})()),k.push([p,g,[],"cpu"])}else{let e=new(ti(p))(y);new Uint8Array(e.buffer,e.byteOffset,e.byteLength).set(o.HEAPU8.subarray(c,c+e.byteLength)),k.push([p,g,e,"cpu"])}}finally{o.stackRestore(s),"string"===p&&c&&o._free(c),d||o._OrtReleaseTensor(i)}}for(let[r,i]of(h&&!f&&(0!==o._OrtClearBoundOutputs(h.handle)&&e6("Can't clear bound outputs."),sK.set(e,[d,p,c,h,f,!1])),await Promise.all(E)))k[r][2]=i;return er("wasm ProcessOutputTensor"),k}finally{o.webnnOnRunEnd?.(d),o.stackRestore(k),$.forEach(e=>o._OrtReleaseTensor(e)),v.forEach(e=>o._OrtReleaseTensor(e)),w.forEach(e=>o._free(e)),0!==b&&o._OrtReleaseRunOptions(b),_.forEach(e=>o._free(e))}},s1=e=>{let r=e2(),i=sK.get(e);if(!i)throw Error("invalid session id");let a=i[0],n=r._OrtEndProfiling(a);0===n&&e6("Can't get an profile file name."),r._OrtFree(n)},s2=e=>{let r=[];for(let i of e){let e=i[2];!Array.isArray(e)&&"buffer"in e&&r.push(e.buffer)}return r}}),og=ed(()=>{eA(),om(),nM(),nO(),s3=()=>!!R.wasm.proxy&&"u">typeof document,s6=!1,s8=!1,s5=!1,oe=new Map,ot=(e,r)=>{let i=oe.get(e);i?i.push(r):oe.set(e,[r])},or=()=>{if(s6||!s8||s5||!s4)throw Error("worker not ready")},oi=e=>{switch(e.data.type){case"init-wasm":s6=!1,e.data.err?(s5=!0,s7[1](e.data.err)):(s8=!0,s7[0]()),s9&&(URL.revokeObjectURL(s9),s9=void 0);break;case"init-ep":case"copy-from":case"create":case"release":case"run":case"end-profiling":{let r=oe.get(e.data.type);e.data.err?r.shift()[1](e.data.err):r.shift()[0](e.data.out)}}},oa=async()=>{if(!s8){if(s6)throw Error("multiple calls to 'initWasm()' detected.");if(s5)throw Error("previous call to 'initWasm()' failed.");if(s6=!0,s3())return new Promise((r,i)=>{s4?.terminate(),eK().then(([a,n])=>{try{(s4=n).onerror=e=>i(e),s4.onmessage=oi,s7=[r,i];let s={type:"init-wasm",in:R};!s.in.wasm.wasmPaths&&(a||eq)&&(s.in.wasm.wasmPaths={wasm:new e.U(e.r(3789)).href}),s4.postMessage(s),s9=a}catch(e){i(e)}},i)});try{await e1(R.wasm),await sF(R),s8=!0}catch(e){throw s5=!0,e}finally{s6=!1}}},on=async e=>{if(s3())return or(),new Promise((r,i)=>{ot("init-ep",[r,i]);let a={type:"init-ep",in:{epName:e,env:R}};s4.postMessage(a)});await sH(R,e)},os=async e=>s3()?(or(),new Promise((r,i)=>{ot("copy-from",[r,i]),s4.postMessage({type:"copy-from",in:{buffer:e}},[e.buffer])})):sX(e),oo=async(e,r)=>{if(!s3())return sQ(e,r);if(r?.preferredOutputLocation)throw Error('session option "preferredOutputLocation" is not supported for proxy.');return or(),new Promise((i,a)=>{ot("create",[i,a]);let n={type:"create",in:{model:e,options:{...r}}},s=[];e instanceof Uint8Array&&s.push(e.buffer),s4.postMessage(n,s)})},ou=async e=>{if(s3())return or(),new Promise((r,i)=>{ot("release",[r,i]),s4.postMessage({type:"release",in:e})});sY(e)},ol=async(e,r,i,a,n,s)=>{if(!s3())return s0(e,r,i,a,n,s);if(i.some(e=>"cpu"!==e[3]))throw Error("input tensor on GPU is not supported for proxy.");if(n.some(e=>e))throw Error("pre-allocated output tensor is not supported for proxy.");return or(),new Promise((n,o)=>{ot("run",[n,o]),s4.postMessage({type:"run",in:{sessionId:e,inputIndices:r,inputs:i,outputIndices:a,options:s}},s2(i))})},od=async e=>{if(s3())return or(),new Promise((r,i)=>{ot("end-profiling",[r,i]),s4.postMessage({type:"end-profiling",in:e})});s1(e)}}),oy=ed(()=>{eA(),og(),nD(),eO(),nU(),op=(e,r)=>{switch(e.location){case"cpu":return[e.type,e.dims,e.data,"cpu"];case"gpu-buffer":return[e.type,e.dims,{gpuBuffer:e.gpuBuffer},"gpu-buffer"];case"ml-tensor":return[e.type,e.dims,{mlTensor:e.mlTensor},"ml-tensor"];default:throw Error(`invalid data location: ${e.location} for ${r()}`)}},oc=e=>{switch(e[3]){case"cpu":return new X(e[0],e[2],e[1]);case"gpu-buffer":{let r=e[0];if(!tn(r))throw Error(`not supported data type: ${r} for deserializing GPU tensor`);let{gpuBuffer:i,download:a,dispose:n}=e[2];return X.fromGpuBuffer(i,{dataType:r,dims:e[1],download:a,dispose:n})}case"ml-tensor":{let r=e[0];if(!ts(r))throw Error(`not supported data type: ${r} for deserializing MLTensor tensor`);let{mlTensor:i,download:a,dispose:n}=e[2];return X.fromMLTensor(i,{dataType:r,dims:e[1],download:a,dispose:n})}default:throw Error(`invalid data location: ${e[3]}`)}},oh=class{async fetchModelAndCopyToWasmMemory(e){return os(await tu(e))}async loadModel(e,r){let i;J(),i="string"==typeof e?await this.fetchModelAndCopyToWasmMemory(e):e,[this.sessionId,this.inputNames,this.outputNames,this.inputMetadata,this.outputMetadata]=await oo(i,r),ee()}async dispose(){return ou(this.sessionId)}async run(e,r,i){J();let a=[],n=[];Object.entries(e).forEach(e=>{let r=e[0],i=e[1],s=this.inputNames.indexOf(r);if(-1===s)throw Error(`invalid input '${r}'`);a.push(i),n.push(s)});let s=[],o=[];Object.entries(r).forEach(e=>{let r=e[0],i=e[1],a=this.outputNames.indexOf(r);if(-1===a)throw Error(`invalid output '${r}'`);s.push(i),o.push(a)});let u=a.map((e,r)=>op(e,()=>`input "${this.inputNames[n[r]]}"`)),l=s.map((e,r)=>e?op(e,()=>`output "${this.outputNames[o[r]]}"`):null),d=await ol(this.sessionId,n,u,o,l,i),p={};for(let e=0;e<d.length;e++)p[this.outputNames[o[e]]]=s[e]??oc(d[e]);return ee(),p}startProfiling(){}endProfiling(){od(this.sessionId)}}}),ob={};ep(ob,{OnnxruntimeWebAssemblyBackend:()=>o$,initializeFlags:()=>o_,wasmBackend:()=>ov});var o_,o$,ov,ow=ed(()=>{eA(),og(),oy(),o_=()=>{("number"!=typeof R.wasm.initTimeout||R.wasm.initTimeout<0)&&(R.wasm.initTimeout=0);let e=R.wasm.simd;if("boolean"!=typeof e&&void 0!==e&&"fixed"!==e&&"relaxed"!==e&&(console.warn(`Property "env.wasm.simd" is set to unknown value "${e}". Reset it to \`false\` and ignore SIMD feature checking.`),R.wasm.simd=!1),"boolean"!=typeof R.wasm.proxy&&(R.wasm.proxy=!1),"boolean"!=typeof R.wasm.trace&&(R.wasm.trace=!1),"number"!=typeof R.wasm.numThreads||!Number.isInteger(R.wasm.numThreads)||R.wasm.numThreads<=0)if("u">typeof self&&!self.crossOriginIsolated)R.wasm.numThreads=1;else{let e=typeof navigator>"u"?el("node:os").cpus().length:navigator.hardwareConcurrency;R.wasm.numThreads=Math.min(4,Math.ceil((e||1)/2))}},ov=new(o$=class{async init(e){o_(),await oa(),await on(e)}async createInferenceSessionHandler(e,r){let i=new oh;return await i.loadModel(e,r),i}})});eA(),eA(),eA();{let e=(ow(),ec(ob)).wasmBackend;C("webgpu",e,5),C("webnn",e,5),C("cpu",e,10),C("wasm",e,10)}Object.defineProperty(R.versions,"web",{value:"1.26.0",enumerable:!0});let ox=[.1,.2],ok=!1;class oS{retinaFaceSession=null;miniFASSession=null;anchors=[];stabilityCounter=0;async loadModels({includeLiveness:e=!0}={}){ok||(R.logLevel="fatal",R.wasm.wasmPaths="/ort/",R.wasm.numThreads=1,ok=!0),this.anchors=this.generateAnchors(640);let r={executionProviders:["wasm"],graphOptimizationLevel:"all"};this.retinaFaceSession=await ea.create("/models/liveness/Widerface-RetinaFace.onnx",r),e&&(this.miniFASSession=await ea.create("/models/liveness/2.7_80x80_MiniFASNetV2_Fixed.onnx",r))}async processFaceFrame(e){if(!this.retinaFaceSession)throw Error("Face detection model is not loaded.");let r=await this.detectFaces(e);return 0===r.length?null:{bbox:r.reduce((e,r)=>this.boxArea(r)>this.boxArea(e)?r:e)}}async processFrame(e){if(!this.retinaFaceSession||!this.miniFASSession)throw Error("Face liveness models are not loaded.");let r=await this.processFaceFrame(e);if(!r)return this.stabilityCounter=0,null;let i=r.bbox,a=await this.checkLivenessRaw(e,i),n="FAKE",s=!1;return a.isRealRaw?(this.stabilityCounter++,this.stabilityCounter>=4?(n="REAL",s=!0,this.stabilityCounter=5):n="VERIFYING..."):this.stabilityCounter=0,{bbox:i,liveness:{isRealRaw:a.isRealRaw,isReal:s,label:n,confidence:a.confidence,stabilityScore:Math.min(this.stabilityCounter,4),probabilities:a.probabilities}}}boxArea(e){return Math.max(0,e[2]-e[0])*Math.max(0,e[3]-e[1])}async detectFaces(e){if(!this.retinaFaceSession)return[];let r=this.preprocessRetinaFace(e),i={[this.retinaFaceSession.inputNames[0]]:r},a=await this.retinaFaceSession.run(i),{loc:n,conf:s}=this.extractRetinaFaceOutput(a);return n&&s?this.postProcessRetinaFace(n,s,this.anchors,e.videoWidth,e.videoHeight):[]}async checkLivenessRaw(e,r){if(!this.miniFASSession)throw Error("MiniFASNet session is not loaded.");let i=this.cropFace(e,r,80),a=this.preprocessMiniFASNet(i),n={[this.miniFASSession.inputNames[0]]:a},s=(await this.miniFASSession.run(n))[this.miniFASSession.outputNames[0]].data,o=s[0]??-999,u=s[1]??-999,l=s[2]??-999,d=Math.max(o,u,l),p=Math.exp(o-d),c=Math.exp(u-d),h=Math.exp(l-d),f=p+c+h,m=p/f,g=c/f,y=h/f,b=0,_=m;return g>_&&(b=1,_=g),y>_&&(b=2,_=y),{isRealRaw:1===b&&_>.62,rawLabel:1===b?"REAL":"FAKE",confidence:_,probabilities:{fakePrint:m,real:g,fakeScreen:y}}}preprocessMiniFASNet(e){let{data:r}=e,i=6400,a=new Float32Array(19200);for(let e=0;e<i;e++){let n=r[4*e],s=r[4*e+1],o=r[4*e+2];a[e]=o,a[e+i]=s,a[e+2*i]=n}return new X("float32",a,[1,3,80,80])}preprocessRetinaFace(e){let r=document.createElement("canvas");r.width=640,r.height=640;let i=r.getContext("2d");if(!i)throw Error("Unable to create canvas context.");i.drawImage(e,0,0,640,640);let{data:a}=i.getImageData(0,0,640,640),n=new Float32Array(1228800);for(let e=0;e<409600;e++){let r=a[4*e],i=a[4*e+1],s=a[4*e+2];n[e]=s-104,n[e+409600]=i-117,n[e+819200]=r-123}return new X("float32",n,[1,3,640,640])}cropFace(e,r,i){let[a,n,s,o]=r,u=s-a,l=o-n,d=1.5*u,p=1.5*l,c=a+u/2-d/2,h=n+l/2-p/2,f=Math.max(0,c),m=Math.max(0,h),g=Math.min(e.videoWidth-f,d-(f-c)),y=Math.min(e.videoHeight-m,p-(m-h));if(g<=0||y<=0)return new ImageData(i,i);let b=document.createElement("canvas");b.width=g,b.height=y;let _=b.getContext("2d");if(!_)return new ImageData(i,i);_.translate(g,0),_.scale(-1,1),_.drawImage(e,f,m,g,y,0,0,g,y);let $=g,v=y;for(;$>2*i;){let e=Math.floor(.5*$),r=Math.floor(.5*v),i=document.createElement("canvas");i.width=e,i.height=r;let a=i.getContext("2d");if(!a)break;a.drawImage(b,0,0,$,v,0,0,e,r),b=i,$=e,v=r}let w=document.createElement("canvas");w.width=i,w.height=i;let x=w.getContext("2d");return x?(x.filter="blur(0.5px)",x.fillStyle="black",x.fillRect(0,0,i,i),x.drawImage(b,0,0,$,v,0,0,i,i),x.getImageData(0,0,i,i)):new ImageData(i,i)}generateAnchors(e){let r=[[16,32],[64,128],[256,512]],i=[8,16,32],a=[];return[[Math.ceil(e/8),Math.ceil(e/8)],[Math.ceil(e/16),Math.ceil(e/16)],[Math.ceil(e/32),Math.ceil(e/32)]].forEach((n,s)=>{let o=i[s];for(let i=0;i<n[0];i++)for(let u=0;u<n[1];u++)for(let n of r[s])a.push([(u+.5)*o/e,(i+.5)*o/e,n/e,n/e])}),a}extractRetinaFaceOutput(e){let r=new Float32Array(67200),i=new Float32Array(33600),a=0;for(let n of[8,16,32]){let s=640/n,o=s*s*2,u=null,l=null;for(let r in e){let i=e[r];if(!("dims"in i)||!("data"in i))continue;let a=i.dims;a[2]===s&&a[3]===s&&(8===a[1]&&(u=i.data),4===a[1]&&(l=i.data))}if(!u||!l){a+=o;continue}for(let e=0;e<s;e++)for(let n=0;n<s;n++)for(let o=0;o<2;o++){let d=a+(e*s+n)*2+o;for(let i=0;i<4;i++){let a=4*o+i;r[4*d+i]=u[s*s*a+e*s+n]}for(let r=0;r<2;r++){let a=2*o+r;i[2*d+r]=l[s*s*a+e*s+n]}}a+=o}return{loc:r,conf:i}}postProcessRetinaFace(e,r,i,a,n){let s=[],[o,u]=ox;for(let l=0;l<i.length;l++){let d=r[2*l+1];if(d<=.45)continue;let p=i[l],c=e[4*l],h=e[4*l+1],f=e[4*l+2],m=e[4*l+3],g=p[0]+c*o*p[2],y=p[1]+h*o*p[3],b=p[2]*Math.exp(f*u),_=p[3]*Math.exp(m*u),$=(g-b/2)*a,v=(y-_/2)*n,w=(g+b/2)*a,x=(y+_/2)*n;s.push([$,v,w,x,d])}return this.nms(s,.4)}nms(e,r){if(0===e.length)return[];e.sort((e,r)=>r[4]-e[4]);let i=[],a=Array(e.length).fill(!0);for(let n=0;n<e.length;n++){if(!a[n])continue;let s=e[n];i.push(s);for(let i=n+1;i<e.length;i++){if(!a[i])continue;let n=e[i],o=Math.max(s[0],n[0]),u=Math.max(s[1],n[1]),l=Math.max(0,Math.min(s[2],n[2])-o)*Math.max(0,Math.min(s[3],n[3])-u),d=this.boxArea(s)+this.boxArea(n)-l;d>0&&l/d>r&&(a[i]=!1)}}return i}}var oT=e.i(27140),oI=e.i(86392),oC=e.i(59538),oE=e.i(20617);let oz={cx:640,cy:300,rx:190,ry:225,minFace:.15,maxScale:1.8,centerTolerance:1.05,shoulderWidth:1.35},oA={cx:640,cy:330,rx:250,ry:300,minFace:.13,maxScale:2.75,centerTolerance:1.22,shoulderWidth:1.75},oO=[{facingMode:{ideal:"user"}},{facingMode:"user"},{}];function oM(e){let r=e?.video,i=e?.stream?.getVideoTracks()[0];return!!(r&&r.readyState>=HTMLMediaElement.HAVE_CURRENT_DATA&&r.videoWidth>0&&r.videoHeight>0&&i&&"live"===i.readyState&&i.enabled&&!i.muted)}function oR(e){try{let r=document.createElement("canvas");r.width=32,r.height=32;let i=r.getContext("2d",{willReadFrequently:!0});if(!i)return!1;i.drawImage(e,0,0,r.width,r.height);let a=i.getImageData(0,0,r.width,r.height).data,n=0;for(let e=0;e<a.length;e+=4)a[e]+a[e+1]+a[e+2]>24&&n++;return n/(a.length/4)>.02}catch{return!1}}function oN(){let[e,a]=(0,i.useState)("verifying"),[s,o]=(0,i.useState)(!1),[p,c]=(0,i.useState)(!1),[g,y]=(0,i.useState)(null),[b,_]=(0,i.useState)(!1),[$,v]=(0,i.useState)(!1);(0,i.useEffect)(()=>{let e=()=>c(window.innerWidth<768);return e(),window.addEventListener("resize",e),()=>window.removeEventListener("resize",e)},[]);let k=(0,i.useRef)(null),S=(0,i.useRef)(null),T=(0,w.useRouter)(),{faceBlob:I,kodeTiket:C,clearVerification:E,setFaceBlob:z}=(0,x.useVerification)(),A=(0,x.useVerificationGuard)("face"),{handleSubmitWithFaceBlob:O,handleErrorClose:M}=(0,oE.useHandleSubmit)({faceBlob:I,kodeTiket:C,errorMsg:g,setErrorMsg:y,setSubmitting:_,submitBiometricData:oI.submitBiometricData,getApiErrorMessage:oI.getApiErrorMessage}),R=(0,i.useCallback)(()=>{k.current?.stream?.getTracks().forEach(e=>e.stop()),E(),T.push("/verification/ticket")},[E,T]),N=(0,i.useCallback)(()=>{if(!k.current||b)return;if(!s||!oM(k.current)){o(!1),y("Kamera tidak aktif. Pastikan wajah terlihat lalu coba lagi.");return}let e=k.current.video;if(!e||!oR(e)){o(!1),y("Tampilan kamera tidak terlihat. Silakan coba lagi.");return}let r=e.videoWidth,i=e.videoHeight,n=k.current.getScreenshot({width:r,height:i});if(!n){o(!1),y("Foto wajah gagal diambil. Pastikan kamera aktif lalu coba lagi.");return}let u=function(e){let r=e.split(","),i=r[0].match(/:(.*?);/)?.[1]||"image/jpeg",a=atob(r[1]),n=new Uint8Array(a.length);for(let e=0;e<a.length;e++)n[e]=a.charCodeAt(e);return new Blob([n],{type:i})}(n);S.current=u,z(u),k.current.stream?.getTracks().forEach(e=>e.stop()),a("success")},[s,y,z,b]),B=(0,i.useCallback)(async()=>{let e=S.current??I;e?await O(e):y("Data wajah belum tersedia. Silakan ambil foto kembali.")},[I,O,y]);return A?(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(oT.default,{}),(0,r.jsx)(oC.Modal,{open:!!g,onClose:R,title:"Registrasi Gagal",description:g}),(0,r.jsx)("div",{className:"space-y-6",children:(0,r.jsxs)("div",{className:"bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden",children:[(0,r.jsxs)("div",{className:"relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2",children:[(0,r.jsxs)("div",{className:"flex items-center gap-2 min-w-0",children:[(0,r.jsx)(d,{className:"w-5 h-5 text-[#3b5bdb] shrink-0"}),(0,r.jsx)("span",{className:"font-semibold text-[#1e2a4a] truncate",children:"Pendaftaran Wajah"})]}),(0,r.jsx)("span",{className:`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${"success"===e?"text-emerald-600 bg-emerald-50 border-emerald-200":"text-[#3b5bdb] bg-blue-50 border-blue-200"}`,children:"success"===e?"Konfirmasi":"Langkah 2 dari 2"})]}),(0,r.jsxs)("div",{className:"px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center",children:["failed"===e&&(0,r.jsx)(oB,{}),"success"===e&&(0,r.jsx)(oD,{faceBlob:S.current??I,isMobile:p,tncAccepted:$,setTncAccepted:v}),"verifying"===e&&(0,r.jsx)(oU,{webcamRef:k,faceInFrame:s,setFaceInFrame:o,onCapture:N,onBackToTicket:R,isMobile:p,submitting:b})]}),(0,r.jsxs)("div",{className:"px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between",children:["failed"===e&&(0,r.jsxs)("button",{onClick:()=>a("verifying"),className:"inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors",children:[(0,r.jsx)(u.RefreshCw,{className:"w-4 h-4"}),"Ulangi"]}),"verifying"===e&&(0,r.jsxs)(r.Fragment,{children:[(0,r.jsxs)("button",{disabled:b,onClick:R,className:`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${b?"opacity-60 cursor-not-allowed":""}`,children:[(0,r.jsx)(l.ArrowLeft,{className:"w-4 h-4"}),"Kembali"]}),!p&&(0,r.jsxs)("button",{disabled:!s||b,onClick:N,className:`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${s&&!b?"bg-[#3b5bdb] hover:bg-[#3451c5]":"bg-gray-300 cursor-not-allowed"}`,children:[b?(0,r.jsx)(h.Loader2,{className:"w-4 h-4 animate-spin"}):(0,r.jsx)(n.Camera,{className:"w-4 h-4"}),b?"Mengirim...":"Ambil Foto"]})]}),"success"===e&&(0,r.jsxs)("div",{className:"flex w-full flex-wrap items-center justify-between gap-3",children:[(0,r.jsxs)("button",{type:"button",disabled:b,onClick:R,className:`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${b?"cursor-not-allowed opacity-60":""}`,children:[(0,r.jsx)(f,{className:"h-4 w-4"}),"Batal"]}),(0,r.jsxs)("button",{type:"button",disabled:b||!$,onClick:B,className:`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${b||!$?"cursor-not-allowed opacity-70":""}`,children:[b?(0,r.jsx)(h.Loader2,{className:"h-4 w-4 animate-spin"}):(0,r.jsx)(m,{className:"h-4 w-4"}),b?"Mengirim...":"Kirim"]})]})]})]})})]}):null}function oB(){return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)("div",{className:"relative mb-6",children:(0,r.jsx)("div",{className:"w-24 h-24 rounded-full bg-red-50 flex items-center justify-center",children:(0,r.jsx)("div",{className:"w-16 h-16 rounded-full bg-red-100 flex items-center justify-center",children:(0,r.jsx)(a.AlertCircle,{className:"w-10 h-10 text-red-500"})})})}),(0,r.jsx)("h2",{className:"text-xl font-bold text-[#1e2a4a] mb-2",children:"Verifikasi Gagal"}),(0,r.jsx)("p",{className:"text-gray-500 text-sm max-w-md mb-6",children:"Kami tidak dapat memverifikasi wajah Anda. Mohon periksa kembali kondisi pengambilan foto berikut:"}),(0,r.jsxs)("div",{className:"bg-red-50 border border-red-100 rounded-xl px-6 py-5 w-full max-w-md text-left space-y-4",children:[(0,r.jsxs)("div",{className:"flex items-start gap-3",children:[(0,r.jsx)(p.XCircle,{className:"w-5 h-5 text-red-500 mt-0.5 shrink-0"}),(0,r.jsxs)("div",{children:[(0,r.jsx)("p",{className:"font-semibold text-red-600 text-sm",children:"Pencahayaan kurang terang"}),(0,r.jsx)("p",{className:"text-gray-500 text-xs mt-0.5",children:"Pastikan wajah tersinari dengan baik."})]})]}),(0,r.jsxs)("div",{className:"flex items-start gap-3",children:[(0,r.jsx)(p.XCircle,{className:"w-5 h-5 text-red-500 mt-0.5 shrink-0"}),(0,r.jsxs)("div",{children:[(0,r.jsx)("p",{className:"font-semibold text-red-600 text-sm",children:"Wajah tidak terdeteksi sepenuhnya"}),(0,r.jsx)("p",{className:"text-gray-500 text-xs mt-0.5",children:"Lepaskan masker atau kacamata hitam."})]})]}),(0,r.jsxs)("div",{className:"flex items-start gap-3",children:[(0,r.jsx)(p.XCircle,{className:"w-5 h-5 text-red-500 mt-0.5 shrink-0"}),(0,r.jsxs)("div",{children:[(0,r.jsx)("p",{className:"font-semibold text-red-600 text-sm",children:"Posisi wajah miring"}),(0,r.jsx)("p",{className:"text-gray-500 text-xs mt-0.5",children:"Harap pandangan lurus ke depan."})]})]})]})]})}function oD({faceBlob:e,isMobile:a,tncAccepted:n,setTncAccepted:s}){let[u,l]=(0,i.useState)(null);return(0,i.useEffect)(()=>{if(!e)return void l(null);let r=URL.createObjectURL(e);return l(r),()=>URL.revokeObjectURL(r)},[e]),(0,r.jsxs)("div",{className:"flex w-full flex-col items-center mx-auto",children:[(0,r.jsxs)("div",{className:"w-full mb-6 text-left",children:[(0,r.jsxs)("div",{className:"flex items-center gap-2 mb-3",children:[(0,r.jsx)(o,{className:"h-5 w-5 text-[#3b5bdb]"}),(0,r.jsx)("h2",{className:"text-base font-bold text-[#1e2a4a]",children:"Syarat & Ketentuan Pendaftaran Face ID"})]}),(0,r.jsx)("p",{className:"mb-4 text-sm leading-relaxed text-gray-600 font-medium",children:"Dengan melakukan registrasi Face ID, saya menyatakan telah membaca, memahami, dan menyetujui ketentuan berikut:"}),(0,r.jsx)("div",{className:"flex flex-col space-y-3 text-sm leading-relaxed text-gray-600",children:["Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.","Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.","Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Jomlo Fest.","Tiket dengan Face ID yang telah terdaftar tidak dapat digunakan oleh orang lain.","Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku."].map((e,i)=>(0,r.jsxs)("div",{className:"flex items-start gap-2",children:[(0,r.jsxs)("span",{className:"font-semibold w-4 shrink-0 text-right",children:[i+1,"."]}),(0,r.jsx)("p",{children:e})]},i))}),(0,r.jsxs)("div",{className:"mt-4 flex items-center gap-2",children:[(0,r.jsx)("input",{type:"checkbox",id:"tnc",className:"peer size-4 shrink-0 cursor-pointer rounded-lg border border-gray-900 shadow-xs transition-shadow outline-none focus-visible:ring-[3px] focus-visible:ring-[#3b5bdb]/50 disabled:cursor-not-allowed disabled:opacity-50 accent-[#3b5bdb]",checked:n,onChange:e=>s(e.target.checked)}),(0,r.jsx)("label",{htmlFor:"tnc",className:"text-sm font-bold leading-relaxed text-[#1e2a4a] cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70",children:"Saya telah membaca dan menyetujui syarat & ketentuan di atas."})]})]}),u?(0,r.jsxs)(k.Dialog,{children:[(0,r.jsx)(k.DialogTrigger,{asChild:!0,children:(0,r.jsxs)("button",{type:"button",className:"inline-flex items-center justify-center gap-2 rounded-xl bg-[#3b5bdb] px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#3451c5] active:scale-95",children:[(0,r.jsx)(g,{className:"h-4 w-4"}),(0,r.jsx)("span",{children:"Lihat Hasil Capture Wajah"})]})}),(0,r.jsxs)(k.DialogContent,{className:"border-0 bg-transparent p-0 shadow-none",showCloseButton:!1,children:[(0,r.jsx)(k.DialogHeader,{className:"sr-only",children:(0,r.jsx)(k.DialogTitle,{children:"Preview Foto Wajah"})}),(0,r.jsxs)("div",{className:"relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl bg-gray-950 aspect-3/4 sm:aspect-video ring-1 ring-white/10 shadow-2xl animate-in zoom-in-95 duration-300",children:[(0,r.jsx)("img",{src:u,alt:"Preview",className:"absolute inset-0 block h-full w-full object-cover scale-x-[-1]"}),(0,r.jsxs)(k.DialogClose,{className:"absolute right-4 top-4 z-50 flex aspect-square h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 p-0 text-white backdrop-blur-md transition-all hover:bg-black/70 focus:outline-none active:scale-95",children:[(0,r.jsx)(y.X,{className:"h-5 w-5"}),(0,r.jsx)("span",{className:"sr-only",children:"Tutup preview"})]})]})]})]}):(0,r.jsx)("div",{className:"flex w-full items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-8 text-xs text-gray-500",children:"Preview tidak tersedia."})]})}function oU({webcamRef:e,faceInFrame:a,setFaceInFrame:s,onCapture:o,onBackToTicket:d,isMobile:p,submitting:c}){let[f,m]=(0,i.useState)("loading"),[g,y]=(0,i.useState)(null),[b,_]=(0,i.useState)(0),[$,w]=(0,i.useState)(0),[x,k]=(0,i.useState)(!0),[S,T]=(0,i.useState)(oz),I=(0,i.useRef)(oz),C=(0,i.useRef)(null),E=(0,i.useRef)(!1),z=(0,i.useRef)(!1),A=(0,i.useRef)(!1),[O,M]=(0,i.useState)(null),[R,N]=(0,i.useState)(!1),[B,D]=(0,i.useState)(0),U=(0,i.useRef)(0),P=(0,i.useRef)(null),L=(0,i.useRef)(null),q=(0,i.useRef)(!1),W=(0,i.useCallback)((e="loading")=>{s(!1),m(e),y(null),_(0)},[s]),j=(0,i.useCallback)(()=>{if(!c&&!P.current){if(U.current>=4){N(!0),W("error");return}N(!1),W(),q.current=!0,L.current&&(clearTimeout(L.current),L.current=null),e.current?.stream?.getTracks().forEach(e=>e.stop()),M(null),k(!1),P.current=setTimeout(()=>{P.current=null,U.current++,w(e=>(e+1)%oO.length),D(e=>e+1),k(!0)},900)}},[W,c,e]),V=(0,i.useCallback)(()=>{U.current=0,N(!1),j()},[j]),G=(0,i.useCallback)(()=>{q.current||j()},[j]),F=(0,i.useCallback)(()=>{q.current||(L.current&&clearTimeout(L.current),L.current=setTimeout(()=>{L.current=null;let r=e.current,i=r?.video;i&&!i.paused&&oM(r)&&oR(i)?(P.current&&(clearTimeout(P.current),P.current=null),U.current=0):j()},1200))},[j,e]),H=(0,i.useCallback)(r=>{q.current=!1,N(!1),M(r),W(),e.current?.video?.play().catch(()=>j()),F()},[W,j,F,e]),K=(0,i.useCallback)(e=>{console.warn("Failed to access camera:",e),q.current=!1,M(null),j()},[j]);(0,i.useEffect)(()=>{{let e=p?oA:oz;T(e),I.current=e}},[p]),(0,i.useEffect)(()=>{let e=O?.getVideoTracks()[0];if(!e)return;let r=()=>F(),i=()=>G();return e.addEventListener("mute",r),e.addEventListener("unmute",F),e.addEventListener("ended",i),()=>{e.removeEventListener("mute",r),e.removeEventListener("unmute",F),e.removeEventListener("ended",i)}},[O,G,F]),(0,i.useEffect)(()=>()=>{P.current&&clearTimeout(P.current),L.current&&clearTimeout(L.current)},[]),(0,i.useEffect)(()=>{let r,i=!0;return async function(){E.current=!1,z.current=!1;try{m("loading"),s(!1);let e=new oS;await e.loadModels({includeLiveness:!1}),C.current=e}catch(r){let e=r instanceof Error?r.message:String(r);console.warn(`Failed to load face detection model: ${e}`),i&&(m("error"),s(!1));return}i&&(r=setInterval(async()=>{let a=e.current,n=a?.video;if(!n||!oM(a))return void W();if(C.current&&!A.current&&!E.current){A.current=!0;try{let r=await C.current.processFaceFrame(n);if(!i)return;if(!oM(e.current))return void W();if(!r)return void W("no-face");let[a,o,u,l]=r.bbox,d=n.videoWidth,p=n.videoHeight,c=n.clientWidth,h=n.clientHeight;if(0===d||0===p||0===c||0===h)return void W();let f=Math.max(c/d,h/p),g=Math.max(c/1280,h/720),b=((a+u)/2*f-(d*f-c)/2+(1280*g-c)/2)/g,$=((o+l)/2*f-(p*f-h)/2+(720*g-h)/2)/g,v=(u-a)*f/g,w=I.current,x=(b-w.cx)/w.rx,k=($-w.cy)/w.ry,S=x*x+k*k<=w.centerTolerance*w.centerTolerance,T=2*w.rx,E=2*w.ry,z=Math.max(1280*w.minFace,.5*T),A=T*w.maxScale,O=S&&v>=z&&(l-o)*f/g>=.55*E&&v<=A;s(O),y(null),_(0),O?m("real"):m("out-of-frame")}catch(e){if(E.current=!0,!z.current){let r=e instanceof Error?e.message:String(e);console.warn(`Face detection disabled: ${r}`),z.current=!0}i&&(s(!1),m("error")),r&&clearInterval(r)}finally{A.current=!1}}},p?1200:400))}(),()=>{i=!1,r&&clearInterval(r),C.current=null,s(!1)}},[p,W,e]);let Z=function(e,r,i){switch(e){case"loading":return{label:"Memuat...",className:"bg-blue-500/90"};case"no-face":return{label:"Posisikan wajah di frame",className:"bg-red-500/90"};case"out-of-frame":return{label:"Wajah belum pas di frame",className:"bg-amber-500/90"};case"verifying":return{label:`Memverifikasi wajah ${i}/4`,className:"bg-amber-500/90"};case"real":return{label:"Posisi wajah sudah pas",className:"bg-emerald-500/90"};case"fake":return{label:"Wajah tidak lolos verifikasi",className:"bg-red-500/90"};default:return{label:"Terjadi kesalahan",className:"bg-red-500/90"}}}(f,0,b);return(0,r.jsxs)(r.Fragment,{children:[(0,r.jsxs)("div",{className:"relative w-full max-w-lg mb-8 rounded-xl bg-gray-900 aspect-3/4 sm:aspect-video",children:[(0,r.jsxs)("div",{className:"absolute inset-0 rounded-xl overflow-hidden",children:[x&&(0,r.jsx)(v.default,{className:"absolute inset-0 w-full h-full object-cover",audio:!1,ref:e,screenshotFormat:"image/jpeg",screenshotQuality:1,mirrored:!0,style:{transform:"translateZ(0)",backfaceVisibility:"hidden",WebkitBackfaceVisibility:"hidden",willChange:"transform"},videoConstraints:oO[$],onUserMedia:H,onUserMediaError:K,onLoadedMetadata:F,onPlaying:F,onPause:F,onEnded:G,onStalled:F,onWaiting:F},`face-camera-${B}`),(0,r.jsxs)("svg",{className:"absolute inset-0 w-full h-full pointer-events-none",viewBox:"0 0 1280 720",preserveAspectRatio:"xMidYMid slice",children:[(0,r.jsx)("defs",{children:(0,r.jsxs)("mask",{id:"face-cutout",children:[(0,r.jsx)("rect",{width:"1280",height:"720",fill:"white"}),(0,r.jsx)("path",{d:oP(S,!0),fill:"black"})]})}),(0,r.jsx)("rect",{width:"1280",height:"720",fill:"rgba(0,0,0,0.5)",mask:"url(#face-cutout)"}),(0,r.jsx)("path",{d:oP(S),fill:"none",stroke:a?"#16A34A":"#DC2626",strokeWidth:"6",strokeLinejoin:"round",strokeLinecap:"round",style:{transition:"stroke 0.3s ease"}})]})]}),!c&&(!O||R)&&(0,r.jsx)("div",{className:"absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-xl bg-gray-950/70 px-6 text-white",role:R?"alert":"status",children:R?(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)("p",{className:"text-sm font-semibold",children:"Kamera tidak dapat diakses. Tutup tab verifikasi lain atau aplikasi yang sedang menggunakan kamera, lalu coba kembali."}),(0,r.jsxs)("div",{className:"flex flex-wrap items-center justify-center gap-2",children:[(0,r.jsxs)("button",{type:"button",onClick:V,className:"inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#101828]",children:[(0,r.jsx)(u.RefreshCw,{className:"h-4 w-4"}),"Coba lagi"]}),(0,r.jsxs)("button",{type:"button",onClick:d,className:"inline-flex items-center gap-2 rounded-lg border border-white/40 bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-white/10",children:[(0,r.jsx)(l.ArrowLeft,{className:"h-4 w-4"}),"Kembali ke tiket"]})]})]}):(0,r.jsxs)(r.Fragment,{children:[(0,r.jsx)(h.Loader2,{className:"h-8 w-8 animate-spin"}),(0,r.jsx)("p",{className:"text-sm font-medium",children:"Menyiapkan kamera..."})]})}),c&&(0,r.jsxs)("div",{className:"absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 rounded-xl bg-gray-950/70 text-white backdrop-blur-sm",role:"status","aria-live":"polite",children:[(0,r.jsx)(h.Loader2,{className:"h-10 w-10 animate-spin"}),(0,r.jsxs)("div",{children:[(0,r.jsx)("p",{className:"text-sm font-semibold",children:"Mengirim data wajah..."}),(0,r.jsx)("p",{className:"mt-1 text-xs text-white/75",children:"Mohon tunggu dan jangan tutup halaman."})]})]}),!c&&O&&!R&&(0,r.jsx)("button",{type:"button",onClick:V,"aria-label":"Muat ulang kamera",className:"absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/60",children:(0,r.jsx)(u.RefreshCw,{className:"h-4 w-4"})}),(0,r.jsx)("div",{className:`absolute text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm z-10 ${Z.className}`,style:p?{top:"-15px",left:"50%",transform:"translateX(-50%)"}:{bottom:"0.75rem",left:"50%",transform:"translateX(-50%)"},children:Z.label}),p&&(0,r.jsx)("div",{className:"absolute bottom-3 left-1/2 -translate-x-1/2 z-20",children:(0,r.jsx)("button",{disabled:!a||c,onClick:o,className:`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/80 shadow-lg transition-all active:scale-95 ${a&&!c?"bg-[#3b5bdb] hover:bg-[#3451c5]":"bg-gray-400 cursor-not-allowed"}`,children:(0,r.jsx)(n.Camera,{className:"w-7 h-7 text-white"})})})]}),(0,r.jsx)(oL,{})]})}function oP(e,r=!1){let{cx:i,cy:a,rx:n,ry:s}=e,o=a+.98*s,u=i-n*e.shoulderWidth,l=i+n*e.shoulderWidth,d=`M ${u} ${o} C ${i-1.02*n} ${a+.88*s}, ${i-.7*n} ${a+.87*s}, ${i-.48*n} ${a+.82*s} C ${i-.37*n} ${a+.79*s}, ${i-.36*n} ${a+.72*s}, ${i-.36*n} ${a+.62*s} C ${i-.53*n} ${a+.52*s}, ${i-.66*n} ${a+.38*s}, ${i-.72*n} ${a+.2*s} C ${i-.84*n} ${a+.2*s}, ${i-.9*n} ${a+.08*s}, ${i-.9*n} ${a-.07*s} C ${i-.9*n} ${a-.22*s}, ${i-.84*n} ${a-.34*s}, ${i-.73*n} ${a-.35*s} C ${i-.7*n} ${a-.72*s}, ${i-.46*n} ${a-.98*s}, ${i} ${a-.98*s} C ${i+.46*n} ${a-.98*s}, ${i+.7*n} ${a-.72*s}, ${i+.73*n} ${a-.35*s} C ${i+.84*n} ${a-.34*s}, ${i+.9*n} ${a-.22*s}, ${i+.9*n} ${a-.07*s} C ${i+.9*n} ${a+.08*s}, ${i+.84*n} ${a+.2*s}, ${i+.72*n} ${a+.2*s} C ${i+.66*n} ${a+.38*s}, ${i+.53*n} ${a+.52*s}, ${i+.36*n} ${a+.62*s} C ${i+.36*n} ${a+.72*s}, ${i+.37*n} ${a+.79*s}, ${i+.48*n} ${a+.82*s} C ${i+.7*n} ${a+.87*s}, ${i+1.02*n} ${a+.88*s}, ${l} ${o}`;return r?`${d} L ${l} 760 L ${u} 760 Z`:d}function oL(){let[e,a]=(0,i.useState)(!1),n=(0,i.useRef)(!1);return(0,i.useEffect)(()=>{n.current||(a(!0),n.current=!0)},[]),(0,r.jsxs)(k.Dialog,{open:e,onOpenChange:a,children:[(0,r.jsx)(k.DialogTrigger,{asChild:!0,children:(0,r.jsxs)("button",{className:"inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer",children:[(0,r.jsx)(c.Info,{className:"w-4 h-4"}),"Lihat Tips Pengambilan Foto"]})}),(0,r.jsxs)(k.DialogContent,{className:"sm:max-w-md bg-white",children:[(0,r.jsx)(k.DialogHeader,{children:(0,r.jsxs)(k.DialogTitle,{className:"flex items-center gap-2 text-[#1e2a4a]",children:[(0,r.jsx)(c.Info,{className:"w-5 h-5 text-[#3b5bdb]"}),"Tips Pengambilan Foto"]})}),(0,r.jsx)("p",{className:"text-gray-500 text-sm leading-relaxed",children:"Pastikan pencahayaan cukup terang dan wajah Anda terlihat jelas tanpa aksesoris (masker, kacamata, topi)."}),(0,r.jsxs)("div",{className:"flex items-center justify-around gap-4 py-4",children:[(0,r.jsxs)("div",{className:"flex flex-col gap-2 items-center",children:[(0,r.jsx)("div",{className:"size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]",children:(0,r.jsx)($,{})}),(0,r.jsx)("p",{className:"text-[12px] text-center text-[#6B7280] uppercase font-medium",children:"Tanpa Masker"})]}),(0,r.jsxs)("div",{className:"flex flex-col gap-2 items-center",children:[(0,r.jsx)("div",{className:"size-12 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-full text-[24px]",children:(0,r.jsx)(_,{})}),(0,r.jsx)("p",{className:"text-[12px] text-center text-[#6B7280] uppercase font-medium",children:"Cahaya Cukup"})]}),(0,r.jsxs)("div",{className:"flex flex-col gap-2 items-center",children:[(0,r.jsx)("div",{className:"size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]",children:(0,r.jsx)(b,{})}),(0,r.jsx)("p",{className:"text-[12px] text-center text-[#6B7280] uppercase font-medium",children:"Wajah Jelas"})]})]}),(0,r.jsx)("button",{onClick:()=>a(!1),className:"mt-2 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors",children:"Mengerti"})]})]})}e.s(["default",()=>oN],11559)}]);
