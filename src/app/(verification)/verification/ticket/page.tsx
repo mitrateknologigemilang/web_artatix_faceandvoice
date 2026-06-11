@@ -193,7 +193,7 @@ export default function TicketVerificationPage() {
 									? "text-emerald-600 bg-emerald-50 border-emerald-200"
 									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
 							}`}>
-							{state === "success" ? "Selesai" : "Langkah 1 dari 3"}
+							{state === "success" ? "Selesai" : "Langkah 1 dari 2"}
 						</span>
 					</div>
 
