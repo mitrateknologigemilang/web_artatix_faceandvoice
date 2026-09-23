@@ -50,10 +50,11 @@ export function getApiErrorMessage(
  */
 export async function getTicketDetail(
 	ticketTag: string,
+	nik: string,
 ): Promise<TicketLookupResult | null> {
 	try {
 		const res = await api.get(
-			`/api/validate_tiket/check/${encodeURIComponent(ticketTag)}`,
+			`/api/validate_tiket/check/${encodeURIComponent(ticketTag)}/${encodeURIComponent(nik)}`,
 		);
 		const data = res.data?.data ?? [];
 		const message = res.data?.message;

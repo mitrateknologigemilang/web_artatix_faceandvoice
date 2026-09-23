@@ -70,7 +70,7 @@ export default function TicketVerificationPage() {
 			setNik(null);
 			setFaceBlob(null);
 			try {
-				const result = await getTicketDetail(code);
+				const result = await getTicketDetail(code, nikInput);
 				console.log("🚀 ~ TicketVerificationPage ~ result:", result);
 
 				if (!result) {
