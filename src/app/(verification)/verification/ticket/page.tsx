@@ -588,12 +588,10 @@ function SuccessState({
 				{detail?.ticketStatus && (
 					<DetailRow label="Status" value={detail.ticketStatus} />
 				)}
-				<div>
-					<p className="text-xs text-gray-500 mb-1">Kode Tiket</p>
-					<p className="font-mono text-base font-bold text-[#1e2a4a] break-all">
-						{detail?.ticketTag || ticketCode}
-					</p>
-				</div>
+				{detail?.ticketTag && (
+					<DetailRow label="Kode Tiket" value={detail.ticketTag} />
+				)}
+
 				<DetailRow label="NIK" value={nik} />
 			</div>
 		</>
