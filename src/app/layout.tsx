@@ -3,12 +3,12 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarConfigProvider } from "@/contexts/sidebar-context";
-import { inter } from "@/lib/fonts";
+import { dmSans, funnel } from "@/lib/fonts";
 
 export const metadata: Metadata = {
-	title: "Artatix Jomlo Festival 2026",
+	title: "Belikarcis",
 	description:
-		"Platform verifikasi wajah dan suara untuk Artatix Jomlo Festival 2026",
+		"Platform verifikasi wajah dan suara untuk Belikarcis",
 	icons: {
 		icon: [
 			{ url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
@@ -26,8 +26,10 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={`${inter.variable} antialiased`}>
-			<body className={inter.className}>
+		<html
+			lang="en"
+			className={`${dmSans.variable} ${funnel.variable} antialiased`}>
+			<body className={dmSans.className}>
 				<ThemeProvider defaultTheme="system" storageKey="nextjs-ui-theme">
 					<SidebarConfigProvider>{children}</SidebarConfigProvider>
 				</ThemeProvider>

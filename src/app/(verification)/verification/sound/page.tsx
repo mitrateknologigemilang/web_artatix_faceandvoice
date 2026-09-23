@@ -175,7 +175,7 @@ export default function SoundVerificationPage() {
 					{/* Card Header */}
 					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
-							<AudioLines className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<AudioLines className="w-5 h-5 text-primary shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
 								Pendaftaran Suara
 							</span>
@@ -184,7 +184,7 @@ export default function SoundVerificationPage() {
 							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
 								state === "success"
 									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+									: "text-primary bg-primary-50 border-primary-200"
 							}`}>
 							{state === "success" ? "Selesai" : "Langkah 3 dari 3"}
 						</span>
@@ -219,7 +219,7 @@ export default function SoundVerificationPage() {
 										setStep("face");
 										router.push("/verification/face");
 									}}
-									className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors">
 									<ArrowLeft className="w-4 h-4" />
 									<span className="hidden sm:inline">Kembali</span>
 								</button>
@@ -228,7 +228,7 @@ export default function SoundVerificationPage() {
 										<button
 											onClick={handleSubmit}
 											disabled={submitting}
-											className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+											className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
 											{submitting ? (
 												<Loader2 className="w-4 h-4 animate-spin" />
 											) : (
@@ -251,8 +251,8 @@ export default function SoundVerificationPage() {
 													stopLocked
 														? "bg-gray-200 text-gray-400 cursor-not-allowed"
 														: state === "recording"
-															? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
-															: "bg-[#3b5bdb] text-white hover:bg-[#3451c5] cursor-pointer"
+															? "bg-primary-700 text-white hover:bg-primary-800 cursor-pointer"
+															: "bg-primary text-white hover:bg-primary-600 cursor-pointer"
 												}`}>
 												<span
 													className={`w-2 h-2 rounded-full ${
@@ -276,7 +276,7 @@ export default function SoundVerificationPage() {
 							<div className="flex w-full justify-end">
 								<button
 									onClick={handleRetry}
-									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 									<RefreshCw className="w-4 h-4" />
 									Ulangi
 								</button>
@@ -286,14 +286,14 @@ export default function SoundVerificationPage() {
 							<div className="flex w-full justify-between">
 								<button
 									onClick={handleRetry}
-									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors">
 									<ArrowLeft className="w-4 h-4" />
 									Ulangi Rekaman
 								</button>
 								<button
 									onClick={handleSubmit}
 									disabled={submitting}
-									className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
+									className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors ${submitting ? "opacity-70 cursor-not-allowed" : ""}`}>
 									{submitting ? (
 										<Loader2 className="w-4 h-4 animate-spin" />
 									) : (
@@ -338,7 +338,7 @@ function IdleRecordingState({
 			<div
 				className={`w-full border rounded-xl px-6 py-5 mb-6 transition-colors ${
 					isRecording
-						? "bg-blue-50 border-[#3b5bdb]/30"
+						? "bg-primary-50 border-primary/30"
 						: "bg-gray-50 border-gray-200"
 				}`}>
 				<p className="text-[#1e2a4a] leading-relaxed">
@@ -371,7 +371,7 @@ function IdleRecordingState({
 									done
 										? "text-emerald-500"
 										: isRecording
-											? "text-[#3b5bdb]"
+											? "text-primary"
 											: "text-gray-400"
 								}`}>
 								{formatTime(recordingTime)}
@@ -383,7 +383,7 @@ function IdleRecordingState({
 						<div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
 							<div
 								className={`h-full rounded-full transition-all duration-500 ${
-									done ? "bg-emerald-500" : "bg-[#3b5bdb]"
+									done ? "bg-emerald-500" : "bg-primary"
 								}`}
 								style={{ width: `${pct}%` }}
 							/>
@@ -475,7 +475,7 @@ function LiveWaveform({
 				<div
 					key={i}
 					className={`w-1 rounded-full transition-all duration-75 ${
-						isRecording ? "bg-[#3b5bdb]" : "bg-blue-200"
+						isRecording ? "bg-primary" : "bg-primary-200"
 					}`}
 					style={{ height: `${height}%` }}
 				/>
@@ -565,7 +565,7 @@ function CustomAudioPlayer({
 			/>
 			<button
 				onClick={togglePlayPause}
-				className="w-10 h-10 rounded-full bg-[#3b5bdb] text-white flex items-center justify-center shrink-0 hover:bg-[#3451c5] transition-colors shadow-sm">
+				className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0 hover:bg-primary-600 transition-colors shadow-sm">
 				{isPlaying ? (
 					<Pause className="w-5 h-5 fill-current" />
 				) : (
@@ -575,7 +575,7 @@ function CustomAudioPlayer({
 			<div className="flex-1 w-full flex flex-col pt-1">
 				<div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden mb-1.5 relative">
 					<div
-						className="absolute top-0 left-0 h-full bg-[#3b5bdb]"
+						className="absolute top-0 left-0 h-full bg-primary"
 						style={{ width: `${progress}%` }}
 					/>
 				</div>
@@ -721,10 +721,10 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<button className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 text-left hover:border-[#3b5bdb]/30 transition-colors cursor-pointer">
+				<button className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 text-left hover:border-primary/30 transition-colors cursor-pointer">
 					<div className="flex items-center justify-between gap-2">
 						<div className="flex items-center gap-2">
-							<Info className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<Info className="w-5 h-5 text-primary shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] text-sm">
 								Lihat Tips Perekaman
 							</span>
@@ -736,7 +736,7 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 			<DialogContent className="sm:max-w-md bg-white">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
-						<Info className="w-5 h-5 text-[#3b5bdb]" />
+						<Info className="w-5 h-5 text-primary" />
 						Tips Perekaman
 					</DialogTitle>
 				</DialogHeader>
@@ -745,7 +745,7 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 						<li
 							key={i}
 							className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
-							<span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-[#3b5bdb] text-xs font-bold shrink-0">
+							<span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-50 text-primary text-xs font-bold shrink-0">
 								{i + 1}
 							</span>
 							{tip}
@@ -754,7 +754,7 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 				</ul>
 				<button
 					onClick={() => setOpen(false)}
-					className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+					className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 					Mengerti
 				</button>
 			</DialogContent>
@@ -773,7 +773,7 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 // 		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
 // 			<div className="flex items-start gap-2">
 // 				<div className="mt-0.5">
-// 					<Shield className="w-5 h-5 text-[#3b5bdb]" />
+// 					<Shield className="w-5 h-5 text-primary" />
 // 				</div>
 // 				<div>
 // 					<h3 className="font-semibold text-[#1e2a4a] text-sm">{title}</h3>

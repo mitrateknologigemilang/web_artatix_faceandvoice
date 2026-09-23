@@ -215,7 +215,7 @@ export default function TicketVerificationPage() {
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
-							<FileText className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<FileText className="w-5 h-5 text-primary shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
 								Data Tiket
 							</span>
@@ -224,7 +224,7 @@ export default function TicketVerificationPage() {
 							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
 								state === "success"
 									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+									: "text-primary bg-primary-50 border-primary-200"
 							}`}>
 							{state === "success" ? "Selesai" : "Langkah 1 dari 2"}
 						</span>
@@ -287,14 +287,14 @@ export default function TicketVerificationPage() {
 										{state === "failed" && (
 											<Button
 												onClick={handleRetry}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 												Coba Lagi
 											</Button>
 										)}
 										{state === "success" && (
 											<Button
 												onClick={handleRetry}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors">
 												Ganti Tiket
 											</Button>
 										)}
@@ -303,7 +303,7 @@ export default function TicketVerificationPage() {
 											<Button
 												onClick={handleContinue}
 												disabled={isNavigating}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 												Lanjutkan
 												<ArrowRight className="w-4 h-4" />
 											</Button>
@@ -317,14 +317,14 @@ export default function TicketVerificationPage() {
 								{state === "failed" && (
 									<button
 										onClick={handleRetry}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 										Coba Lagi
 									</button>
 								)}
 								{state === "success" && (
 									<button
 										onClick={handleRetry}
-										className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+										className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors">
 										Ganti Tiket
 									</button>
 								)}
@@ -333,7 +333,7 @@ export default function TicketVerificationPage() {
 									<button
 										onClick={handleContinue}
 										disabled={isNavigating}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 										Lanjutkan
 										<ArrowRight className="w-4 h-4" />
 									</button>
@@ -389,12 +389,12 @@ function UploadState({
 					!nikValid
 						? "cursor-not-allowed border-gray-200 bg-gray-100 opacity-70"
 						: dragOver
-							? "cursor-pointer border-[#3b5bdb] bg-blue-50"
-							: "cursor-pointer border-gray-300 bg-gray-50 hover:border-[#3b5bdb] hover:bg-blue-50/50"
+							? "cursor-pointer border-primary bg-primary-50"
+							: "cursor-pointer border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary-50/50"
 				}`}>
 				<div className="flex flex-col items-center gap-3">
-					<div className="w-14 h-14 rounded-full bg-[#3b5bdb]/10 flex items-center justify-center">
-						<Upload className="w-7 h-7 text-[#3b5bdb]" />
+					<div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+						<Upload className="w-7 h-7 text-primary" />
 					</div>
 					<p className="text-sm font-medium text-[#1e2a4a]">
 						{nikValid
@@ -409,7 +409,7 @@ function UploadState({
 
 			<button
 				onClick={onSwitchManual}
-				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-primary font-medium text-sm hover:bg-primary-50 transition-colors cursor-pointer">
 				Isi kode tiket manual
 			</button>
 		</>
@@ -452,7 +452,7 @@ function ManualInputState({
 						value={value}
 						onChange={(e) => onChange(e.target.value)}
 						placeholder="Contoh: TIK-ABCD-1234"
-						className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
+						className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 					/>
 				</label>
 
@@ -463,7 +463,7 @@ function ManualInputState({
 					disabled={!formValid}
 					className={`mt-3 hidden md:inline-flex w-full  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
 						formValid
-							? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+							? "bg-primary hover:bg-primary-600"
 							: "bg-gray-300 cursor-not-allowed"
 					}`}>
 					Cek Tiket
@@ -476,7 +476,7 @@ function ManualInputState({
 							disabled={!formValid}
 							className={`md:hidden w-full inline-flex  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
 								formValid
-									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+									? "bg-primary hover:bg-primary-600"
 									: "bg-gray-800 cursor-not-allowed"
 							}`}>
 							Cek Tiket
@@ -487,7 +487,7 @@ function ManualInputState({
 
 			<button
 				onClick={onSwitchUpload}
-				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-primary font-medium text-sm hover:bg-primary-50 transition-colors cursor-pointer">
 				<Upload className="w-4 h-4" />
 				Scan dari file tiket
 			</button>
@@ -517,7 +517,7 @@ function NikInput({
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder="16 digit NIK"
-				className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
+				className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 			/>
 			<p
 				className={`mt-1.5 text-xs ${
@@ -535,8 +535,8 @@ function ScanningState({ fileName }: { fileName: string }) {
 	return (
 		<>
 			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
-					<Loader2 className="w-12 h-12 text-[#3b5bdb] animate-spin" />
+				<div className="w-24 h-24 rounded-full bg-primary-50 flex items-center justify-center">
+					<Loader2 className="w-12 h-12 text-primary animate-spin" />
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
@@ -611,8 +611,8 @@ function ValidatingState() {
 	return (
 		<>
 			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
-					<Loader2 className="w-12 h-12 text-[#3b5bdb] animate-spin" />
+				<div className="w-24 h-24 rounded-full bg-primary-50 flex items-center justify-center">
+					<Loader2 className="w-12 h-12 text-primary animate-spin" />
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
@@ -653,7 +653,7 @@ function FailedState({
 // 	return (
 // 		<div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 sm:py-5">
 // 			<div className="flex items-start gap-2">
-// 				<Shield className="w-5 h-5 text-[#3b5bdb] mt-0.5 shrink-0" />
+// 				<Shield className="w-5 h-5 text-primary mt-0.5 shrink-0" />
 // 				<div>
 // 					<h3 className="font-semibold text-[#1e2a4a] text-sm">
 // 						Tiket Anda Aman

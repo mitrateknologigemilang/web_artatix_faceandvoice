@@ -60,7 +60,7 @@ export default function VerificationSuccessPage() {
 								clearVerification();
 								router.push("/verification/ticket");
 							}}
-							className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors w-full justify-center">
+							className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors w-full justify-center">
 							<ArrowLeft className="w-4 h-4" />
 							Daftarkan Tiket Lain
 						</button>

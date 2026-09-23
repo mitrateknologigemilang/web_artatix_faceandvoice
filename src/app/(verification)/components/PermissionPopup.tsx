@@ -183,8 +183,8 @@ export function PermissionPopup() {
 				className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
 				style={{ zIndex: 9999 }}>
 				<div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200">
-					<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
-						<Camera className="w-6 h-6 text-[#3b5bdb]" />
+					<div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+						<Camera className="w-6 h-6 text-primary" />
 					</div>
 
 					<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
@@ -208,14 +208,14 @@ export function PermissionPopup() {
 							</div>
 							<button
 								onClick={() => window.location.reload()}
-								className="mt-2 text-sm font-medium bg-white border border-red-200 text-red-600 py-2 rounded-lg hover:bg-red-50 transition-colors">
+								className="mt-2 text-sm font-medium bg-white border border-primary/25 text-primary py-2 rounded-lg hover:bg-primary-50 transition-colors">
 								Muat Ulang Halaman
 							</button>
 						</div>
 					) : (
 						<button
 							onClick={requestPermission}
-							className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
+							className="w-full bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-600 transition-colors shadow-sm">
 							Izinkan Akses
 						</button>
 					)}

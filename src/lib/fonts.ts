@@ -1,8 +1,14 @@
-import { Inter } from 'next/font/google'
+import { DM_Sans, Funnel_Display } from "next/font/google";
 
-// Configure Inter font to match exactly what Next.js optimizes for
-export const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
+// Configure DM Sans font to match exactly what Next.js optimizes for
+export const dmSans = DM_Sans({
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-sans",
+});
+
+export const funnel = Funnel_Display({
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-funnel",
+});

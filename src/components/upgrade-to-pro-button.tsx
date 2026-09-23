@@ -18,7 +18,7 @@ export function UpgradeToProButton() {
         <HoverCardTrigger asChild>
           <Button
             size="lg"
-            className="px-6 py-3 bg-gradient-to-br shadow-lg from-slate-900 cursor-pointer to-slate-400 text-white font-bold"
+            className="px-6 py-3 bg-gradient-to-br shadow-lg from-primary-700 cursor-pointer to-primary text-white font-bold hover:from-primary-800 hover:to-primary-600"
             style={{ minWidth: 180 }} onClick={() => typeof window !== "undefined" && window.open(SHADCN_BLOCKS_URL, "_blank")}
           >
             Upgrade to Pro

@@ -244,7 +244,7 @@ export default function FaceVerificationPage() {
 					{/* Card Header */}
 					<div className="relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
-							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
+							<ScanFace className="w-5 h-5 text-primary shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
 								Verifikasi Wajah
 							</span>
@@ -253,7 +253,7 @@ export default function FaceVerificationPage() {
 							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
 								state === "success"
 									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+									: "text-primary bg-primary-50 border-primary-200"
 							}`}>
 							{state === "success" ? "Konfirmasi" : "Langkah 2 dari 2"}
 						</span>
@@ -291,7 +291,7 @@ export default function FaceVerificationPage() {
 								{state === "failed" && (
 									<Button
 										onClick={() => setState("verifying")}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 										<RefreshCw className="w-4 h-4" />
 										Ulangi
 									</Button>
@@ -301,7 +301,7 @@ export default function FaceVerificationPage() {
 										<Button
 											disabled={submitting}
 											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
+											className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors ${
 												submitting ? "opacity-60 cursor-not-allowed" : ""
 											}`}>
 											<ArrowLeft className="w-4 h-4" />
@@ -314,7 +314,7 @@ export default function FaceVerificationPage() {
 												onClick={capture}
 												className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
 													faceInFrame && !submitting
-														? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+														? "bg-primary hover:bg-primary-600"
 														: "bg-gray-300 cursor-not-allowed"
 												}`}>
 												{submitting ? (
@@ -333,7 +333,7 @@ export default function FaceVerificationPage() {
 											type="button"
 											disabled={submitting}
 											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+											className={`inline-flex items-center gap-2 rounded-lg border border-primary/25 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary-50 ${
 												submitting ? "cursor-not-allowed opacity-60" : ""
 											}`}>
 											<TicketX className="h-4 w-4" />
@@ -343,7 +343,7 @@ export default function FaceVerificationPage() {
 											type="button"
 											disabled={submitting || !tncAccepted}
 											onClick={confirmSubmit}
-											className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
+											className={`inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-600 ${
 												submitting || !tncAccepted
 													? "cursor-not-allowed opacity-70"
 													: ""
@@ -365,7 +365,7 @@ export default function FaceVerificationPage() {
 						{state === "failed" && (
 							<button
 								onClick={() => setState("verifying")}
-								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 								<RefreshCw className="w-4 h-4" />
 								Ulangi
 							</button>
@@ -375,7 +375,7 @@ export default function FaceVerificationPage() {
 								<button
 									disabled={submitting}
 									onClick={returnToTicket}
-									className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
+									className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors ${
 										submitting ? "opacity-60 cursor-not-allowed" : ""
 									}`}>
 									<ArrowLeft className="w-4 h-4" />
@@ -388,7 +388,7 @@ export default function FaceVerificationPage() {
 										onClick={capture}
 										className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
 											faceInFrame && !submitting
-												? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+												? "bg-primary hover:bg-primary-600"
 												: "bg-gray-300 cursor-not-allowed"
 										}`}>
 										{submitting ? (
@@ -407,7 +407,7 @@ export default function FaceVerificationPage() {
 									type="button"
 									disabled={submitting}
 									onClick={returnToTicket}
-									className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+									className={`inline-flex items-center gap-2 rounded-lg border border-primary/25 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary-50 ${
 										submitting ? "cursor-not-allowed opacity-60" : ""
 									}`}>
 									<TicketX className="h-4 w-4" />
@@ -417,7 +417,7 @@ export default function FaceVerificationPage() {
 									type="button"
 									disabled={submitting || !tncAccepted}
 									onClick={confirmSubmit}
-									className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
+									className={`inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-600 ${
 										submitting || !tncAccepted
 											? "cursor-not-allowed opacity-70"
 											: ""
@@ -532,7 +532,7 @@ function SuccessState({
 			{/* Compact Text-only T&C */}
 			<div className="w-full mb-6 text-left">
 				<div className="flex items-center gap-2 mb-3">
-					<Shield className="h-5 w-5 text-[#3b5bdb]" />
+					<Shield className="h-5 w-5 text-primary" />
 					<h2 className="text-base font-bold text-[#1e2a4a]">
 						Syarat & Ketentuan Pendaftaran Face ID
 					</h2>
@@ -561,7 +561,7 @@ function SuccessState({
 					<input
 						type="checkbox"
 						id="tnc"
-						className="peer size-4 shrink-0 cursor-pointer rounded-lg border border-gray-900 shadow-xs transition-shadow outline-none focus-visible:ring-[3px] focus-visible:ring-[#3b5bdb]/50 disabled:cursor-not-allowed disabled:opacity-50 accent-[#3b5bdb]"
+						className="peer size-4 shrink-0 cursor-pointer rounded-lg border border-gray-900 shadow-xs transition-shadow outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 accent-primary"
 						checked={tncAccepted}
 						onChange={(e) => setTncAccepted(e.target.checked)}
 					/>
@@ -579,7 +579,7 @@ function SuccessState({
 					<DialogTrigger asChild>
 						<button
 							type="button"
-							className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3b5bdb] px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#3451c5] active:scale-95">
+							className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-600 active:scale-95">
 							<Maximize2 className="h-4 w-4" />
 							<span>Lihat Hasil Capture Wajah</span>
 						</button>
@@ -1136,7 +1136,7 @@ function VerifyingState({
 							onClick={onCapture}
 							className={`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/80 shadow-lg transition-all active:scale-95 ${
 								faceInFrame && !submitting
-									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+									? "bg-primary hover:bg-primary-600"
 									: "bg-gray-400 cursor-not-allowed"
 							}`}>
 							<Camera className="w-7 h-7 text-white" />
@@ -1161,7 +1161,7 @@ function getLivenessStatusMeta(
 		case "loading":
 			return {
 				label: "Memuat...",
-				className: "bg-blue-500/90",
+				className: "bg-primary-500/90",
 			};
 		case "no-face":
 			return {
@@ -1237,7 +1237,7 @@ function FaceTipsModal() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
+				<button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-primary font-medium text-sm hover:bg-primary-50 transition-colors cursor-pointer">
 					<Info className="w-4 h-4" />
 					Lihat Tips Pengambilan Foto
 				</button>
@@ -1245,7 +1245,7 @@ function FaceTipsModal() {
 			<DialogContent className="sm:max-w-md bg-white">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
-						<Info className="w-5 h-5 text-[#3b5bdb]" />
+						<Info className="w-5 h-5 text-primary" />
 						Tips Pengambilan Foto
 					</DialogTitle>
 				</DialogHeader>
@@ -1281,7 +1281,7 @@ function FaceTipsModal() {
 				</div>
 				<button
 					onClick={() => setOpen(false)}
-					className="mt-2 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+					className="mt-2 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary-600 transition-colors">
 					Mengerti
 				</button>
 			</DialogContent>

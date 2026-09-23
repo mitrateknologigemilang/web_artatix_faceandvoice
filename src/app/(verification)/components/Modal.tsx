@@ -64,7 +64,7 @@ export function Modal({
 				{children ?? (
 					<button
 						onClick={onClose}
-						className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
+						className="w-full bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-600 transition-colors shadow-sm">
 						Tutup
 					</button>
 				)}
