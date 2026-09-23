@@ -25,8 +25,10 @@ export const STEP_ROUTE: Record<VerificationStep, string> = {
 interface VerificationContextType {
 	step: VerificationStep;
 	setStep: (s: VerificationStep) => void;
-	kodeTiket: string | null;
-	setKodeTiket: (code: string | null) => void;
+	ticketCode: string | null;
+	setTicketCode: (code: string | null) => void;
+	nik: string | null;
+	setNik: (nik: string | null) => void;
 	ticketDetail: TicketDetail | null;
 	setTicketDetail: (detail: TicketDetail | null) => void;
 	faceBlob: Blob | null;
@@ -40,8 +42,10 @@ interface VerificationContextType {
 const VerificationContext = createContext<VerificationContextType>({
 	step: "ticket",
 	setStep: () => {},
-	kodeTiket: null,
-	setKodeTiket: () => {},
+	ticketCode: null,
+	setTicketCode: () => {},
+	nik: null,
+	setNik: () => {},
 	ticketDetail: null,
 	setTicketDetail: () => {},
 	faceBlob: null,
@@ -58,7 +62,8 @@ export function VerificationProvider({
 	children: React.ReactNode;
 }) {
 	const [step, setStep] = useState<VerificationStep>("ticket");
-	const [kodeTiket, setKodeTiket] = useState<string | null>(null);
+	const [ticketCode, setTicketCode] = useState<string | null>(null);
+	const [nik, setNik] = useState<string | null>(null);
 	const [ticketDetail, setTicketDetail] = useState<TicketDetail | null>(null);
 	const [faceBlob, setFaceBlobState] = useState<Blob | null>(null);
 	const [permissionGrantedTime, setPermissionGrantedTime] = useState<
@@ -79,7 +84,8 @@ export function VerificationProvider({
 			sessionStorage.removeItem(STORAGE_KEY);
 		} catch {}
 		setStep("ticket");
-		setKodeTiket(null);
+		setTicketCode(null);
+		setNik(null);
 		setTicketDetail(null);
 		setFaceBlobState(null);
 	}, []);
@@ -105,8 +111,10 @@ export function VerificationProvider({
 			value={{
 				step,
 				setStep,
-				kodeTiket,
-				setKodeTiket,
+				ticketCode,
+				setTicketCode,
+				nik,
+				setNik,
 				ticketDetail,
 				setTicketDetail,
 				faceBlob,

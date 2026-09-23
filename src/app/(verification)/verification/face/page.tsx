@@ -44,6 +44,8 @@ import {
 } from "@/services/verification.service";
 import { Modal } from "../../components/Modal";
 import { useHandleSubmit } from "@/hooks/use-handle-submit";
+import FooterMobileBtn from "../../components/FooterMobileBtn";
+import { Button } from "@/components/ui/button";
 type VerificationState = "verifying" | "success" | "failed";
 
 // Face frame config (SVG viewBox 1280x720). The detection area stays forgiving,
@@ -157,13 +159,14 @@ export default function FaceVerificationPage() {
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
-	const { faceBlob, kodeTiket, clearVerification, setFaceBlob } =
+	const { faceBlob, ticketCode, nik, clearVerification, setFaceBlob } =
 		useVerification();
 	const allowed = useVerificationGuard("face");
 
 	const { handleSubmitWithFaceBlob, handleErrorClose } = useHandleSubmit({
 		faceBlob,
-		kodeTiket,
+		ticketCode,
+		nik,
 		errorMsg,
 		setErrorMsg,
 		setSubmitting,
@@ -231,11 +234,11 @@ export default function FaceVerificationPage() {
 			<Modal
 				open={!!errorMsg}
 				onClose={returnToTicket}
-				title="Registrasi Gagal"
+				title="Pendaftaran Gagal"
 				description={errorMsg}
 			/>
 
-			<div className="space-y-6">
+			<div className="space-y-6 pb-28 md:pb-0">
 				{/* Main Card */}
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 					{/* Card Header */}
@@ -243,7 +246,7 @@ export default function FaceVerificationPage() {
 						<div className="flex items-center gap-2 min-w-0">
 							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
-								Pendaftaran Wajah
+								Verifikasi Wajah
 							</span>
 						</div>
 						<span
@@ -281,7 +284,84 @@ export default function FaceVerificationPage() {
 					</div>
 
 					{/* Card Footer */}
-					<div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-between">
+
+					<FooterMobileBtn
+						children={
+							<>
+								{state === "failed" && (
+									<Button
+										onClick={() => setState("verifying")}
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										<RefreshCw className="w-4 h-4" />
+										Ulangi
+									</Button>
+								)}
+								{state === "verifying" && (
+									<>
+										<Button
+											disabled={submitting}
+											onClick={returnToTicket}
+											className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
+												submitting ? "opacity-60 cursor-not-allowed" : ""
+											}`}>
+											<ArrowLeft className="w-4 h-4" />
+											Kembali
+										</Button>
+										{/* Desktop-only capture button in footer */}
+										{!isMobile && (
+											<button
+												disabled={!faceInFrame || submitting}
+												onClick={capture}
+												className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+													faceInFrame && !submitting
+														? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+														: "bg-gray-300 cursor-not-allowed"
+												}`}>
+												{submitting ? (
+													<Loader2 className="w-4 h-4 animate-spin" />
+												) : (
+													<Camera className="w-4 h-4" />
+												)}
+												{submitting ? "Mengirim..." : "Ambil Foto"}
+											</button>
+										)}
+									</>
+								)}
+								{state === "success" && (
+									<>
+										<Button
+											type="button"
+											disabled={submitting}
+											onClick={returnToTicket}
+											className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+												submitting ? "cursor-not-allowed opacity-60" : ""
+											}`}>
+											<TicketX className="h-4 w-4" />
+											Batal
+										</Button>
+										<Button
+											type="button"
+											disabled={submitting || !tncAccepted}
+											onClick={confirmSubmit}
+											className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
+												submitting || !tncAccepted
+													? "cursor-not-allowed opacity-70"
+													: ""
+											}`}>
+											{submitting ? (
+												<Loader2 className="h-4 w-4 animate-spin" />
+											) : (
+												<Send className="h-4 w-4" />
+											)}
+											{submitting ? "Mengirim..." : "Daftarkan"}
+											</Button>
+									</>
+								)}
+							</>
+						}
+					/>
+
+					<div className="px-4 md:flex hidden sm:px-6 py-3 sm:py-4 border-t border-gray-100  items-center justify-between">
 						{state === "failed" && (
 							<button
 								onClick={() => setState("verifying")}
@@ -347,8 +427,8 @@ export default function FaceVerificationPage() {
 									) : (
 										<Send className="h-4 w-4" />
 									)}
-									{submitting ? "Mengirim..." : "Kirim"}
-								</button>
+									{submitting ? "Mengirim..." : "Daftarkan"}
+									</button>
 							</div>
 						)}
 					</div>

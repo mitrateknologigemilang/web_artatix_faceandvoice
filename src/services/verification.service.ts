@@ -2,18 +2,17 @@ import axios from "axios";
 import api from "@/lib/axios";
 
 export interface TicketDetail {
-	orderId: string;
-	status: string;
-	detailTransactionDocument: {
-		name: string;
-		fullname: string;
-		generatedIdentityType: string;
-		identityNumber: string;
-	};
-	ticket: {
-		category: string;
-		ticketCode: string;
-	};
+	valid: string;
+	ticketTag: string;
+	ticketStatus: string;
+	ownerName: string;
+	ticketCategory: string;
+	ticketName: string;
+	orderTag: string;
+	eventName: string;
+	eventLocation: string;
+	validationMode: "scan" | "face" | "both";
+	allowedValidation: ("scan" | "face")[];
 }
 
 export interface TicketLookupResult {
@@ -37,7 +36,8 @@ export function getApiErrorMessage(
 		error.message,
 	];
 	const message = candidates.find(
-		(value): value is string => typeof value === "string" && value.trim() !== "",
+		(value): value is string =>
+			typeof value === "string" && value.trim() !== "",
 	);
 
 	return message || fallback;
@@ -49,23 +49,44 @@ export function getApiErrorMessage(
  * Throws only on unexpected (network/server) errors.
  */
 export async function getTicketDetail(
-	ticketCode: string,
+	ticketTag: string,
 ): Promise<TicketLookupResult | null> {
 	try {
 		const res = await api.get(
-			`/api/ref/getDetailTiket?kode=${encodeURIComponent(ticketCode)}`,
+			`/api/validate_tiket/check/${encodeURIComponent(ticketTag)}`,
 		);
-		if (res.data?.data?.message === "success" && res.data?.data?.data) {
+		const data = res.data?.data ?? [];
+		const message = res.data?.message;
+
+		console.log("🚀 ~ getTicketDetail ~ res:", data);
+
+		if (message === "Tiket valid" && res.data?.data) {
 			return {
-				detail: res.data.data.data as TicketDetail,
-				registered: res.data.data.registered === true,
+				detail: {
+					valid: data.valid,
+					ticketTag: data.tiket_tag,
+					ticketStatus: data.tiket_status,
+					ownerName: data.owner_name,
+					ticketCategory: data.ticket_category,
+					ticketName: data.ticket_name,
+					orderTag: data.order_tag,
+					eventName: data.event_name,
+					eventLocation: data.event_location,
+					validationMode: data.validation_mode,
+					allowedValidation: data.allowed_validation,
+				} as TicketDetail,
+				registered: data.tiket_status === "used",
 			};
 		}
-		const message =
-			res.data?.data?.message || res.data?.message || "Kode tiket tidak ditemukan.";
-		if (typeof message === "string" && message.toLowerCase() !== "not found") {
-			throw new Error(message);
-		}
+
+		// const message =
+		// 	res.data?.data?.message ||
+		// 	res.data?.message ||
+		// 	"Kode tiket tidak ditemukan.";
+
+		// if (typeof message === "string" && message.toLowerCase() !== "not found") {
+		// 	throw new Error(message);
+		// }
 		return null;
 	} catch (err) {
 		// 404 → ticket not found (expected), anything else → rethrow
@@ -77,20 +98,18 @@ export async function getTicketDetail(
 }
 
 export interface SubmitBiometricPayload {
-	ticketCode: string;
+	ticketTag: string;
+	nik: string;
 	file_wajah: Blob;
-	file_suara?: Blob;
 }
 
 export async function submitBiometricData(payload: SubmitBiometricPayload) {
 	const formData = new FormData();
 
-	formData.append("ticketCode", payload.ticketCode);
+	formData.append("tiket_tag", payload.ticketTag);
+	formData.append("nik", payload.nik);
 	formData.append("file_wajah", payload.file_wajah, "face.jpg");
-	if (payload.file_suara) {
-		formData.append("file_suara", payload.file_suara, "sound.wav");
-	}
 
-	const response = await api.post("/api/ref/registerDataDiri", formData);
+	const response = await api.post("/api/validate_tiket/face", formData);
 	return response.data;
 }

@@ -13,6 +13,10 @@ api.interceptors.request.use(
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
+		const xApiKey = process.env.NEXT_PUBLIC_X_API_KEY;
+		if (xApiKey) {
+			config.headers["X-API-KEY"] = xApiKey;
+		}
 
 		// Jika body adalah FormData, biarkan browser set Content-Type + boundary
 		if (config.data instanceof FormData) {
@@ -53,10 +57,7 @@ artatixApi.interceptors.request.use(
 artatixApi.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		console.error(
-			"Artatix API Error:",
-			error?.response?.data || error.message,
-		);
+		console.error("Artatix API Error:", error?.response?.data || error.message);
 		return Promise.reject(error);
 	},
 );

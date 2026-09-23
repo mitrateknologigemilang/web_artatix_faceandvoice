@@ -23,10 +23,21 @@ import {
 } from "@/services/verification.service";
 import { TransitionLoading } from "../../components/TransitionLoading";
 import HeaderSection from "../../components/HeaderSection";
+import FooterMobileBtn from "../../components/FooterMobileBtn";
+import { Button } from "@/components/ui/button";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const NIK_LENGTH = 16;
+
+function normalizeNik(value: string) {
+	return value.replace(/\D/g, "").slice(0, NIK_LENGTH);
+}
+
+function isValidNik(value: string) {
+	return /^\d{16}$/.test(value);
+}
 
 export default function TicketVerificationPage() {
 	const [state, setState] = useState<ScanState>("idle");
@@ -34,12 +45,14 @@ export default function TicketVerificationPage() {
 	const [fileName, setFileName] = useState<string>("");
 	const [uploadMode, setUploadMode] = useState(false);
 	const [manualCode, setManualCode] = useState("");
+	const [nikInput, setNikInput] = useState("");
 	const [isNavigating, setIsNavigating] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
 	const {
-		kodeTiket,
-		setKodeTiket,
+		ticketCode,
+		setTicketCode,
+		setNik,
 		ticketDetail,
 		setTicketDetail,
 		setFaceBlob,
@@ -53,10 +66,13 @@ export default function TicketVerificationPage() {
 			setState("validating");
 			setErrorMsg("");
 			setTicketDetail(null);
-			setKodeTiket(null);
+			setTicketCode(null);
+			setNik(null);
 			setFaceBlob(null);
 			try {
 				const result = await getTicketDetail(code);
+				console.log("🚀 ~ TicketVerificationPage ~ result:", result);
+
 				if (!result) {
 					setErrorMsg(
 						"Kode tiket tidak ditemukan. Pastikan tiket sesuai dengan acara ini.",
@@ -64,6 +80,7 @@ export default function TicketVerificationPage() {
 					setState("failed");
 					return;
 				}
+
 				if (result.registered) {
 					setErrorMsg(
 						"Tiket yang Anda input telah teregistrasi oleh sistem kami, silakan masukkan tiket lain.",
@@ -71,9 +88,11 @@ export default function TicketVerificationPage() {
 					setState("failed");
 					return;
 				}
+
 				const { detail } = result;
 				setTicketDetail(detail);
-				setKodeTiket(detail.ticket?.ticketCode || code);
+				setTicketCode(detail.ticketTag || code);
+				setNik(nikInput);
 				setFaceBlob(null);
 				setState("success");
 			} catch (err) {
@@ -87,12 +106,18 @@ export default function TicketVerificationPage() {
 				setState("failed");
 			}
 		},
-		[setFaceBlob, setKodeTiket, setTicketDetail],
+		[nikInput, setFaceBlob, setTicketCode, setNik, setTicketDetail],
 	);
 
 	// Step 1: decode QR/barcode from the uploaded file.
 	const handleFile = useCallback(
 		async (file: File) => {
+			if (!isValidNik(nikInput)) {
+				setErrorMsg("Masukkan NIK 16 digit sebelum mengunggah tiket.");
+				setState("failed");
+				return;
+			}
+
 			const isPdf = file.type === "application/pdf";
 			const isImage = file.type.startsWith("image/");
 			if (!isPdf && !isImage) {
@@ -127,7 +152,7 @@ export default function TicketVerificationPage() {
 				setState("failed");
 			}
 		},
-		[validateCode],
+		[nikInput, validateCode],
 	);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,21 +172,29 @@ export default function TicketVerificationPage() {
 		setErrorMsg("");
 		setFileName("");
 		setTicketDetail(null);
-		setKodeTiket(null);
+		setTicketCode(null);
+		setNik(null);
 		setFaceBlob(null);
 		setManualCode("");
+		setNikInput("");
 		setUploadMode(false);
 	};
 
 	const handleManualSubmit = () => {
 		const trimmed = manualCode.trim().toUpperCase();
-		if (!trimmed) return;
+		if (!trimmed || !isValidNik(nikInput)) return;
 		setFileName("Input manual");
 		validateCode(trimmed);
 	};
 
+	const handleNikChange = (value: string) => {
+		const normalizedNik = normalizeNik(value);
+		setNikInput(normalizedNik);
+		setNik(normalizedNik || null);
+	};
+
 	const handleContinue = () => {
-		if (kodeTiket && !isNavigating) {
+		if (ticketCode && isValidNik(nikInput) && !isNavigating) {
 			setIsNavigating(true);
 			setStep("face");
 			router.push("/verification/face");
@@ -178,13 +211,13 @@ export default function TicketVerificationPage() {
 		<>
 			<HeaderSection />
 
-			<div className="space-y-6">
+			<div className="space-y-6 pb-24 md:pb-0">
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
 							<FileText className="w-5 h-5 text-[#3b5bdb] shrink-0" />
 							<span className="font-semibold text-[#1e2a4a] truncate">
-								Verifikasi Tiket
+								Data Tiket
 							</span>
 						</div>
 						<span
@@ -202,12 +235,16 @@ export default function TicketVerificationPage() {
 							<ManualInputState
 								value={manualCode}
 								onChange={setManualCode}
+								nik={nikInput}
+								onNikChange={handleNikChange}
 								onSubmit={handleManualSubmit}
 								onSwitchUpload={() => setUploadMode(true)}
 							/>
 						)}
 						{state === "idle" && uploadMode && (
 							<UploadState
+								nik={nikInput}
+								onNikChange={handleNikChange}
 								onPickFile={() => fileInputRef.current?.click()}
 								onDrop={handleDrop}
 								onSwitchManual={() => setUploadMode(false)}
@@ -218,7 +255,8 @@ export default function TicketVerificationPage() {
 						{state === "success" && (
 							<SuccessState
 								fileName={fileName}
-								kodeTiket={kodeTiket}
+								ticketCode={ticketCode}
+								nik={nikInput}
 								detail={ticketDetail}
 							/>
 						)}
@@ -242,33 +280,66 @@ export default function TicketVerificationPage() {
 					</div>
 
 					{["failed", "success"].includes(state) && (
-						<div
-							className={`px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex items-center justify-end gap-2 ${state === "failed" ? "justify-end" : "justify-between"}`}>
-							{state === "failed" && (
-								<button
-									onClick={handleRetry}
-									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-									Coba Lagi
-								</button>
-							)}
-							{state === "success" && (
-								<button
-									onClick={handleRetry}
-									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-									Ganti Tiket
-								</button>
-							)}
+						<>
+							<FooterMobileBtn
+								children={
+									<>
+										{state === "failed" && (
+											<Button
+												onClick={handleRetry}
+												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+												Coba Lagi
+											</Button>
+										)}
+										{state === "success" && (
+											<Button
+												onClick={handleRetry}
+												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+												Ganti Tiket
+											</Button>
+										)}
 
-							{state === "success" && (
-								<button
-									onClick={handleContinue}
-									disabled={isNavigating}
-									className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-									Lanjutkan
-									<ArrowRight className="w-4 h-4" />
-								</button>
-							)}
-						</div>
+										{state === "success" && (
+											<Button
+												onClick={handleContinue}
+												disabled={isNavigating}
+												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+												Lanjutkan
+												<ArrowRight className="w-4 h-4" />
+											</Button>
+										)}
+									</>
+								}
+							/>
+
+							<div
+								className={`hidden px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 md:flex items-center gap-2 ${state === "failed" ? "justify-end" : "justify-between"}`}>
+								{state === "failed" && (
+									<button
+										onClick={handleRetry}
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										Coba Lagi
+									</button>
+								)}
+								{state === "success" && (
+									<button
+										onClick={handleRetry}
+										className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
+										Ganti Tiket
+									</button>
+								)}
+
+								{state === "success" && (
+									<button
+										onClick={handleContinue}
+										disabled={isNavigating}
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+										Lanjutkan
+										<ArrowRight className="w-4 h-4" />
+									</button>
+								)}
+							</div>
+						</>
 					)}
 				</div>
 			</div>
@@ -277,50 +348,61 @@ export default function TicketVerificationPage() {
 }
 
 function UploadState({
+	nik,
+	onNikChange,
 	onPickFile,
 	onDrop,
 	onSwitchManual,
 }: {
+	nik: string;
+	onNikChange: (v: string) => void;
 	onPickFile: () => void;
 	onDrop: (e: React.DragEvent) => void;
 	onSwitchManual: () => void;
 }) {
 	const [dragOver, setDragOver] = useState(false);
+	const nikValid = isValidNik(nik);
 	return (
 		<>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Unggah Tiket Anda
-			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Kami akan memindai barcode/QR pada tiket Anda secara otomatis untuk
-				mendapatkan kode tiket. Mendukung file PDF dan gambar.
+			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">Unggah Tiket</h2>
+			<p className="text-gray-500 text-sm max-w-md mb-4">
+				Masukkan NIK terlebih dahulu, lalu unggah tiket agar sistem dapat
+				membaca kode QR/barcode secara otomatis.
 			</p>
 
+			<NikInput value={nik} onChange={onNikChange} />
+
 			<div
-				onClick={onPickFile}
+				onClick={() => {
+					if (nikValid) onPickFile();
+				}}
 				onDragOver={(e) => {
 					e.preventDefault();
-					setDragOver(true);
+					if (nikValid) setDragOver(true);
 				}}
 				onDragLeave={() => setDragOver(false)}
 				onDrop={(e) => {
 					setDragOver(false);
-					onDrop(e);
+					if (nikValid) onDrop(e);
 				}}
-				className={`w-full max-w-md border-2 border-dashed rounded-xl px-6 py-10 cursor-pointer transition-colors ${
-					dragOver
-						? "border-[#3b5bdb] bg-blue-50"
-						: "border-gray-300 bg-gray-50 hover:border-[#3b5bdb] hover:bg-blue-50/50"
+				className={`w-full max-w-md border-2 border-dashed rounded-xl px-5 py-8 sm:px-6 sm:py-10 transition-colors ${
+					!nikValid
+						? "cursor-not-allowed border-gray-200 bg-gray-100 opacity-70"
+						: dragOver
+							? "cursor-pointer border-[#3b5bdb] bg-blue-50"
+							: "cursor-pointer border-gray-300 bg-gray-50 hover:border-[#3b5bdb] hover:bg-blue-50/50"
 				}`}>
 				<div className="flex flex-col items-center gap-3">
 					<div className="w-14 h-14 rounded-full bg-[#3b5bdb]/10 flex items-center justify-center">
 						<Upload className="w-7 h-7 text-[#3b5bdb]" />
 					</div>
 					<p className="text-sm font-medium text-[#1e2a4a]">
-						Klik untuk pilih file atau seret ke sini
+						{nikValid
+							? "Pilih file tiket atau seret ke sini"
+							: "Lengkapi NIK 16 digit terlebih dahulu"}
 					</p>
 					<p className="text-xs text-gray-500">
-						PDF atau gambar JPG/PNG (maks 5 MB)
+						Format PDF, JPG, atau PNG. Maksimal 5 MB.
 					</p>
 				</div>
 			</div>
@@ -328,7 +410,7 @@ function UploadState({
 			<button
 				onClick={onSwitchManual}
 				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
-				Kembali ke input kode tiket
+				Isi kode tiket manual
 			</button>
 		</>
 	);
@@ -337,50 +419,115 @@ function UploadState({
 function ManualInputState({
 	value,
 	onChange,
+	nik,
+	onNikChange,
 	onSubmit,
 	onSwitchUpload,
 }: {
 	value: string;
 	onChange: (v: string) => void;
+	nik: string;
+	onNikChange: (v: string) => void;
 	onSubmit: () => void;
 	onSwitchUpload: () => void;
 }) {
+	const formValid = Boolean(value.trim() && isValidNik(nik));
+
 	return (
 		<>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Masukkan Kode Tiket
+			<h2 className="text-lg sm:text-xl font-bold text-[#1e2a4a] mb-2">
+				Masukkan Data Tiket
 			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Ketik kode tiket sesuai dengan yang tertera pada tiket Anda.
+			<p className="text-gray-500 text-sm max-w-md mb-4">
+				Isi kode tiket dan NIK sesuai identitas yang akan didaftarkan.
 			</p>
 
-			<div className="w-full max-w-md">
-				<input
-					type="text"
-					value={value}
-					onChange={(e) => onChange(e.target.value)}
-					placeholder="Contoh: TKT-ABCD-1234"
-					className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-[#1e2a4a] placeholder-gray-400 focus:outline-none focus:border-[#3b5bdb] focus:ring-2 focus:ring-[#3b5bdb]/20"
-				/>
+			<div className="w-full max-w-md space-y-3 text-left">
+				<label className="block">
+					<span className="mb-1.5 block text-xs font-semibold text-gray-600">
+						Kode Tiket
+					</span>
+					<input
+						type="text"
+						value={value}
+						onChange={(e) => onChange(e.target.value)}
+						placeholder="Contoh: TIK-ABCD-1234"
+						className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
+					/>
+				</label>
+
+				<NikInput value={nik} onChange={onNikChange} />
+
 				<button
 					onClick={onSubmit}
-					disabled={!value.trim()}
-					className={`mt-3 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-						value.trim()
+					disabled={!formValid}
+					className={`mt-3 hidden md:inline-flex w-full  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+						formValid
 							? "bg-[#3b5bdb] hover:bg-[#3451c5]"
 							: "bg-gray-300 cursor-not-allowed"
 					}`}>
-					Verifikasi Kode
+					Cek Tiket
 				</button>
+
+				<FooterMobileBtn
+					children={
+						<Button
+							onClick={onSubmit}
+							disabled={!formValid}
+							className={`md:hidden w-full inline-flex  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
+								formValid
+									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+									: "bg-gray-800 cursor-not-allowed"
+							}`}>
+							Cek Tiket
+						</Button>
+					}
+				/>
 			</div>
 
 			<button
 				onClick={onSwitchUpload}
 				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
 				<Upload className="w-4 h-4" />
-				Scan dari PDF / QR Code
+				Scan dari file tiket
 			</button>
 		</>
+	);
+}
+
+function NikInput({
+	value,
+	onChange,
+}: {
+	value: string;
+	onChange: (v: string) => void;
+}) {
+	const hasValue = value.length > 0;
+	const valid = isValidNik(value);
+
+	return (
+		<label className="block w-full max-w-md text-left">
+			<span className="mb-1.5 block text-xs font-semibold text-gray-600">
+				NIK
+			</span>
+			<input
+				type="text"
+				inputMode="numeric"
+				autoComplete="off"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				placeholder="16 digit NIK"
+				className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
+			/>
+			<p
+				className={`mt-1.5 text-xs ${
+					hasValue && !valid ? "text-red-500" : "text-gray-400"
+				}`}>
+				{hasValue && !valid
+					? `${value.length}/${NIK_LENGTH} digit — NIK harus 16 digit angka.`
+					: "NIK digunakan untuk pendaftaran data diri."}
+			</p>
+		</label>
 	);
 }
 
@@ -393,7 +540,7 @@ function ScanningState({ fileName }: { fileName: string }) {
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Memindai Barcode...
+				Memindai Tiket...
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md">
 				Sedang memproses{" "}
@@ -401,7 +548,7 @@ function ScanningState({ fileName }: { fileName: string }) {
 			</p>
 			<div className="inline-flex items-center gap-2 mt-4 text-xs text-gray-400">
 				<ScanLine className="w-4 h-4" />
-				Mencari barcode/QR pada file
+				Mencari QR/barcode pada file
 			</div>
 		</>
 	);
@@ -409,11 +556,13 @@ function ScanningState({ fileName }: { fileName: string }) {
 
 function SuccessState({
 	fileName,
-	kodeTiket,
+	ticketCode,
+	nik,
 	detail,
 }: {
 	fileName: string;
-	kodeTiket: string | null;
+	ticketCode: string | null;
+	nik: string;
 	detail: TicketDetail | null;
 }) {
 	return (
@@ -425,25 +574,27 @@ function SuccessState({
 					</div>
 				</div>
 			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">Tiket Valid!</h2>
+			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
+				Tiket Terverifikasi
+			</h2>
 
 			<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-left space-y-3">
-				{detail?.detailTransactionDocument?.name && (
-					<DetailRow
-						label="Nama"
-						value={detail.detailTransactionDocument.name}
-					/>
+				{detail?.eventName && (
+					<DetailRow label="Nama" value={detail.eventName} />
 				)}
-				{detail?.ticket?.category && (
-					<DetailRow label="Kategori" value={detail.ticket.category} />
+				{detail?.ticketCategory && (
+					<DetailRow label="Kategori" value={detail.ticketCategory} />
 				)}
-				{detail?.status && <DetailRow label="Status" value={detail.status} />}
+				{detail?.ticketStatus && (
+					<DetailRow label="Status" value={detail.ticketStatus} />
+				)}
 				<div>
 					<p className="text-xs text-gray-500 mb-1">Kode Tiket</p>
 					<p className="font-mono text-base font-bold text-[#1e2a4a] break-all">
-						{detail?.ticket?.ticketCode || kodeTiket}
+						{detail?.ticketTag || ticketCode}
 					</p>
 				</div>
+				<DetailRow label="NIK" value={nik} />
 			</div>
 		</>
 	);
@@ -467,10 +618,10 @@ function ValidatingState() {
 				</div>
 			</div>
 			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Memvalidasi Tiket...
+				Mengecek Tiket...
 			</h2>
 			<p className="text-gray-500 text-sm max-w-md">
-				Memeriksa keabsahan kode tiket ke server.
+				Mohon tunggu, sistem sedang mengecek data tiket Anda.
 			</p>
 		</>
 	);

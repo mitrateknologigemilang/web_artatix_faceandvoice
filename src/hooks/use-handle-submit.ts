@@ -5,7 +5,8 @@ import { SubmitBiometricPayload } from "@/services/verification.service";
 
 export function useHandleSubmit({
 	faceBlob,
-	kodeTiket,
+	ticketCode,
+	nik,
 	errorMsg,
 	setErrorMsg,
 	setSubmitting,
@@ -13,7 +14,8 @@ export function useHandleSubmit({
 	getApiErrorMessage,
 }: {
 	faceBlob: Blob | null;
-	kodeTiket: string | null;
+	ticketCode: string | null;
+	nik: string | null;
 	errorMsg: string | null;
 	setErrorMsg: (msg: string | null) => void;
 	setSubmitting: (submitting: boolean) => void;
@@ -29,8 +31,15 @@ export function useHandleSubmit({
 				return false;
 			}
 
-			if (!kodeTiket) {
+			if (!ticketCode) {
 				setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
+				return false;
+			}
+
+			if (!nik) {
+				setErrorMsg(
+					"NIK belum tersedia. Silakan lengkapi data tiket terlebih dahulu.",
+				);
 				return false;
 			}
 
@@ -38,7 +47,8 @@ export function useHandleSubmit({
 
 			try {
 				await submitBiometricData({
-					ticketCode: kodeTiket,
+					ticketTag: ticketCode,
+					nik,
 					file_wajah: face,
 				});
 
@@ -56,7 +66,8 @@ export function useHandleSubmit({
 			}
 		},
 		[
-			kodeTiket,
+			ticketCode,
+			nik,
 			setErrorMsg,
 			setSubmitting,
 			submitBiometricData,
@@ -74,7 +85,9 @@ export function useHandleSubmit({
 
 	const handleErrorClose = useCallback(() => {
 		const wasMissingTicket =
-			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1.";
+			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1." ||
+			errorMsg ===
+				"NIK belum tersedia. Silakan lengkapi data tiket terlebih dahulu.";
 
 		setErrorMsg(null);
 

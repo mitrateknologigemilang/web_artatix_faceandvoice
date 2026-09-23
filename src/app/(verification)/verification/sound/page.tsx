@@ -27,7 +27,6 @@ import {
 	getApiErrorMessage,
 	submitBiometricData,
 } from "@/services/verification.service";
-import { convertToWav } from "@/lib/audioConverter";
 import { useRouter } from "next/navigation";
 import {
 	Dialog,
@@ -52,7 +51,7 @@ export default function SoundVerificationPage() {
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const { faceBlob, kodeTiket, setFaceBlob, setStep } = useVerification();
+	const { faceBlob, ticketCode, nik, setFaceBlob, setStep } = useVerification();
 	const allowed = useVerificationGuard("sound");
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -140,14 +139,12 @@ export default function SoundVerificationPage() {
 
 	const { handleSubmit, handleErrorClose } = useHandleSubmit({
 		faceBlob,
-		kodeTiket,
+		ticketCode,
+		nik,
 		errorMsg,
 		setErrorMsg,
 		setSubmitting,
-		submitBiometricData: async (payload) => {
-			const wavBlob = audioBlob ? await convertToWav(audioBlob) : undefined;
-			return submitBiometricData({ ...payload, file_suara: wavBlob });
-		},
+		submitBiometricData,
 		getApiErrorMessage,
 	});
 
