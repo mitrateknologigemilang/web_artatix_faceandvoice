@@ -294,7 +294,7 @@ export default function TicketVerificationPage() {
 										{state === "success" && (
 											<Button
 												onClick={handleRetry}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors">
+												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25  font-medium text-sm text-white hover:bg-primary-50 transition-colors">
 												Ganti Tiket
 											</Button>
 										)}

@@ -301,7 +301,7 @@ export default function FaceVerificationPage() {
 										<Button
 											disabled={submitting}
 											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25 text-primary font-medium text-sm hover:bg-primary-50 transition-colors ${
+											className={`inline-flex text-white items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/25  font-medium text-sm hover:bg-primary-50 transition-colors ${
 												submitting ? "opacity-60 cursor-not-allowed" : ""
 											}`}>
 											<ArrowLeft className="w-4 h-4" />
@@ -333,7 +333,7 @@ export default function FaceVerificationPage() {
 											type="button"
 											disabled={submitting}
 											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 rounded-lg border border-primary/25 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary-50 ${
+											className={`inline-flex text-white items-center gap-2 rounded-lg border border-primary/25 px-5 py-2.5 text-sm font-medium  transition-colors hover:bg-primary-50 ${
 												submitting ? "cursor-not-allowed opacity-60" : ""
 											}`}>
 											<TicketX className="h-4 w-4" />
@@ -354,7 +354,7 @@ export default function FaceVerificationPage() {
 												<Send className="h-4 w-4" />
 											)}
 											{submitting ? "Mengirim..." : "Daftarkan"}
-											</Button>
+										</Button>
 									</>
 								)}
 							</>
@@ -428,7 +428,7 @@ export default function FaceVerificationPage() {
 										<Send className="h-4 w-4" />
 									)}
 									{submitting ? "Mengirim..." : "Daftarkan"}
-									</button>
+								</button>
 							</div>
 						)}
 					</div>
