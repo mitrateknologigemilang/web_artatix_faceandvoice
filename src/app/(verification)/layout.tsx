@@ -7,6 +7,7 @@ export default function VerificationLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const year = new Date().getFullYear();
 	return (
 		<VerificationProvider>
 			<div className="min-h-screen relative flex flex-col bg-[#f0f2f8]">
@@ -25,7 +26,7 @@ export default function VerificationLayout({
 				{/* Footer */}
 				<footer className="py-4 sm:py-6 text-center bg-white">
 					<p className="text-sm text-gray-500">
-						© 2026 Artatix. All rights reserved.
+						© {year} Belikarcis. All rights reserved.
 					</p>
 				</footer>
 			</div>
