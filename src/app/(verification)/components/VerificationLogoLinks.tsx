@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import artatixLogo from "@/assets/artatix-logo.svg";
+import beliKercisLogo from "@/assets/logo.webp";
 import jomloFestLogo from "@/assets/jomlo-fest-logo.png";
 import { useVerification } from "../VerificationContext";
 
@@ -20,21 +20,7 @@ export function VerificationLogoLinks() {
 				onClick={handleReset}
 				className="flex h-16 items-center"
 				aria-label="Kembali ke verifikasi tiket">
-				<Image width={100} height={25} src={artatixLogo} alt="Artatix" />
-			</button>
-
-			<button
-				type="button"
-				onClick={handleReset}
-				className="flex h-16 items-center"
-				aria-label="Kembali ke verifikasi tiket">
-				<Image
-					unoptimized
-					width={70}
-					height={25}
-					src={jomloFestLogo}
-					alt="Jomlo Fest"
-				/>
+				<Image width={200} height={100} src={beliKercisLogo} alt="Artatix" />
 			</button>
 		</>
 	);
