@@ -20,7 +20,7 @@ export function VerificationLogoLinks() {
 				onClick={handleReset}
 				className="flex h-16 items-center"
 				aria-label="Kembali ke verifikasi tiket">
-				<Image width={200} height={100} src={beliKercisLogo} alt="Artatix" />
+				<Image width={180} height={100} src={beliKercisLogo} alt="Artatix" />
 			</button>
 		</>
 	);
