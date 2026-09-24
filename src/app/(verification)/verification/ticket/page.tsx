@@ -211,7 +211,7 @@ export default function TicketVerificationPage() {
 		<>
 			<HeaderSection />
 
-			<div className="space-y-6 pb-24 md:pb-0">
+			<div className="space-y-6">
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
@@ -506,7 +506,7 @@ function NikInput({
 	const valid = isValidNik(value);
 
 	return (
-		<label className="block w-full max-w-md text-left">
+		<label className="block w-full max-w-md text-left mb-3">
 			<span className="mb-1.5 block text-xs font-semibold text-gray-600">
 				NIK
 			</span>

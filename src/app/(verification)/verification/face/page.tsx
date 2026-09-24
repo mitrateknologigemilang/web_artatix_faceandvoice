@@ -238,9 +238,9 @@ export default function FaceVerificationPage() {
 				description={errorMsg}
 			/>
 
-			<div className="space-y-6 pb-28 md:pb-0">
+			<div className="space-y-6">
 				{/* Main Card */}
-				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-3 md:mb-0">
 					{/* Card Header */}
 					<div className="relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
 						<div className="flex items-center gap-2 min-w-0">
