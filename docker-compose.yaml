@@ -1,0 +1,13 @@
+name: beli-karcis
+
+services:
+  beli-karcis-fe:
+    image:
+      beli-karcis-face-regis
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: beli-karcis-face-regis
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
