@@ -24,7 +24,7 @@ RUN yarn build
 FROM nginx:stable-alpine AS production-stage
 
 # Copy built files from previous stage
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY --from=build-stage /app/out /usr/share/nginx/html
 
 # Remove default config
 RUN rm /etc/nginx/conf.d/default.conf
