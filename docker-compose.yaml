@@ -4,6 +4,9 @@ services:
   beli-karcis-fe:
     image:
       beli-karcis-face-regis
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_X_API_KEY=${NEXT_PUBLIC_X_API_KEY}
     build:
       context: .
       dockerfile: Dockerfile
