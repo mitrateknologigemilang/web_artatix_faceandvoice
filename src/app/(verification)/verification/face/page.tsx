@@ -545,7 +545,7 @@ function SuccessState({
 					{[
 						"Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.",
 						"Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.",
-						"Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Jomlo Fest.",
+						"Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Venue.",
 						"Tiket dengan Face ID yang telah terdaftar tidak dapat digunakan oleh orang lain.",
 						"Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku.",
 					].map((text, i) => (
