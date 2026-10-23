@@ -442,10 +442,10 @@ function ManualInputState({
 				Isi kode tiket dan NIK sesuai identitas yang akan didaftarkan.
 			</p>
 
-			<div className="w-full max-w-md space-y-3 text-left">
-				<label className="block">
+			<div className="w-full max-w-md  text-left">
+				<label className="block mb-3">
 					<span className="mb-1.5 block text-xs font-semibold text-gray-600">
-						Kode Tiket
+						Kode Tiket <span className=" text-red-500">*</span>
 					</span>
 					<input
 						type="text"
@@ -506,9 +506,9 @@ function NikInput({
 	const valid = isValidNik(value);
 
 	return (
-		<label className="block w-full max-w-md text-left">
+		<label className="block w-full max-w-md text-left mb-3">
 			<span className="mb-1.5 block text-xs font-semibold text-gray-600">
-				NIK
+				NIK <span className=" text-red-500">*</span>
 			</span>
 			<input
 				type="text"
