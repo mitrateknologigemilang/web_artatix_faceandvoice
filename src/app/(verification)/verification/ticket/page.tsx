@@ -23,6 +23,7 @@ import {
 	getTicketDetail,
 	type TicketDetail,
 } from "@/services/verification.service";
+import { preloadFaceDetector } from "@/lib/face-liveness-detector";
 import { TransitionLoading } from "../../components/TransitionLoading";
 import HeaderSection from "../../components/HeaderSection";
 import FooterMobileBtn from "../../components/FooterMobileBtn";
@@ -32,7 +33,19 @@ import { Button } from "@/components/ui/button";
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const TICKET_CODE_LENGTH = 16;
 const NIK_LENGTH = 16;
+
+function normalizeTicketCode(value: string) {
+	return value
+		.toUpperCase()
+		.replace(/[^A-Z0-9]/g, "")
+		.slice(0, TICKET_CODE_LENGTH);
+}
+
+function isValidTicketCode(value: string) {
+	return /^[A-Z0-9]{16}$/.test(value);
+}
 
 function normalizeNik(value: string) {
 	return value.replace(/\D/g, "").slice(0, NIK_LENGTH);
@@ -98,6 +111,7 @@ export default function TicketVerificationPage() {
 				setNik(nik);
 				setFaceBlob(null);
 				setState("success");
+				preloadFaceDetector();
 			} catch (err) {
 				console.error(err);
 				setErrorMsg(
@@ -183,11 +197,15 @@ export default function TicketVerificationPage() {
 		setUploadMode(false);
 	};
 
+	const handleManualCodeChange = (value: string) => {
+		setManualCode(normalizeTicketCode(value));
+	};
+
 	const handleManualSubmit = () => {
-		const trimmed = manualCode.trim().toUpperCase();
-		if (!trimmed || !isValidNik(nikInput)) return;
+		const normalizedCode = normalizeTicketCode(manualCode);
+		if (!isValidTicketCode(normalizedCode) || !isValidNik(nikInput)) return;
 		setFileName("Input manual");
-		validateCode(trimmed, nikInput);
+		validateCode(normalizedCode, nikInput);
 	};
 
 	const handleNikChange = (value: string) => {
@@ -271,7 +289,7 @@ export default function TicketVerificationPage() {
 				{state === "idle" && !uploadMode && (
 					<ManualInputState
 						value={manualCode}
-						onChange={setManualCode}
+						onChange={handleManualCodeChange}
 						nik={nikInput}
 						onNikChange={handleNikChange}
 						onSubmit={handleManualSubmit}
@@ -429,21 +447,44 @@ function ManualInputState({
 	onSubmit: () => void;
 	onSwitchUpload: () => void;
 }) {
-	const formValid = Boolean(value.trim() && isValidNik(nik));
+	const hasCode = value.length > 0;
+	const codeValid = isValidTicketCode(value);
+	const formValid = codeValid && isValidNik(nik);
 
 	return (
 		<div className="w-full flex-1 flex flex-col text-left gap-4">
-			<label className="block">
-				<span className="mb-1.5 block text-xs font-semibold text-slate-700">
-					Kode Tiket <span className="text-red-500">*</span>
-				</span>
+			<label className="block w-full text-left">
+				<div className="mb-1.5 flex items-center justify-between">
+					<span className="text-xs font-semibold text-slate-700">
+						Kode Tiket <span className="text-red-500">*</span>
+					</span>
+					<span
+						className={`text-[11px] font-mono font-semibold ${
+							codeValid
+								? "text-emerald-600"
+								: hasCode
+									? "text-amber-600"
+									: "text-slate-400"
+						}`}>
+						{value.length}/{TICKET_CODE_LENGTH}
+					</span>
+				</div>
 				<input
 					type="text"
+					autoComplete="off"
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
-					placeholder="Contoh: TIK-ABCD-1234"
-					className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 text-[15px] font-medium text-[#1e2a4a] placeholder-slate-400 transition-colors focus:border-[#3b5bdb] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/15"
+					placeholder="Contoh: 4E02E1D72C4D4264"
+					className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 font-mono text-[15px] font-medium uppercase text-[#1e2a4a] placeholder:font-sans placeholder:normal-case placeholder-slate-400 transition-colors focus:border-[#3b5bdb] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/15"
 				/>
+				<p
+					className={`mt-1.5 text-[11px] ${
+						hasCode && !codeValid ? "text-red-500" : "text-slate-400"
+					}`}>
+					{hasCode && !codeValid
+						? "Kode tiket harus berjumlah 16 karakter huruf/angka."
+						: "Masukkan 16 karakter kode yang tertera di bawah barcode e-ticket."}
+				</p>
 			</label>
 
 			<NikInput value={nik} onChange={onNikChange} />
