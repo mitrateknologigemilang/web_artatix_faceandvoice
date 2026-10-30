@@ -46,14 +46,16 @@ export function Modal({
 					<SheetTitle
 						className={
 							title
-								? "text-lg font-bold text-center text-[#1e2a4a]"
+								? "text-base font-bold text-center text-[#1e2a4a]"
 								: "sr-only"
 						}>
 						{title || "Notifikasi"}
 					</SheetTitle>
 					{description && (
-						<SheetDescription className="text-slate-500 text-sm text-center mt-1 leading-relaxed">
-							{description}
+						<SheetDescription asChild>
+							<div className="text-slate-600 text-xs text-center mt-1 leading-relaxed">
+								{description}
+							</div>
 						</SheetDescription>
 					)}
 				</SheetHeader>
@@ -61,7 +63,7 @@ export function Modal({
 				{children ?? (
 					<button
 						onClick={onClose}
-						className="mt-2 w-full bg-[#3b5bdb] text-white font-semibold text-sm h-11 rounded-xl hover:bg-[#3451c5] active:scale-[0.99] transition-all shadow-sm">
+						className="mt-2 w-full bg-[#3b5bdb] text-white font-semibold text-sm h-11 rounded-xl hover:bg-[#3451c5] active:scale-[0.99] transition-all">
 						Tutup
 					</button>
 				)}
