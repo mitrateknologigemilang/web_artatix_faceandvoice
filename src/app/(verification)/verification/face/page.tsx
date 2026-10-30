@@ -88,8 +88,8 @@ const FRAME: Record<"desktop" | "mobile", FrameCfg> = {
 const CAMERA_READY_CHECK_DELAY_MS = 1200;
 const CAMERA_RESTART_DELAY_MS = 900;
 const MAX_CAMERA_RESTART_ATTEMPTS = 4;
-const FACE_DETECTION_INTERVAL_DESKTOP_MS = 400;
-const FACE_DETECTION_INTERVAL_MOBILE_MS = 1200;
+const FACE_DETECTION_INTERVAL_DESKTOP_MS = 350;
+const FACE_DETECTION_INTERVAL_MOBILE_MS = 350;
 const CAMERA_VIDEO_CONSTRAINTS: MediaTrackConstraints[] = [
 	{ facingMode: { ideal: "user" } },
 	{ facingMode: "user" },

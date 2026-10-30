@@ -1,4 +1,4 @@
-import * as ort from "onnxruntime-web";
+import type * as ortTypes from "onnxruntime-web";
 
 type FaceBox = [number, number, number, number, number];
 
@@ -42,6 +42,11 @@ interface RawLivenessResult {
 	};
 }
 
+const TINY_FACE_CONFIG = {
+	inputSize: 224,
+	scoreThreshold: 0.45,
+};
+
 const RF_CONFIG = {
 	inputSize: 640,
 	confThreshold: 0.45,
@@ -56,27 +61,73 @@ const MINIFAS_CONFIG = {
 
 const REQUIRED_CONSECUTIVE_REAL = 4;
 
-let runtimeConfigured = false;
+type FaceApiModule = typeof import("face-api.js");
+type OrtModule = typeof import("onnxruntime-web");
 
-function configureRuntime() {
-	if (runtimeConfigured) return;
-	ort.env.logLevel = "fatal";
-	ort.env.wasm.wasmPaths = "/ort/";
-	ort.env.wasm.numThreads = 1;
-	runtimeConfigured = true;
+let faceApiPromise: Promise<FaceApiModule> | null = null;
+let tinyDetectorReady = false;
+let ortModulePromise: Promise<OrtModule> | null = null;
+
+async function ensureTinyFaceDetector(): Promise<FaceApiModule> {
+	if (!faceApiPromise) {
+		faceApiPromise = (async () => {
+			const faceapi = await import("face-api.js");
+			if (!tinyDetectorReady && !faceapi.nets.tinyFaceDetector.isLoaded) {
+				await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+			}
+			tinyDetectorReady = true;
+			return faceapi;
+		})().catch((err) => {
+			faceApiPromise = null;
+			tinyDetectorReady = false;
+			throw err;
+		});
+	}
+	return faceApiPromise;
+}
+
+/**
+ * Preload the lightweight TinyFaceDetector (~190 KB) in the background
+ * so it is already in memory before the user opens the camera.
+ */
+export function preloadFaceDetector(): void {
+	if (typeof window === "undefined") return;
+	void ensureTinyFaceDetector().catch(() => {});
+}
+
+async function getOrtRuntime(): Promise<OrtModule> {
+	if (!ortModulePromise) {
+		ortModulePromise = (async () => {
+			const ort = await import("onnxruntime-web");
+			ort.env.logLevel = "fatal";
+			ort.env.wasm.wasmPaths = "/ort/";
+			ort.env.wasm.numThreads = 1;
+			return ort;
+		})();
+	}
+	return ortModulePromise;
 }
 
 export class FaceLivenessDetector {
-	private retinaFaceSession: ort.InferenceSession | null = null;
-	private miniFASSession: ort.InferenceSession | null = null;
+	private faceapi: FaceApiModule | null = null;
+	private ort: OrtModule | null = null;
+	private retinaFaceSession: ortTypes.InferenceSession | null = null;
+	private miniFASSession: ortTypes.InferenceSession | null = null;
 	private anchors: number[][] = [];
 	private stabilityCounter = 0;
 
 	async loadModels({ includeLiveness = true } = {}) {
-		configureRuntime();
+		if (!includeLiveness) {
+			// Lightweight path (~190 KB TinyFaceDetector via face-api.js, cached as singleton)
+			this.faceapi = await ensureTinyFaceDetector();
+			return;
+		}
+
+		const ort = await getOrtRuntime();
+		this.ort = ort;
 		this.anchors = this.generateAnchors(RF_CONFIG.inputSize);
 
-		const options: ort.InferenceSession.SessionOptions = {
+		const options: ortTypes.InferenceSession.SessionOptions = {
 			executionProviders: ["wasm"],
 			graphOptimizationLevel: "all",
 		};
@@ -86,17 +137,28 @@ export class FaceLivenessDetector {
 			options,
 		);
 
-		if (includeLiveness) {
-			this.miniFASSession = await ort.InferenceSession.create(
-				"/models/liveness/2.7_80x80_MiniFASNetV2_Fixed.onnx",
-				options,
-			);
-		}
+		this.miniFASSession = await ort.InferenceSession.create(
+			"/models/liveness/2.7_80x80_MiniFASNetV2_Fixed.onnx",
+			options,
+		);
 	}
 
 	async processFaceFrame(
 		videoElement: HTMLVideoElement,
 	): Promise<FaceDetectionResult | null> {
+		if (this.faceapi) {
+			const detection = await this.faceapi.detectSingleFace(
+				videoElement,
+				new this.faceapi.TinyFaceDetectorOptions(TINY_FACE_CONFIG),
+			);
+			if (!detection) return null;
+
+			const { x, y, width, height } = detection.box;
+			return {
+				bbox: [x, y, x + width, y + height, detection.score],
+			};
+		}
+
 		if (!this.retinaFaceSession) {
 			throw new Error("Face detection model is not loaded.");
 		}
@@ -167,7 +229,7 @@ export class FaceLivenessDetector {
 		if (!this.retinaFaceSession) return [];
 
 		const input = this.preprocessRetinaFace(videoElement);
-		const feeds: Record<string, ort.Tensor> = {
+		const feeds: Record<string, ortTypes.Tensor> = {
 			[this.retinaFaceSession.inputNames[0]]: input,
 		};
 		const results = await this.retinaFaceSession.run(feeds);
@@ -198,7 +260,7 @@ export class FaceLivenessDetector {
 			MINIFAS_CONFIG.inputSize,
 		);
 		const input = this.preprocessMiniFASNet(faceCrop);
-		const feeds: Record<string, ort.Tensor> = {
+		const feeds: Record<string, ortTypes.Tensor> = {
 			[this.miniFASSession.inputNames[0]]: input,
 		};
 		const results = await this.miniFASSession.run(feeds);
@@ -241,6 +303,7 @@ export class FaceLivenessDetector {
 	}
 
 	private preprocessMiniFASNet(imageData: ImageData) {
+		if (!this.ort) throw new Error("ONNX runtime is not initialized.");
 		const { data } = imageData;
 		const size = MINIFAS_CONFIG.inputSize;
 		const totalPixels = size * size;
@@ -255,10 +318,11 @@ export class FaceLivenessDetector {
 			float32Data[i + totalPixels * 2] = r;
 		}
 
-		return new ort.Tensor("float32", float32Data, [1, 3, size, size]);
+		return new this.ort.Tensor("float32", float32Data, [1, 3, size, size]);
 	}
 
 	private preprocessRetinaFace(videoElement: HTMLVideoElement) {
+		if (!this.ort) throw new Error("ONNX runtime is not initialized.");
 		const size = RF_CONFIG.inputSize;
 		const canvas = document.createElement("canvas");
 		canvas.width = size;
@@ -280,7 +344,7 @@ export class FaceLivenessDetector {
 			float32Data[i + size * size * 2] = r - 123;
 		}
 
-		return new ort.Tensor("float32", float32Data, [1, 3, size, size]);
+		return new this.ort.Tensor("float32", float32Data, [1, 3, size, size]);
 	}
 
 	private cropFace(
@@ -385,7 +449,7 @@ export class FaceLivenessDetector {
 	}
 
 	private extractRetinaFaceOutput(
-		results: ort.InferenceSession.OnnxValueMapType,
+		results: ortTypes.InferenceSession.OnnxValueMapType,
 	) {
 		const inputSize = RF_CONFIG.inputSize;
 		const strides = [8, 16, 32];
