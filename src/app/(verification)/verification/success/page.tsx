@@ -1,16 +1,33 @@
 "use client";
 
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import { useEffect } from "react";
+import {
+	ArrowLeft,
+	CheckCircle2,
+	ShieldCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useVerification } from "../../VerificationContext";
 import { useRouter } from "next/navigation";
 import HeaderSection from "../../components/HeaderSection";
 import FooterMobileBtn from "../../components/FooterMobileBtn";
+import InfoListCard from "../../components/InfoListCard";
 import { Button } from "@/components/ui/button";
 
 export default function VerificationSuccessPage() {
 	const router = useRouter();
-	const { clearVerification } = useVerification();
+	const { ticketCode, nik, ticketDetail, clearVerification } =
+		useVerification();
+
+	const [snapshot] = useState(() => ({
+		ticketCode: ticketDetail?.ticket?.ticketCode || ticketCode,
+		nik:
+			ticketDetail?.detailTransactionDocument?.identityNumber || nik,
+		ownerName:
+			ticketDetail?.detailTransactionDocument?.name ||
+			ticketDetail?.detailTransactionDocument?.fullname ||
+			null,
+		category: ticketDetail?.ticket?.category || null,
+	}));
 
 	// All steps done — drop the saved progress so a reload starts fresh.
 	useEffect(() => {
@@ -27,34 +44,105 @@ export default function VerificationSuccessPage() {
 
 			<HeaderSection />
 
-			<div className="my-auto py-10 flex flex-col items-center text-center">
-				{/* Success Icon */}
-				<div className="relative mb-5">
-					<div className="w-20 h-20 rounded-3xl bg-emerald-50 flex items-center justify-center relative ring-4 ring-emerald-50/50">
-						<div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center">
-							<CheckCircle2 className="w-8 h-8 text-emerald-500" />
+			<div className="flex-1 flex flex-col pb-4">
+				{/* Clean Status Banner */}
+				<div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4 text-left">
+					<div className="flex items-start gap-3">
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+							<CheckCircle2 className="h-5 w-5" />
 						</div>
-						<svg
-							className="absolute -top-1 -right-1 w-5 h-5 text-emerald-400"
-							viewBox="0 0 24 24"
-							fill="currentColor">
-							<path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
-						</svg>
-						<svg
-							className="absolute bottom-0 -left-2 w-4 h-4 text-emerald-300"
-							viewBox="0 0 24 24"
-							fill="currentColor">
-							<path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
-						</svg>
+						<div className="min-w-0">
+							<span className="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+								Registrasi Berhasil
+							</span>
+							<h1 className="mt-0.5 text-lg font-bold tracking-tight text-[#1e2a4a]">
+								Face ID Telah Terdaftar
+							</h1>
+							<p className="mt-1 text-xs leading-relaxed text-slate-600">
+								Data wajah Anda telah terhubung dengan tiket dan siap digunakan
+								untuk verifikasi masuk pada hari acara.
+							</p>
+						</div>
 					</div>
 				</div>
-				<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-					Registrasi Selesai!
-				</h2>
-				<p className="text-slate-500 text-xs leading-relaxed max-w-xs">
-					Data biometrik Anda telah berhasil disimpan. Identitas Anda kini
-					terhubung dengan tiket untuk akses masuk pada hari acara.
-				</p>
+
+				{/* Registered Ticket Summary (if available from flow) */}
+				{(snapshot.ticketCode || snapshot.ownerName || snapshot.nik) && (
+					<div className="mt-4 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+						<div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-2.5">
+							<span className="text-xs font-bold text-[#1e2a4a]">
+								Ringkasan Registrasi
+							</span>
+							<span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+								<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+								Terverifikasi
+							</span>
+						</div>
+						<div className="divide-y divide-slate-100 px-4">
+							{snapshot.ownerName && (
+								<div className="flex items-center justify-between gap-3 py-2.5">
+									<span className="text-xs text-slate-500">Nama Pemilik</span>
+									<span className="text-xs font-semibold text-[#1e2a4a] text-right truncate">
+										{snapshot.ownerName}
+									</span>
+								</div>
+							)}
+							{snapshot.category && (
+								<div className="flex items-center justify-between gap-3 py-2.5">
+									<span className="text-xs text-slate-500">Kategori Tiket</span>
+									<span className="text-xs font-semibold text-[#1e2a4a] text-right truncate">
+										{snapshot.category}
+									</span>
+								</div>
+							)}
+							{snapshot.ticketCode && (
+								<div className="flex items-center justify-between gap-3 py-2.5">
+									<span className="text-xs text-slate-500">Kode Tiket</span>
+									<span className="font-mono text-xs font-bold text-[#1e2a4a]">
+										{snapshot.ticketCode}
+									</span>
+								</div>
+							)}
+							{snapshot.nik && (
+								<div className="flex items-center justify-between gap-3 py-2.5">
+									<span className="text-xs text-slate-500">NIK</span>
+									<span className="font-mono text-xs font-semibold text-[#1e2a4a]">
+										{snapshot.nik}
+									</span>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
+
+				{/* Event Entry Guide Card */}
+				<InfoListCard
+					className="mt-4"
+					title="Panduan Masuk Saat Hari Acara"
+					items={[
+						{
+							title: "Pemindaian Wajah di Gate Masuk",
+							desc: "Arahkan wajah ke perangkat pemindai di jalur masuk tanpa mengenakan masker atau kacamata hitam.",
+						},
+						{
+							title: "Siapkan E-Ticket & Identitas",
+							desc: "Tetap simpan e-ticket dan KTP/identitas asli sebagai cadangan verifikasi petugas di lokasi.",
+						},
+						{
+							title: "Satu Wajah untuk Satu Tiket",
+							desc: "Tiket yang sudah terhubung dengan Face ID bersifat pribadi dan tidak dapat dipindahtangankan.",
+						},
+					]}
+				/>
+
+				{/* Privacy / Security Note */}
+				<div className="mt-3 flex items-center gap-2 px-1 text-left">
+					<ShieldCheck className="h-4 w-4 shrink-0 text-slate-400" />
+					<p className="text-[11px] text-slate-400">
+						Data biometrik Anda dienkripsi dan hanya digunakan untuk keperluan
+						verifikasi akses acara.
+					</p>
+				</div>
 			</div>
 
 			<FooterMobileBtn

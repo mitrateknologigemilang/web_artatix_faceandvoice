@@ -26,6 +26,7 @@ import {
 import { TransitionLoading } from "../../components/TransitionLoading";
 import HeaderSection from "../../components/HeaderSection";
 import FooterMobileBtn from "../../components/FooterMobileBtn";
+import InfoListCard from "../../components/InfoListCard";
 import { Button } from "@/components/ui/button";
 
 type ScanState = "idle" | "scanning" | "validating" | "success" | "failed";
@@ -213,12 +214,16 @@ export default function TicketVerificationPage() {
 		<div className="flex flex-col flex-1">
 			{/* Segmented Mobile Stepper */}
 			<div className="mb-4 flex items-center gap-2">
-				<div className="h-1.5 flex-1 rounded-full bg-[#3b5bdb]" />
 				<div
 					className={`h-1.5 flex-1 rounded-full transition-colors ${
-						state === "success" ? "bg-emerald-500" : "bg-slate-100"
+						state === "success"
+							? "bg-emerald-500"
+							: state === "failed"
+								? "bg-red-500"
+								: "bg-[#3b5bdb]"
 					}`}
 				/>
+				<div className="h-1.5 flex-1 rounded-full bg-slate-100" />
 			</div>
 
 			<HeaderSection />
@@ -464,49 +469,25 @@ function ManualInputState({
 }
 
 function TicketGuideCard() {
-	const steps = [
-		{
-			title: "Cek Kode pada E-Ticket",
-			desc: "Temukan kode tiket di bawah QR/Barcode pada PDF e-ticket dari email penerima e-ticket.",
-		},
-		{
-			title: "Masukkan Kode & 16 Digit NIK",
-			desc: "Pastikan NIK sesuai dengan identitas pemilik tiket. 1 tiket hanya berlaku untuk 1 identitas.",
-		},
-		{
-			title: "Lanjut Ambil Foto Wajah",
-			desc: "Setelah tiket terverifikasi, Anda akan diarahkan untuk mengambil foto selfie sebagai akses Face ID.",
-		},
-	];
-
 	return (
-		<div className="mt-2 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4">
-			<div className="mb-3 flex items-center gap-2">
-				<div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-50 text-[#3b5bdb]">
-					<Info className="h-3.5 w-3.5" />
-				</div>
-				<h3 className="text-xs font-bold text-[#1e2a4a]">
-					Panduan Singkat Registrasi
-				</h3>
-			</div>
-			<div className="space-y-3">
-				{steps.map((item, idx) => (
-					<div key={idx} className="flex items-start gap-3">
-						<span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-bold text-[#3b5bdb] border border-slate-200 shadow-2xs">
-							{idx + 1}
-						</span>
-						<div className="min-w-0">
-							<p className="text-xs font-semibold text-[#1e2a4a] leading-snug">
-								{item.title}
-							</p>
-							<p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-								{item.desc}
-							</p>
-						</div>
-					</div>
-				))}
-			</div>
-		</div>
+		<InfoListCard
+			className="mt-2"
+			title="Panduan Singkat Registrasi"
+			items={[
+				{
+					title: "Cek Kode pada E-Ticket",
+					desc: "Temukan kode tiket di bawah QR/Barcode pada PDF e-ticket dari email penerima e-ticket.",
+				},
+				{
+					title: "Masukkan Kode & 16 Digit NIK",
+					desc: "Pastikan NIK sesuai dengan identitas pemilik tiket. 1 tiket hanya berlaku untuk 1 identitas.",
+				},
+				{
+					title: "Lanjut Ambil Foto Wajah",
+					desc: "Setelah tiket terverifikasi, Anda akan diarahkan untuk mengambil foto selfie sebagai akses Face ID.",
+				},
+			]}
+		/>
 	);
 }
 
@@ -590,31 +571,41 @@ function SuccessState({
 	detail: TicketDetail | null;
 }) {
 	return (
-		<div className="w-full flex flex-col text-left">
-			<div className="mb-5">
-				<p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
-					Langkah 1 Selesai
-				</p>
-				<h1 className="mt-0.5 text-xl font-bold tracking-tight text-[#1e2a4a]">
-					Tiket Terverifikasi
-				</h1>
-				<p className="mt-1 text-xs leading-relaxed text-slate-500">
-					Periksa kembali rincian tiket Anda sebelum mengambil foto wajah.
-				</p>
-			</div>
-
-			{/* Mobile E-Ticket Stub Card */}
-			<div className="w-full rounded-3xl border border-slate-200 bg-slate-50/60 overflow-hidden">
-				<div className="flex items-center justify-between bg-emerald-50/80 px-4 py-3 border-b border-emerald-100">
-					<div className="flex items-center gap-2">
-						<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-						<span className="text-xs font-bold text-emerald-700">
-							Tiket Valid & Tersedia
+		<div className="w-full flex flex-col text-left pb-4">
+			{/* Clean Status Banner */}
+			<div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4">
+				<div className="flex items-start gap-3">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+						<CheckCircle2 className="h-5 w-5" />
+					</div>
+					<div className="min-w-0">
+						<span className="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+							Langkah 1 Selesai
 						</span>
+						<h1 className="mt-0.5 text-lg font-bold tracking-tight text-[#1e2a4a]">
+							Tiket Terverifikasi
+						</h1>
+						<p className="mt-1 text-xs leading-relaxed text-slate-600">
+							Data tiket dan identitas Anda telah sesuai. Periksa rincian di
+							bawah sebelum lanjut ke pengambilan foto wajah.
+						</p>
 					</div>
 				</div>
+			</div>
 
-				<div className="px-4 py-1 divide-y divide-slate-200/70">
+			{/* Ticket Detail Card */}
+			<div className="mt-4 w-full rounded-2xl border border-slate-200 bg-white overflow-hidden">
+				<div className="flex items-center justify-between bg-slate-50/70 px-4 py-2.5 border-b border-slate-100">
+					<span className="text-xs font-bold text-[#1e2a4a]">
+						Rincian Pemegang Tiket
+					</span>
+					<span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+						<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+						Valid & Tersedia
+					</span>
+				</div>
+
+				<div className="px-4 divide-y divide-slate-100">
 					{detail?.detailTransactionDocument?.name && (
 						<DetailRow
 							label="Nama Pemilik"
@@ -636,13 +627,13 @@ function SuccessState({
 			</div>
 
 			{/* Next Step Info Card */}
-			<div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-3.5">
-				<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-[#3b5bdb] shadow-2xs border border-blue-100">
+			<div className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-200/90 bg-slate-50/60 p-3.5">
+				<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-[#3b5bdb] border border-slate-200">
 					<ScanFace className="h-4 w-4" />
 				</div>
 				<div className="min-w-0">
 					<p className="text-xs font-bold text-[#1e2a4a]">
-						Langkah Selanjutnya: Foto Wajah
+						Langkah Selanjutnya: Ambil Foto Wajah
 					</p>
 					<p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
 						Siapkan kamera depan di tempat terang dan lepaskan masker atau
@@ -664,11 +655,11 @@ function DetailRow({
 	mono?: boolean;
 }) {
 	return (
-		<div className="flex items-center justify-between gap-3 py-3">
+		<div className="flex items-center justify-between gap-3 py-2.5">
 			<p className="text-xs text-slate-500 shrink-0">{label}</p>
 			<p
-				className={`text-xs font-bold text-[#1e2a4a] text-right truncate ${
-					mono ? "font-mono" : ""
+				className={`text-xs font-semibold text-[#1e2a4a] text-right truncate ${
+					mono ? "font-mono font-bold" : ""
 				}`}>
 				{value}
 			</p>
@@ -679,14 +670,14 @@ function DetailRow({
 function ValidatingState() {
 	return (
 		<div className="my-auto py-12 flex flex-col items-center text-center">
-			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50">
-				<Loader2 className="w-8 h-8 text-[#3b5bdb] animate-spin" />
+			<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/70">
+				<Loader2 className="w-6 h-6 text-[#3b5bdb] animate-spin" />
 			</div>
-			<h2 className="text-lg font-bold text-[#1e2a4a] mb-1">
-				Mengecek Tiket...
+			<h2 className="text-base font-bold text-[#1e2a4a] mb-1">
+				Mengecek Data Tiket...
 			</h2>
-			<p className="text-slate-500 text-xs max-w-xs">
-				Mohon tunggu, sistem sedang memvalidasi tiket dan NIK Anda.
+			<p className="text-slate-500 text-xs max-w-xs leading-relaxed">
+				Mohon tunggu, sistem sedang memvalidasi kode tiket dan NIK Anda.
 			</p>
 		</div>
 	);
@@ -699,16 +690,47 @@ function FailedState({
 	onSwitchManual: () => void;
 }) {
 	return (
-		<div className="my-auto py-10 flex flex-col items-center text-center">
-			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-red-50">
-				<XCircle className="w-8 h-8 text-red-500" />
+		<div className="w-full flex flex-col text-left pb-4">
+			{/* Clean Error Status Banner */}
+			<div className="rounded-2xl border border-red-200/80 bg-red-50/50 p-4">
+				<div className="flex items-start gap-3">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white">
+						<XCircle className="h-5 w-5" />
+					</div>
+					<div className="min-w-0">
+						<span className="inline-block text-[11px] font-bold uppercase tracking-wider text-red-700">
+							Verifikasi Gagal
+						</span>
+						<h1 className="mt-0.5 text-lg font-bold tracking-tight text-[#1e2a4a]">
+							Tiket Tidak Dapat Diverifikasi
+						</h1>
+						<p className="mt-1 text-xs leading-relaxed text-slate-600">
+							{message ||
+								"Data tiket atau NIK tidak ditemukan. Silakan periksa kembali data yang Anda masukkan."}
+						</p>
+					</div>
+				</div>
 			</div>
-			<h2 className="text-lg font-bold text-[#1e2a4a] mb-1">
-				Verifikasi Tiket Gagal
-			</h2>
-			<p className="text-slate-500 text-xs max-w-xs leading-relaxed">
-				{message}
-			</p>
+
+			{/* Troubleshooting / Checklist Card */}
+			<InfoListCard
+				className="mt-4"
+				title="Hal yang Perlu Diperiksa"
+				items={[
+					{
+						title: "Kesesuaian Kode Tiket",
+						desc: "Pastikan kode karakter sesuai dengan yang tertera di bawah barcode pada e-ticket Anda.",
+					},
+					{
+						title: "Kesesuaian 16 Digit NIK",
+						desc: "Gunakan NIK KTP yang sama dengan identitas yang didaftarkan saat pembelian tiket.",
+					},
+					{
+						title: "Status Pendaftaran Tiket",
+						desc: "Setiap kode tiket hanya dapat didaftarkan satu kali untuk satu data wajah (Face ID).",
+					},
+				]}
+			/>
 		</div>
 	);
 }

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
 	AlertCircle,
 	Camera,
+	CheckCircle2,
 	Shield,
 	RefreshCw,
 	ArrowLeft,
@@ -38,6 +39,7 @@ import {
 	type FaceLivenessStatus,
 } from "@/lib/face-liveness-detector";
 import HeaderSection from "../../components/HeaderSection";
+import InfoListCard from "../../components/InfoListCard";
 import {
 	getApiErrorMessage,
 	submitBiometricData,
@@ -171,18 +173,19 @@ export default function FaceVerificationPage() {
 		setState("verifying");
 	}, [setFaceBlob]);
 
-	const { handleSubmitWithFaceBlob, handleErrorClose } = useHandleSubmit({
-		faceBlob,
-		ticketCode,
-		nik,
-		errorMsg,
-		setErrorMsg,
-		setSubmitting,
-		submitBiometricData,
-		getApiErrorMessage,
-		onTicketError: returnToTicket,
-		onFaceError: resetToFaceCapture,
-	});
+	const { handleSubmitWithFaceBlob, handleErrorClose, failureStage } =
+		useHandleSubmit({
+			faceBlob,
+			ticketCode,
+			nik,
+			errorMsg,
+			setErrorMsg,
+			setSubmitting,
+			submitBiometricData,
+			getApiErrorMessage,
+			onTicketError: returnToTicket,
+			onFaceError: resetToFaceCapture,
+		});
 
 	const capture = useCallback(() => {
 		if (!webcamRef.current || submitting) return;
@@ -248,9 +251,54 @@ export default function FaceVerificationPage() {
 			<Modal
 				open={!!errorMsg}
 				onClose={handleErrorClose}
-				title="Pendaftaran Gagal"
-				description={errorMsg}
-			/>
+				icon={
+					<div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-red-600">
+						<XCircle className="h-5 w-5" />
+					</div>
+				}
+				title={
+					failureStage === "ticket"
+						? "Data Tiket Bermasalah"
+						: failureStage === "retry"
+							? "Gagal Mengirim Data"
+							: "Verifikasi Wajah Gagal"
+				}
+				description={
+					<div className="mt-2 space-y-2.5 text-left">
+						<div className="rounded-xl border border-red-200/80 bg-red-50/50 px-3.5 py-2.5 text-xs font-medium text-red-900">
+							{errorMsg}
+						</div>
+						<p className="text-[11px] leading-relaxed text-slate-500">
+							{failureStage === "ticket"
+								? "Terdapat kendala pada kode tiket atau NIK Anda. Silakan kembali ke langkah pertama untuk memeriksa ulang data tiket."
+								: failureStage === "retry"
+									? "Terjadi gangguan koneksi saat mengirim data. Foto wajah Anda tetap tersimpan dan siap dikirim ulang."
+									: "Pastikan pencahayaan cukup terang, wajah menghadap lurus ke kamera, dan tidak tertutup masker atau kacamata."}
+						</p>
+					</div>
+				}>
+				<button
+					type="button"
+					onClick={handleErrorClose}
+					className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#3b5bdb] text-sm font-semibold text-white transition-all hover:bg-[#3451c5] active:scale-[0.99]">
+					{failureStage === "ticket" ? (
+						<>
+							<ArrowLeft className="h-4 w-4" />
+							Periksa Data Tiket
+						</>
+					) : failureStage === "retry" ? (
+						<>
+							<RefreshCw className="h-4 w-4" />
+							Coba Lagi
+						</>
+					) : (
+						<>
+							<Camera className="h-4 w-4" />
+							Ambil Ulang Foto
+						</>
+					)}
+				</button>
+			</Modal>
 
 			<div className="mb-4 text-left">
 				<p
@@ -323,12 +371,12 @@ export default function FaceVerificationPage() {
 								<Button
 									type="button"
 									disabled={submitting}
-									onClick={returnToTicket}
+									onClick={resetToFaceCapture}
 									className={`inline-flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 transition-colors hover:bg-slate-50 ${
 										submitting ? "cursor-not-allowed opacity-60" : ""
 									}`}>
-									<TicketX className="h-4 w-4" />
-									Batal
+									<RefreshCw className="h-4 w-4" />
+									Foto Ulang
 								</Button>
 								<Button
 									type="button"
@@ -359,61 +407,46 @@ export default function FaceVerificationPage() {
 
 function FailedState() {
 	return (
-		<>
-			{/* Error Icon */}
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-red-50 flex items-center justify-center">
-					<div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-						<AlertCircle className="w-10 h-10 text-red-500" />
+		<div className="w-full flex flex-col text-left">
+			<div className="rounded-2xl border border-red-200/80 bg-red-50/50 p-4">
+				<div className="flex items-start gap-3">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white">
+						<XCircle className="h-5 w-5" />
+					</div>
+					<div className="min-w-0">
+						<span className="inline-block text-[11px] font-bold uppercase tracking-wider text-red-700">
+							Verifikasi Gagal
+						</span>
+						<h2 className="mt-0.5 text-lg font-bold tracking-tight text-[#1e2a4a]">
+							Wajah Tidak Terdeteksi
+						</h2>
+						<p className="mt-1 text-xs leading-relaxed text-slate-600">
+							Sistem belum dapat memverifikasi foto wajah Anda. Periksa kondisi
+							berikut sebelum mengambil foto ulang.
+						</p>
 					</div>
 				</div>
 			</div>
 
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Verifikasi Gagal
-			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-6">
-				Kami tidak dapat memverifikasi wajah Anda. Mohon periksa kembali kondisi
-				pengambilan foto berikut:
-			</p>
-
-			{/* Error Tips */}
-			<div className="bg-red-50 border border-red-100 rounded-xl px-6 py-5 w-full max-w-md text-left space-y-4">
-				<div className="flex items-start gap-3">
-					<XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-					<div>
-						<p className="font-semibold text-red-600 text-sm">
-							Pencahayaan kurang terang
-						</p>
-						<p className="text-gray-500 text-xs mt-0.5">
-							Pastikan wajah tersinari dengan baik.
-						</p>
-					</div>
-				</div>
-				<div className="flex items-start gap-3">
-					<XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-					<div>
-						<p className="font-semibold text-red-600 text-sm">
-							Wajah tidak terdeteksi sepenuhnya
-						</p>
-						<p className="text-gray-500 text-xs mt-0.5">
-							Lepaskan masker atau kacamata hitam.
-						</p>
-					</div>
-				</div>
-				<div className="flex items-start gap-3">
-					<XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-					<div>
-						<p className="font-semibold text-red-600 text-sm">
-							Posisi wajah miring
-						</p>
-						<p className="text-gray-500 text-xs mt-0.5">
-							Harap pandangan lurus ke depan.
-						</p>
-					</div>
-				</div>
-			</div>
-		</>
+			<InfoListCard
+				className="mt-4"
+				title="Panduan Pengambilan Foto"
+				items={[
+					{
+						title: "Pencahayaan Cukup Terang",
+						desc: "Pastikan wajah menghadap sumber cahaya dan tidak membelakangi lampu atau jendela.",
+					},
+					{
+						title: "Tanpa Masker atau Kacamata",
+						desc: "Lepaskan masker, kacamata hitam, atau topi yang menutupi area wajah.",
+					},
+					{
+						title: "Posisi Wajah Lurus ke Kamera",
+						desc: "Arahkan pandangan lurus ke depan tepat di dalam bingkai panduan.",
+					},
+				]}
+			/>
+		</div>
 	);
 }
 
@@ -452,7 +485,7 @@ function SuccessState({
 					<SheetTrigger asChild>
 						<button
 							type="button"
-							className="flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-left transition-all hover:border-[#3b5bdb]/40 active:scale-[0.99]">
+							className="flex w-full items-center justify-between gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-3 text-left transition-all hover:border-emerald-300 active:scale-[0.99]">
 							<div className="flex items-center gap-3 min-w-0">
 								<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-900 ring-1 ring-black/10">
 									<img
@@ -462,15 +495,18 @@ function SuccessState({
 									/>
 								</div>
 								<div className="min-w-0">
-									<p className="text-xs font-bold text-[#1e2a4a] truncate">
-										Foto Wajah Berhasil Diambil
-									</p>
-									<p className="text-[11px] text-slate-500 truncate">
-										Ketuk untuk melihat ukuran penuh
+									<div className="flex items-center gap-1.5">
+										<CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+										<p className="text-xs font-bold text-[#1e2a4a] truncate">
+											Foto Wajah Siap Didaftarkan
+										</p>
+									</div>
+									<p className="mt-0.5 text-[11px] text-slate-500 truncate">
+										Ketuk untuk memeriksa foto ukuran penuh
 									</p>
 								</div>
 							</div>
-							<span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#3b5bdb] shadow-2xs border border-slate-200/80">
+							<span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#3b5bdb] border border-slate-200/80">
 								<Maximize2 className="h-3.5 w-3.5" />
 								Lihat
 							</span>
@@ -507,25 +543,31 @@ function SuccessState({
 
 			{/* Compact Text-only T&C */}
 			<div className="w-full text-left">
-				<div className="flex flex-col space-y-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 text-xs leading-relaxed text-slate-600">
-					<p className="font-semibold text-[#1e2a4a]">
-						Dengan melakukan registrasi Face ID, saya menyetujui ketentuan berikut:
-					</p>
-					{[
-						"Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.",
-						"Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.",
-						"Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Jomlo Fest.",
-						"Tiket dengan Face ID yang telah terdaftar tidak dapat digunakan oleh orang lain.",
-						"Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku.",
-					].map((text, i) => (
-						<div key={i} className="flex items-start gap-2">
-							<span className="font-bold text-[#3b5bdb] w-3.5 shrink-0 text-right">
-								{i + 1}.
-							</span>
-							<p>{text}</p>
-						</div>
-					))}
-				</div>
+				<InfoListCard
+					title="Dengan melakukan registrasi Face ID, saya menyetujui ketentuan berikut:"
+					items={[
+						{
+							title: "Satu Wajah untuk Satu Tiket",
+							desc: "Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.",
+						},
+						{
+							title: "Kesesuaian Data Diri Pribadi",
+							desc: "Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.",
+						},
+						{
+							title: "Metode Verifikasi Akses Masuk",
+							desc: "Wajah yang telah didaftarkan akan digunakan sebagai salah satu metode verifikasi saat memasuki area Jomlo Fest.",
+						},
+						{
+							title: "Tidak Dapat Dipindahtangankan",
+							desc: "Tiket dengan Face ID yang telah terdaftar tidak dapat digunakan oleh orang lain.",
+						},
+						{
+							title: "Persetujuan Syarat & Ketentuan",
+							desc: "Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku.",
+						},
+					]}
+				/>
 				<label
 					htmlFor="tnc"
 					className={`mt-3 flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all ${
