@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { X } from "lucide-react";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 
 export interface ModalProps {
 	open: boolean;
@@ -16,8 +22,7 @@ export interface ModalProps {
 }
 
 /**
- * Reusable centered modal dialog.
- * Backdrop click and the X button both trigger onClose.
+ * Reusable bottom sheet dialog using shadcn Sheet.
  */
 export function Modal({
 	open,
@@ -28,47 +33,39 @@ export function Modal({
 	children,
 	hideCloseButton = false,
 }: ModalProps) {
-	if (!open) return null;
-
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-			style={{ zIndex: 9999 }}
-			onClick={onClose}>
-			<div
-				className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200"
-				onClick={(e) => e.stopPropagation()}>
-				{!hideCloseButton && (
-					<button
-						onClick={onClose}
-						aria-label="Tutup"
-						className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
-						<X className="w-5 h-5" />
-					</button>
-				)}
+		<Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+			<SheetContent
+				side="bottom"
+				showCloseButton={!hideCloseButton}
+				className="mx-auto w-full max-w-md rounded-t-3xl border-t-0 bg-white px-5 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl">
+				<div className="mx-auto mb-1 h-1.5 w-12 shrink-0 rounded-full bg-slate-200" />
+				{icon && <div className="mb-1 flex justify-center">{icon}</div>}
 
-				{icon && <div className="mb-4">{icon}</div>}
-
-				{title && (
-					<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
-						{title}
-					</h2>
-				)}
-
-				{description && (
-					<div className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
-						{description}
-					</div>
-				)}
+				<SheetHeader className="p-0 text-center">
+					<SheetTitle
+						className={
+							title
+								? "text-lg font-bold text-center text-[#1e2a4a]"
+								: "sr-only"
+						}>
+						{title || "Notifikasi"}
+					</SheetTitle>
+					{description && (
+						<SheetDescription className="text-slate-500 text-sm text-center mt-1 leading-relaxed">
+							{description}
+						</SheetDescription>
+					)}
+				</SheetHeader>
 
 				{children ?? (
 					<button
 						onClick={onClose}
-						className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
+						className="mt-2 w-full bg-[#3b5bdb] text-white font-semibold text-sm h-11 rounded-xl hover:bg-[#3451c5] active:scale-[0.99] transition-all shadow-sm">
 						Tutup
 					</button>
 				)}
-			</div>
-		</div>
+			</SheetContent>
+		</Sheet>
 	);
 }

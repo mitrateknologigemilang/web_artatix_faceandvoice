@@ -1,9 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Camera, Mic, ShieldAlert } from "lucide-react";
+import { Camera, ShieldAlert } from "lucide-react";
 import { useVerification } from "../VerificationContext";
 import { Modal } from "./Modal";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 
 /**
  * Try getUserMedia with fallback constraints for broader compatibility.
@@ -179,48 +186,53 @@ export function PermissionPopup() {
 				title="Terjadi Kesalahan"
 				description={errorMsg}
 			/>
-			<div
-				className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-				style={{ zIndex: 9999 }}>
-				<div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative animate-in zoom-in-95 duration-200">
-					<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+			<Sheet open={show}>
+				<SheetContent
+					side="bottom"
+					showCloseButton={false}
+					onInteractOutside={(e) => e.preventDefault()}
+					onEscapeKeyDown={(e) => e.preventDefault()}
+					className="mx-auto w-full max-w-md rounded-t-3xl border-t-0 bg-white px-5 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl">
+					<div className="mx-auto mb-1 h-1.5 w-12 shrink-0 rounded-full bg-slate-200" />
+					<div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-1 relative">
 						<Camera className="w-6 h-6 text-[#3b5bdb]" />
 					</div>
 
-					<h2 className="text-xl font-bold text-center text-[#1e2a4a] mb-2">
-						{denied ? "Akses Ditolak" : "Izin Dibutuhkan"}
-					</h2>
-
-					<p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
-						{denied
-							? "Anda telah menolak akses kamera. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
-							: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera Anda."}
-					</p>
+					<SheetHeader className="p-0 text-center">
+						<SheetTitle className="text-lg font-bold text-center text-[#1e2a4a]">
+							{denied ? "Akses Ditolak" : "Izin Kamera Dibutuhkan"}
+						</SheetTitle>
+						<SheetDescription className="text-slate-500 text-sm text-center mt-1 leading-relaxed">
+							{denied
+								? "Anda telah menolak akses kamera. Mohon ubah pengaturan situs di browser Anda untuk memberikan izin, lalu muat ulang halaman."
+								: "Untuk melanjutkan verifikasi biometrik, kami membutuhkan akses ke kamera perangkat Anda."}
+						</SheetDescription>
+					</SheetHeader>
 
 					{denied ? (
-						<div className="bg-red-50 text-red-600 text-sm rounded-lg p-3 flex flex-col gap-2">
+						<div className="mt-2 bg-red-50 text-red-600 text-sm rounded-xl p-3.5 flex flex-col gap-2 border border-red-100">
 							<div className="flex items-start gap-2">
 								<ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-								<p>
+								<p className="text-xs leading-relaxed">
 									Silakan buka pengaturan situs (ikon gembok di URL bar) dan
 									izinkan Kamera.
 								</p>
 							</div>
 							<button
 								onClick={() => window.location.reload()}
-								className="mt-2 text-sm font-medium bg-white border border-red-200 text-red-600 py-2 rounded-lg hover:bg-red-50 transition-colors">
+								className="mt-1.5 text-sm font-semibold bg-white border border-red-200 text-red-600 h-10 rounded-xl hover:bg-red-50 transition-colors">
 								Muat Ulang Halaman
 							</button>
 						</div>
 					) : (
 						<button
 							onClick={requestPermission}
-							className="w-full bg-[#3b5bdb] text-white font-medium py-3 rounded-xl hover:bg-[#3451c5] transition-colors shadow-sm">
-							Izinkan Akses
+							className="mt-2 w-full bg-[#3b5bdb] text-white font-semibold text-sm h-11 rounded-xl hover:bg-[#3451c5] active:scale-[0.99] transition-all shadow-sm">
+							Izinkan Akses Kamera
 						</button>
 					)}
-				</div>
-			</div>
+				</SheetContent>
+			</Sheet>
 		</>
 	);
 }
