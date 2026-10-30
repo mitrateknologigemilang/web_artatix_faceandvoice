@@ -1,7 +1,36 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { SubmitBiometricPayload } from "@/services/verification.service";
-// atau import router sesuai framework kamu
+
+export type SubmitFailureStage = "ticket" | "face" | "retry" | null;
+
+function detectFailureStage(error: unknown, message: string): SubmitFailureStage {
+	const normalized = message.toLowerCase();
+
+	// Jika pesan error berkaitan dengan tiket atau NIK (tidak ditemukan, tidak sesuai, sudah terdaftar)
+	const isTicketOrNikError =
+		/\b(tiket|ticket|kode|nik|identitas|ktp)\b/i.test(normalized) ||
+		(/\b(terdaftar|teregistrasi|registered)\b/i.test(normalized) &&
+			!/\b(wajah|face|foto|photo)\b/i.test(normalized));
+
+	if (isTicketOrNikError) {
+		return "ticket";
+	}
+
+	// Jika error karena masalah jaringan / timeout / server 5xx, tetap di halaman konfirmasi agar bisa coba kirim ulang
+	if (
+		axios.isAxiosError(error) &&
+		(!error.response ||
+			error.response.status >= 500 ||
+			error.code === "ECONNABORTED")
+	) {
+		return "retry";
+	}
+
+	// Default untuk kegagalan validasi biometrik / foto wajah: ulangi pengambilan foto wajah
+	return "face";
+}
 
 export function useHandleSubmit({
 	faceBlob,
@@ -12,6 +41,8 @@ export function useHandleSubmit({
 	setSubmitting,
 	submitBiometricData,
 	getApiErrorMessage,
+	onTicketError,
+	onFaceError,
 }: {
 	faceBlob: Blob | null;
 	ticketCode: string | null;
@@ -21,25 +52,31 @@ export function useHandleSubmit({
 	setSubmitting: (submitting: boolean) => void;
 	submitBiometricData: (payload: SubmitBiometricPayload) => Promise<any>;
 	getApiErrorMessage: (error: unknown, fallback?: string) => string;
+	onTicketError?: () => void;
+	onFaceError?: () => void;
 }) {
 	const router = useRouter();
+	const [failureStage, setFailureStage] = useState<SubmitFailureStage>(null);
 
 	const submit = useCallback(
 		async (face: Blob | null) => {
-			if (!face) {
-				setErrorMsg("Data wajah belum tersedia.");
-				return false;
-			}
-
 			if (!ticketCode) {
+				setFailureStage("ticket");
 				setErrorMsg("Kode tiket belum tersedia. Silakan kembali ke langkah 1.");
 				return false;
 			}
 
 			if (!nik) {
+				setFailureStage("ticket");
 				setErrorMsg(
 					"NIK belum tersedia. Silakan lengkapi data tiket terlebih dahulu.",
 				);
+				return false;
+			}
+
+			if (!face) {
+				setFailureStage("face");
+				setErrorMsg("Data wajah belum tersedia. Silakan ambil foto kembali.");
 				return false;
 			}
 
@@ -52,14 +89,18 @@ export function useHandleSubmit({
 					file_wajah: face,
 				});
 
+				setFailureStage(null);
 				router.replace("/verification/success");
 				return true;
 			} catch (error) {
 				console.error("Submit error:", error);
 
-				setErrorMsg(
-					getApiErrorMessage(error, "Gagal mengirim data. Silakan coba lagi."),
+				const message = getApiErrorMessage(
+					error,
+					"Gagal mengirim data. Silakan coba lagi.",
 				);
+				setFailureStage(detectFailureStage(error, message));
+				setErrorMsg(message);
 				return false;
 			} finally {
 				setSubmitting(false);
@@ -84,21 +125,31 @@ export function useHandleSubmit({
 	);
 
 	const handleErrorClose = useCallback(() => {
-		const wasMissingTicket =
-			errorMsg === "Kode tiket belum tersedia. Silakan kembali ke langkah 1." ||
-			errorMsg ===
-				"NIK belum tersedia. Silakan lengkapi data tiket terlebih dahulu.";
+		const currentMsg = errorMsg ?? "";
+		const stage =
+			failureStage ?? detectFailureStage(undefined, currentMsg);
 
 		setErrorMsg(null);
+		setFailureStage(null);
 
-		if (wasMissingTicket) {
-			router.push("/verification/ticket");
+		if (stage === "ticket") {
+			if (onTicketError) {
+				onTicketError();
+			} else {
+				router.push("/verification/ticket");
+			}
+			return;
 		}
-	}, [errorMsg, setErrorMsg, router]);
+
+		if (stage === "face") {
+			onFaceError?.();
+		}
+	}, [errorMsg, failureStage, onFaceError, onTicketError, router, setErrorMsg]);
 
 	return {
 		handleSubmit,
 		handleSubmitWithFaceBlob,
 		handleErrorClose,
+		failureStage,
 	};
 }

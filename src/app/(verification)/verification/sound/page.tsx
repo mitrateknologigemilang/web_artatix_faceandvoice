@@ -29,12 +29,12 @@ import {
 } from "@/services/verification.service";
 import { useRouter } from "next/navigation";
 import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from "@/components/ui/sheet";
 import { Modal } from "../../components/Modal";
 import HeaderSection from "../../components/HeaderSection";
 import { useHandleSubmit } from "@/hooks/use-handle-submit";
@@ -51,7 +51,8 @@ export default function SoundVerificationPage() {
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const { faceBlob, ticketCode, nik, setFaceBlob, setStep } = useVerification();
+	const { faceBlob, ticketCode, nik, setFaceBlob, setStep, clearVerification } =
+		useVerification();
 	const allowed = useVerificationGuard("sound");
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -146,6 +147,15 @@ export default function SoundVerificationPage() {
 		setSubmitting,
 		submitBiometricData,
 		getApiErrorMessage,
+		onTicketError: () => {
+			clearVerification();
+			router.push("/verification/ticket");
+		},
+		onFaceError: () => {
+			setFaceBlob(null);
+			setStep("face");
+			router.push("/verification/face");
+		},
 	});
 
 	const formatTime = (seconds: number) => {
@@ -719,8 +729,8 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 	];
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
+		<Sheet open={open} onOpenChange={setOpen}>
+			<SheetTrigger asChild>
 				<button className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-4 sm:px-6 py-4 text-left hover:border-[#3b5bdb]/30 transition-colors cursor-pointer">
 					<div className="flex items-center justify-between gap-2">
 						<div className="flex items-center gap-2">
@@ -732,14 +742,16 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 						<ArrowRight className="w-4 h-4 text-gray-400" />
 					</div>
 				</button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-md bg-white">
-				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
+			</SheetTrigger>
+			<SheetContent
+				side="bottom"
+				className="mx-auto w-full max-w-md rounded-t-2xl bg-white p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+				<SheetHeader className="p-0 text-left">
+					<SheetTitle className="flex items-center gap-2 text-[#1e2a4a]">
 						<Info className="w-5 h-5 text-[#3b5bdb]" />
 						Tips Perekaman
-					</DialogTitle>
-				</DialogHeader>
+					</SheetTitle>
+				</SheetHeader>
 				<ul className="space-y-3 mt-2">
 					{tips.map((tip, i) => (
 						<li
@@ -757,8 +769,8 @@ function TipsModal({ autoOpen }: { autoOpen: boolean }) {
 					className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
 					Mengerti
 				</button>
-			</DialogContent>
-		</Dialog>
+			</SheetContent>
+		</Sheet>
 	);
 }
 
