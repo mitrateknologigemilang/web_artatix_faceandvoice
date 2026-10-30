@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" className={`${inter.variable} antialiased`}>
-			<body className={inter.className}>
+			<body className={`${inter.className} w-full mx-auto bg-slate-200/70`}>
 				<ThemeProvider defaultTheme="system" storageKey="nextjs-ui-theme">
 					<SidebarConfigProvider>{children}</SidebarConfigProvider>
 				</ThemeProvider>

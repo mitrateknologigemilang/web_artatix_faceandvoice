@@ -18,20 +18,20 @@ export function VerificationLogoLinks() {
 			<button
 				type="button"
 				onClick={handleReset}
-				className="flex h-16 items-center"
+				className="flex h-10 items-center active:scale-95 transition-transform"
 				aria-label="Kembali ke verifikasi tiket">
-				<Image width={100} height={25} src={artatixLogo} alt="Artatix" />
+				<Image width={92} height={22} src={artatixLogo} alt="Artatix" />
 			</button>
 
 			<button
 				type="button"
 				onClick={handleReset}
-				className="flex h-16 items-center"
+				className="flex h-10 items-center active:scale-95 transition-transform"
 				aria-label="Kembali ke verifikasi tiket">
 				<Image
 					unoptimized
-					width={70}
-					height={25}
+					width={64}
+					height={22}
 					src={jomloFestLogo}
 					alt="Jomlo Fest"
 				/>

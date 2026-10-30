@@ -5,7 +5,9 @@ import {
 	ArrowRight,
 	CheckCircle2,
 	FileText,
+	Info,
 	Loader2,
+	ScanFace,
 	ScanLine,
 	Shield,
 	Upload,
@@ -62,7 +64,7 @@ export default function TicketVerificationPage() {
 
 	// Step 2: validate the decoded/entered ticket code against the backend.
 	const validateCode = useCallback(
-		async (code: string) => {
+		async (code: string, nik: string) => {
 			setState("validating");
 			setErrorMsg("");
 			setTicketDetail(null);
@@ -70,7 +72,7 @@ export default function TicketVerificationPage() {
 			setNik(null);
 			setFaceBlob(null);
 			try {
-				const result = await getTicketDetail(code);
+				const result = await getTicketDetail(code, nik);
 				console.log("🚀 ~ TicketVerificationPage ~ result:", result);
 
 				if (!result) {
@@ -91,8 +93,8 @@ export default function TicketVerificationPage() {
 
 				const { detail } = result;
 				setTicketDetail(detail);
-				setTicketCode(detail.ticketTag || code);
-				setNik(nikInput);
+				setTicketCode(detail.ticket?.ticketCode || code);
+				setNik(nik);
 				setFaceBlob(null);
 				setState("success");
 			} catch (err) {
@@ -106,7 +108,7 @@ export default function TicketVerificationPage() {
 				setState("failed");
 			}
 		},
-		[nikInput, setFaceBlob, setTicketCode, setNik, setTicketDetail],
+		[setFaceBlob, setTicketCode, setNik, setTicketDetail],
 	);
 
 	// Step 1: decode QR/barcode from the uploaded file.
@@ -143,7 +145,7 @@ export default function TicketVerificationPage() {
 					setState("failed");
 					return;
 				}
-				await validateCode(code);
+				await validateCode(code, nikInput);
 			} catch (err) {
 				console.error(err);
 				setErrorMsg(
@@ -184,7 +186,7 @@ export default function TicketVerificationPage() {
 		const trimmed = manualCode.trim().toUpperCase();
 		if (!trimmed || !isValidNik(nikInput)) return;
 		setFileName("Input manual");
-		validateCode(trimmed);
+		validateCode(trimmed, nikInput);
 	};
 
 	const handleNikChange = (value: string) => {
@@ -208,142 +210,140 @@ export default function TicketVerificationPage() {
 	if (!allowed) return null;
 
 	return (
-		<>
+		<div className="flex flex-col flex-1">
+			{/* Segmented Mobile Stepper */}
+			<div className="mb-4 flex items-center gap-2">
+				<div className="h-1.5 flex-1 rounded-full bg-[#3b5bdb]" />
+				<div
+					className={`h-1.5 flex-1 rounded-full transition-colors ${
+						state === "success" ? "bg-emerald-500" : "bg-slate-100"
+					}`}
+				/>
+			</div>
+
 			<HeaderSection />
 
-			<div className="space-y-6 ">
-				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-					<div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
-						<div className="flex items-center gap-2 min-w-0">
-							<FileText className="w-5 h-5 text-[#3b5bdb] shrink-0" />
-							<span className="font-semibold text-[#1e2a4a] truncate">
-								Data Tiket
-							</span>
-						</div>
-						<span
-							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-								state === "success"
-									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
+			{state === "idle" && (
+				<div className="mb-5 text-left">
+					<p className="text-[11px] font-bold uppercase tracking-wider text-[#3b5bdb]">
+						Langkah 1 dari 2
+					</p>
+					<h1 className="mt-0.5 text-xl font-bold tracking-tight text-[#1e2a4a]">
+						Verifikasi Data Tiket
+					</h1>
+					<p className="mt-1 text-xs leading-relaxed text-slate-500">
+						Masukkan kode tiket dan 16 digit NIK sesuai identitas KTP Anda.
+					</p>
+
+					{/* Native Segmented Control */}
+					<div className="mt-4 grid w-full grid-cols-2 rounded-2xl bg-slate-100 p-1">
+						<button
+							type="button"
+							onClick={() => setUploadMode(false)}
+							className={`rounded-xl py-2.5 text-xs font-semibold transition-all ${
+								!uploadMode
+									? "bg-white text-[#1e2a4a] shadow-xs"
+									: "text-slate-500 hover:text-slate-700"
 							}`}>
-							{state === "success" ? "Selesai" : "Langkah 1 dari 2"}
-						</span>
+							Input Kode
+						</button>
+						<button
+							type="button"
+							onClick={() => setUploadMode(true)}
+							className={`inline-flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all ${
+								uploadMode
+									? "bg-white text-[#1e2a4a] shadow-xs"
+									: "text-slate-500 hover:text-slate-700"
+							}`}>
+							<Upload className="h-3.5 w-3.5" />
+							Upload E-Ticket
+						</button>
 					</div>
-
-					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-						{state === "idle" && !uploadMode && (
-							<ManualInputState
-								value={manualCode}
-								onChange={setManualCode}
-								nik={nikInput}
-								onNikChange={handleNikChange}
-								onSubmit={handleManualSubmit}
-								onSwitchUpload={() => setUploadMode(true)}
-							/>
-						)}
-						{state === "idle" && uploadMode && (
-							<UploadState
-								nik={nikInput}
-								onNikChange={handleNikChange}
-								onPickFile={() => fileInputRef.current?.click()}
-								onDrop={handleDrop}
-								onSwitchManual={() => setUploadMode(false)}
-							/>
-						)}
-						{state === "scanning" && <ScanningState fileName={fileName} />}
-						{state === "validating" && <ValidatingState />}
-						{state === "success" && (
-							<SuccessState
-								fileName={fileName}
-								ticketCode={ticketCode}
-								nik={nikInput}
-								detail={ticketDetail}
-							/>
-						)}
-						{state === "failed" && (
-							<FailedState
-								message={errorMsg}
-								onSwitchManual={() => {
-									setUploadMode(false);
-									setState("idle");
-									setErrorMsg("");
-								}}
-							/>
-						)}
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept="application/pdf,image/*"
-							className="hidden"
-							onChange={handleFileChange}
-						/>
-					</div>
-
-					{["failed", "success"].includes(state) && (
-						<>
-							<FooterMobileBtn
-								children={
-									<>
-										{state === "failed" && (
-											<Button
-												onClick={handleRetry}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-												Coba Lagi
-											</Button>
-										)}
-										{state === "success" && (
-											<Button
-												onClick={handleRetry}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-												Ganti Tiket
-											</Button>
-										)}
-
-										{state === "success" && (
-											<Button
-												onClick={handleContinue}
-												disabled={isNavigating}
-												className="inline-flex min-w-0 w-full items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-												Lanjutkan
-												<ArrowRight className="w-4 h-4" />
-											</Button>
-										)}
-									</>
-								}
-							/>
-
-							<div
-								className={`hidden px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 md:flex items-center gap-2 ${state === "failed" ? "justify-end" : "justify-between"}`}>
-								{state === "failed" && (
-									<button
-										onClick={handleRetry}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-										Coba Lagi
-									</button>
-								)}
-								{state === "success" && (
-									<button
-										onClick={handleRetry}
-										className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
-										Ganti Tiket
-									</button>
-								)}
-
-								{state === "success" && (
-									<button
-										onClick={handleContinue}
-										disabled={isNavigating}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-										Lanjutkan
-										<ArrowRight className="w-4 h-4" />
-									</button>
-								)}
-							</div>
-						</>
-					)}
 				</div>
+			)}
+
+			<div className="flex-1 flex flex-col">
+				{state === "idle" && !uploadMode && (
+					<ManualInputState
+						value={manualCode}
+						onChange={setManualCode}
+						nik={nikInput}
+						onNikChange={handleNikChange}
+						onSubmit={handleManualSubmit}
+						onSwitchUpload={() => setUploadMode(true)}
+					/>
+				)}
+				{state === "idle" && uploadMode && (
+					<UploadState
+						nik={nikInput}
+						onNikChange={handleNikChange}
+						onPickFile={() => fileInputRef.current?.click()}
+						onDrop={handleDrop}
+						onSwitchManual={() => setUploadMode(false)}
+					/>
+				)}
+				{state === "scanning" && <ScanningState fileName={fileName} />}
+				{state === "validating" && <ValidatingState />}
+				{state === "success" && (
+					<SuccessState
+						fileName={fileName}
+						ticketCode={ticketCode}
+						nik={nikInput}
+						detail={ticketDetail}
+					/>
+				)}
+				{state === "failed" && (
+					<FailedState
+						message={errorMsg}
+						onSwitchManual={() => {
+							setUploadMode(false);
+							setState("idle");
+							setErrorMsg("");
+						}}
+					/>
+				)}
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="application/pdf,image/*"
+					className="hidden"
+					onChange={handleFileChange}
+				/>
 			</div>
-		</>
+
+			{["failed", "success"].includes(state) && (
+				<FooterMobileBtn
+					children={
+						<>
+							{state === "failed" && (
+								<Button
+									onClick={handleRetry}
+									className="inline-flex min-w-0 w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#3451c5] transition-colors">
+									Coba Lagi
+								</Button>
+							)}
+							{state === "success" && (
+								<Button
+									onClick={handleRetry}
+									className="inline-flex min-w-0 w-full items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
+									Ganti Tiket
+								</Button>
+							)}
+
+							{state === "success" && (
+								<Button
+									onClick={handleContinue}
+									disabled={isNavigating}
+									className="inline-flex min-w-0 w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#3451c5] transition-colors">
+									Lanjutkan
+									<ArrowRight className="w-4 h-4" />
+								</Button>
+							)}
+						</>
+					}
+				/>
+			)}
+		</div>
 	);
 }
 
@@ -352,7 +352,6 @@ function UploadState({
 	onNikChange,
 	onPickFile,
 	onDrop,
-	onSwitchManual,
 }: {
 	nik: string;
 	onNikChange: (v: string) => void;
@@ -363,56 +362,51 @@ function UploadState({
 	const [dragOver, setDragOver] = useState(false);
 	const nikValid = isValidNik(nik);
 	return (
-		<>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">Unggah Tiket</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-4">
-				Masukkan NIK terlebih dahulu, lalu unggah tiket agar sistem dapat
-				membaca kode QR/barcode secara otomatis.
-			</p>
-
+		<div className="w-full text-left space-y-4">
 			<NikInput value={nik} onChange={onNikChange} />
 
-			<div
-				onClick={() => {
-					if (nikValid) onPickFile();
-				}}
-				onDragOver={(e) => {
-					e.preventDefault();
-					if (nikValid) setDragOver(true);
-				}}
-				onDragLeave={() => setDragOver(false)}
-				onDrop={(e) => {
-					setDragOver(false);
-					if (nikValid) onDrop(e);
-				}}
-				className={`w-full max-w-md border-2 border-dashed rounded-xl px-5 py-8 sm:px-6 sm:py-10 transition-colors ${
-					!nikValid
-						? "cursor-not-allowed border-gray-200 bg-gray-100 opacity-70"
-						: dragOver
-							? "cursor-pointer border-[#3b5bdb] bg-blue-50"
-							: "cursor-pointer border-gray-300 bg-gray-50 hover:border-[#3b5bdb] hover:bg-blue-50/50"
-				}`}>
-				<div className="flex flex-col items-center gap-3">
-					<div className="w-14 h-14 rounded-full bg-[#3b5bdb]/10 flex items-center justify-center">
-						<Upload className="w-7 h-7 text-[#3b5bdb]" />
+			<div>
+				<span className="mb-1.5 block text-xs font-semibold text-slate-700">
+					File E-Ticket <span className="text-red-500">*</span>
+				</span>
+				<div
+					onClick={() => {
+						if (nikValid) onPickFile();
+					}}
+					onDragOver={(e) => {
+						e.preventDefault();
+						if (nikValid) setDragOver(true);
+					}}
+					onDragLeave={() => setDragOver(false)}
+					onDrop={(e) => {
+						setDragOver(false);
+						if (nikValid) onDrop(e);
+					}}
+					className={`w-full border-2 border-dashed rounded-2xl px-4 py-8 text-center transition-all ${
+						!nikValid
+							? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-65"
+							: dragOver
+								? "cursor-pointer border-[#3b5bdb] bg-blue-50"
+								: "cursor-pointer border-slate-300 bg-slate-50/70 hover:border-[#3b5bdb] active:scale-[0.99]"
+					}`}>
+					<div className="flex flex-col items-center gap-2.5">
+						<div className="w-12 h-12 rounded-2xl bg-[#3b5bdb]/10 flex items-center justify-center">
+							<Upload className="w-6 h-6 text-[#3b5bdb]" />
+						</div>
+						<p className="text-sm font-semibold text-[#1e2a4a]">
+							{nikValid
+								? "Ketuk untuk pilih file e-ticket"
+								: "Isi 16 digit NIK terlebih dahulu"}
+						</p>
+						<p className="text-xs text-slate-400">
+							Mendukung PDF, JPG, atau PNG (Maks. 5 MB)
+						</p>
 					</div>
-					<p className="text-sm font-medium text-[#1e2a4a]">
-						{nikValid
-							? "Pilih file tiket atau seret ke sini"
-							: "Lengkapi NIK 16 digit terlebih dahulu"}
-					</p>
-					<p className="text-xs text-gray-500">
-						Format PDF, JPG, atau PNG. Maksimal 5 MB.
-					</p>
 				</div>
 			</div>
 
-			<button
-				onClick={onSwitchManual}
-				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
-				Isi kode tiket manual
-			</button>
-		</>
+			<TicketGuideCard />
+		</div>
 	);
 }
 
@@ -422,7 +416,6 @@ function ManualInputState({
 	nik,
 	onNikChange,
 	onSubmit,
-	onSwitchUpload,
 }: {
 	value: string;
 	onChange: (v: string) => void;
@@ -434,64 +427,86 @@ function ManualInputState({
 	const formValid = Boolean(value.trim() && isValidNik(nik));
 
 	return (
-		<>
-			<h2 className="text-lg sm:text-xl font-bold text-[#1e2a4a] mb-2">
-				Masukkan Data Tiket
-			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-4">
-				Isi kode tiket dan NIK sesuai identitas yang akan didaftarkan.
-			</p>
-
-			<div className="w-full max-w-md  text-left">
-				<label className="block mb-3">
-					<span className="mb-1.5 block text-xs font-semibold text-gray-600">
-						Kode Tiket <span className=" text-red-500">*</span>
-					</span>
-					<input
-						type="text"
-						value={value}
-						onChange={(e) => onChange(e.target.value)}
-						placeholder="Contoh: TIK-ABCD-1234"
-						className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
-					/>
-				</label>
-
-				<NikInput value={nik} onChange={onNikChange} />
-
-				<button
-					onClick={onSubmit}
-					disabled={!formValid}
-					className={`mt-3 hidden md:inline-flex w-full  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-						formValid
-							? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-							: "bg-gray-300 cursor-not-allowed"
-					}`}>
-					Cek Tiket
-				</button>
-
-				<FooterMobileBtn
-					children={
-						<Button
-							onClick={onSubmit}
-							disabled={!formValid}
-							className={`md:hidden w-full inline-flex  items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-								formValid
-									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-									: "bg-gray-800 cursor-not-allowed"
-							}`}>
-							Cek Tiket
-						</Button>
-					}
+		<div className="w-full flex-1 flex flex-col text-left gap-4">
+			<label className="block">
+				<span className="mb-1.5 block text-xs font-semibold text-slate-700">
+					Kode Tiket <span className="text-red-500">*</span>
+				</span>
+				<input
+					type="text"
+					value={value}
+					onChange={(e) => onChange(e.target.value)}
+					placeholder="Contoh: TIK-ABCD-1234"
+					className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 text-[15px] font-medium text-[#1e2a4a] placeholder-slate-400 transition-colors focus:border-[#3b5bdb] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/15"
 				/>
-			</div>
+			</label>
 
-			<button
-				onClick={onSwitchUpload}
-				className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
-				<Upload className="w-4 h-4" />
-				Scan dari file tiket
-			</button>
-		</>
+			<NikInput value={nik} onChange={onNikChange} />
+
+			<TicketGuideCard />
+
+			<FooterMobileBtn
+				children={
+					<Button
+						onClick={onSubmit}
+						disabled={!formValid}
+						className={`w-full inline-flex items-center justify-center gap-2 text-white transition-colors ${
+							formValid
+								? "bg-[#3b5bdb] hover:bg-[#3451c5]"
+								: "bg-slate-300 text-slate-500 cursor-not-allowed"
+						}`}>
+						Cek Tiket
+					</Button>
+				}
+			/>
+		</div>
+	);
+}
+
+function TicketGuideCard() {
+	const steps = [
+		{
+			title: "Cek Kode pada E-Ticket",
+			desc: "Temukan kode tiket di bawah QR/Barcode pada PDF e-ticket dari email penerima e-ticket.",
+		},
+		{
+			title: "Masukkan Kode & 16 Digit NIK",
+			desc: "Pastikan NIK sesuai dengan identitas pemilik tiket. 1 tiket hanya berlaku untuk 1 identitas.",
+		},
+		{
+			title: "Lanjut Ambil Foto Wajah",
+			desc: "Setelah tiket terverifikasi, Anda akan diarahkan untuk mengambil foto selfie sebagai akses Face ID.",
+		},
+	];
+
+	return (
+		<div className="mt-2 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4">
+			<div className="mb-3 flex items-center gap-2">
+				<div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-50 text-[#3b5bdb]">
+					<Info className="h-3.5 w-3.5" />
+				</div>
+				<h3 className="text-xs font-bold text-[#1e2a4a]">
+					Panduan Singkat Registrasi
+				</h3>
+			</div>
+			<div className="space-y-3">
+				{steps.map((item, idx) => (
+					<div key={idx} className="flex items-start gap-3">
+						<span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-bold text-[#3b5bdb] border border-slate-200 shadow-2xs">
+							{idx + 1}
+						</span>
+						<div className="min-w-0">
+							<p className="text-xs font-semibold text-[#1e2a4a] leading-snug">
+								{item.title}
+							</p>
+							<p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+								{item.desc}
+							</p>
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
 	);
 }
 
@@ -506,26 +521,38 @@ function NikInput({
 	const valid = isValidNik(value);
 
 	return (
-		<label className="block w-full max-w-md text-left mb-3">
-			<span className="mb-1.5 block text-xs font-semibold text-gray-600">
-				NIK <span className=" text-red-500">*</span>
-			</span>
+		<label className="block w-full text-left">
+			<div className="mb-1.5 flex items-center justify-between">
+				<span className="text-xs font-semibold text-slate-700">
+					Nomor Induk Kependudukan (NIK) <span className="text-red-500">*</span>
+				</span>
+				<span
+					className={`text-[11px] font-mono font-semibold ${
+						valid
+							? "text-emerald-600"
+							: hasValue
+								? "text-amber-600"
+								: "text-slate-400"
+					}`}>
+					{value.length}/{NIK_LENGTH}
+				</span>
+			</div>
 			<input
 				type="text"
 				inputMode="numeric"
 				autoComplete="off"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
-				placeholder="16 digit NIK"
-				className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#1e2a4a] placeholder-gray-400 focus:border-[#3b5bdb] focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/20"
+				placeholder="Masukkan 16 digit NIK sesuai KTP"
+				className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 text-[15px] font-medium text-[#1e2a4a] placeholder-slate-400 transition-colors focus:border-[#3b5bdb] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3b5bdb]/15"
 			/>
 			<p
-				className={`mt-1.5 text-xs ${
-					hasValue && !valid ? "text-red-500" : "text-gray-400"
+				className={`mt-1.5 text-[11px] ${
+					hasValue && !valid ? "text-red-500" : "text-slate-400"
 				}`}>
 				{hasValue && !valid
-					? `${value.length}/${NIK_LENGTH} digit — NIK harus 16 digit angka.`
-					: "NIK digunakan untuk pendaftaran data diri."}
+					? "NIK harus berjumlah 16 digit angka."
+					: "Digunakan untuk pencocokan identitas pemilik tiket."}
 			</p>
 		</label>
 	);
@@ -533,29 +560,26 @@ function NikInput({
 
 function ScanningState({ fileName }: { fileName: string }) {
 	return (
-		<>
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
-					<Loader2 className="w-12 h-12 text-[#3b5bdb] animate-spin" />
-				</div>
+		<div className="my-auto py-12 flex flex-col items-center text-center">
+			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50">
+				<Loader2 className="w-8 h-8 text-[#3b5bdb] animate-spin" />
 			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Memindai Tiket...
+			<h2 className="text-lg font-bold text-[#1e2a4a] mb-1">
+				Memindai E-Ticket...
 			</h2>
-			<p className="text-gray-500 text-sm max-w-md">
-				Sedang memproses{" "}
-				<span className="font-medium text-[#1e2a4a]">{fileName}</span>
+			<p className="text-slate-500 text-xs max-w-xs truncate">
+				Memproses{" "}
+				<span className="font-semibold text-[#1e2a4a]">{fileName}</span>
 			</p>
-			<div className="inline-flex items-center gap-2 mt-4 text-xs text-gray-400">
-				<ScanLine className="w-4 h-4" />
-				Mencari QR/barcode pada file
+			<div className="inline-flex items-center gap-1.5 mt-3 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-500">
+				<ScanLine className="w-3.5 h-3.5 text-[#3b5bdb]" />
+				Mencari QR / Barcode
 			</div>
-		</>
+		</div>
 	);
 }
 
 function SuccessState({
-	fileName,
 	ticketCode,
 	nik,
 	detail,
@@ -566,86 +590,126 @@ function SuccessState({
 	detail: TicketDetail | null;
 }) {
 	return (
-		<>
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center">
-					<div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
-						<CheckCircle2 className="w-10 h-10 text-emerald-500" />
+		<div className="w-full flex flex-col text-left">
+			<div className="mb-5">
+				<p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
+					Langkah 1 Selesai
+				</p>
+				<h1 className="mt-0.5 text-xl font-bold tracking-tight text-[#1e2a4a]">
+					Tiket Terverifikasi
+				</h1>
+				<p className="mt-1 text-xs leading-relaxed text-slate-500">
+					Periksa kembali rincian tiket Anda sebelum mengambil foto wajah.
+				</p>
+			</div>
+
+			{/* Mobile E-Ticket Stub Card */}
+			<div className="w-full rounded-3xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+				<div className="flex items-center justify-between bg-emerald-50/80 px-4 py-3 border-b border-emerald-100">
+					<div className="flex items-center gap-2">
+						<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+						<span className="text-xs font-bold text-emerald-700">
+							Tiket Valid & Tersedia
+						</span>
 					</div>
 				</div>
-			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
-				Tiket Terverifikasi
-			</h2>
 
-			<div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-left space-y-3">
-				{detail?.eventName && (
-					<DetailRow label="Nama" value={detail.eventName} />
-				)}
-				{detail?.ticketCategory && (
-					<DetailRow label="Kategori" value={detail.ticketCategory} />
-				)}
-				{detail?.ticketStatus && (
-					<DetailRow label="Status" value={detail.ticketStatus} />
-				)}
-				{detail?.ticketTag && (
-					<DetailRow label="Kode Tiket" value={detail.ticketTag} />
-				)}
-
-				<DetailRow label="NIK" value={nik} />
+				<div className="px-4 py-1 divide-y divide-slate-200/70">
+					{detail?.detailTransactionDocument?.name && (
+						<DetailRow
+							label="Nama Pemilik"
+							value={detail.detailTransactionDocument.name}
+						/>
+					)}
+					{detail?.ticket?.category && (
+						<DetailRow label="Kategori Tiket" value={detail.ticket.category} />
+					)}
+					{(detail?.ticket?.ticketCode || ticketCode) && (
+						<DetailRow
+							label="Kode Tiket"
+							value={detail?.ticket?.ticketCode || ticketCode || ""}
+							mono
+						/>
+					)}
+					<DetailRow label="NIK Terdaftar" value={nik} mono />
+				</div>
 			</div>
-		</>
+
+			{/* Next Step Info Card */}
+			<div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-3.5">
+				<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-[#3b5bdb] shadow-2xs border border-blue-100">
+					<ScanFace className="h-4 w-4" />
+				</div>
+				<div className="min-w-0">
+					<p className="text-xs font-bold text-[#1e2a4a]">
+						Langkah Selanjutnya: Foto Wajah
+					</p>
+					<p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+						Siapkan kamera depan di tempat terang dan lepaskan masker atau
+						kacamata sebelum menekan tombol <strong>Lanjutkan</strong>.
+					</p>
+				</div>
+			</div>
+		</div>
 	);
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({
+	label,
+	value,
+	mono = false,
+}: {
+	label: string;
+	value: string;
+	mono?: boolean;
+}) {
 	return (
-		<div>
-			<p className="text-xs text-gray-500 mb-0.5">{label}</p>
-			<p className="text-sm font-semibold text-[#1e2a4a]">{value}</p>
+		<div className="flex items-center justify-between gap-3 py-3">
+			<p className="text-xs text-slate-500 shrink-0">{label}</p>
+			<p
+				className={`text-xs font-bold text-[#1e2a4a] text-right truncate ${
+					mono ? "font-mono" : ""
+				}`}>
+				{value}
+			</p>
 		</div>
 	);
 }
 
 function ValidatingState() {
 	return (
-		<>
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
-					<Loader2 className="w-12 h-12 text-[#3b5bdb] animate-spin" />
-				</div>
+		<div className="my-auto py-12 flex flex-col items-center text-center">
+			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50">
+				<Loader2 className="w-8 h-8 text-[#3b5bdb] animate-spin" />
 			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
+			<h2 className="text-lg font-bold text-[#1e2a4a] mb-1">
 				Mengecek Tiket...
 			</h2>
-			<p className="text-gray-500 text-sm max-w-md">
-				Mohon tunggu, sistem sedang mengecek data tiket Anda.
+			<p className="text-slate-500 text-xs max-w-xs">
+				Mohon tunggu, sistem sedang memvalidasi tiket dan NIK Anda.
 			</p>
-		</>
+		</div>
 	);
 }
 
 function FailedState({
 	message,
-	onSwitchManual,
 }: {
 	message: string;
 	onSwitchManual: () => void;
 }) {
 	return (
-		<>
-			<div className="relative mb-6">
-				<div className="w-24 h-24 rounded-full bg-red-50 flex items-center justify-center">
-					<div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-						<XCircle className="w-10 h-10 text-red-500" />
-					</div>
-				</div>
+		<div className="my-auto py-10 flex flex-col items-center text-center">
+			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-red-50">
+				<XCircle className="w-8 h-8 text-red-500" />
 			</div>
-			<h2 className="text-xl font-bold text-[#1e2a4a] mb-2">
+			<h2 className="text-lg font-bold text-[#1e2a4a] mb-1">
 				Verifikasi Tiket Gagal
 			</h2>
-			<p className="text-gray-500 text-sm max-w-md mb-2">{message}</p>
-		</>
+			<p className="text-slate-500 text-xs max-w-xs leading-relaxed">
+				{message}
+			</p>
+		</div>
 	);
 }
 

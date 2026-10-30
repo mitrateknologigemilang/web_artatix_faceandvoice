@@ -25,13 +25,13 @@ import {
 	useVerificationGuard,
 } from "../../VerificationContext";
 import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-	DialogClose,
-} from "@/components/ui/dialog";
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+	SheetClose,
+} from "@/components/ui/sheet";
 import {
 	FaceLivenessDetector,
 	LIVENESS_REQUIRED_FRAMES,
@@ -145,23 +145,31 @@ function hasVisibleVideoFrame(video: HTMLVideoElement): boolean {
 export default function FaceVerificationPage() {
 	const [state, setState] = useState<VerificationState>("verifying");
 	const [faceInFrame, setFaceInFrame] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
+	const [isMobile] = useState(true);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [tncAccepted, setTncAccepted] = useState(false);
 
-	useEffect(() => {
-		const checkMobile = () => setIsMobile(window.innerWidth < 768);
-		checkMobile();
-		window.addEventListener("resize", checkMobile);
-		return () => window.removeEventListener("resize", checkMobile);
-	}, []);
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
 	const router = useRouter();
 	const { faceBlob, ticketCode, nik, clearVerification, setFaceBlob } =
 		useVerification();
 	const allowed = useVerificationGuard("face");
+
+	const returnToTicket = useCallback(() => {
+		webcamRef.current?.stream?.getTracks().forEach((track) => track.stop());
+		clearVerification();
+		router.push("/verification/ticket");
+	}, [clearVerification, router]);
+
+	const resetToFaceCapture = useCallback(() => {
+		faceBlobRef.current = null;
+		setFaceBlob(null);
+		setTncAccepted(false);
+		setFaceInFrame(false);
+		setState("verifying");
+	}, [setFaceBlob]);
 
 	const { handleSubmitWithFaceBlob, handleErrorClose } = useHandleSubmit({
 		faceBlob,
@@ -172,13 +180,9 @@ export default function FaceVerificationPage() {
 		setSubmitting,
 		submitBiometricData,
 		getApiErrorMessage,
+		onTicketError: returnToTicket,
+		onFaceError: resetToFaceCapture,
 	});
-
-	const returnToTicket = useCallback(() => {
-		webcamRef.current?.stream?.getTracks().forEach((track) => track.stop());
-		clearVerification();
-		router.push("/verification/ticket");
-	}, [clearVerification, router]);
 
 	const capture = useCallback(() => {
 		if (!webcamRef.current || submitting) return;
@@ -228,198 +232,111 @@ export default function FaceVerificationPage() {
 	if (!allowed) return null;
 
 	return (
-		<>
+		<div className="flex flex-col flex-1">
+			{/* Segmented Mobile Stepper */}
+			<div className="mb-4 flex items-center gap-2">
+				<div className="h-1.5 flex-1 rounded-full bg-emerald-500" />
+				<div
+					className={`h-1.5 flex-1 rounded-full transition-colors ${
+						state === "success" ? "bg-emerald-500" : "bg-[#3b5bdb]"
+					}`}
+				/>
+			</div>
+
 			<HeaderSection />
 
 			<Modal
 				open={!!errorMsg}
-				onClose={returnToTicket}
+				onClose={handleErrorClose}
 				title="Pendaftaran Gagal"
 				description={errorMsg}
 			/>
 
-			<div className="space-y-6 pb-28 md:pb-0">
-				{/* Main Card */}
-				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-					{/* Card Header */}
-					<div className="relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 gap-2">
-						<div className="flex items-center gap-2 min-w-0">
-							<ScanFace className="w-5 h-5 text-[#3b5bdb] shrink-0" />
-							<span className="font-semibold text-[#1e2a4a] truncate">
-								Verifikasi Wajah
-							</span>
-						</div>
-						<span
-							className={`text-xs font-semibold px-3 py-1 rounded-full border shrink-0 ${
-								state === "success"
-									? "text-emerald-600 bg-emerald-50 border-emerald-200"
-									: "text-[#3b5bdb] bg-blue-50 border-blue-200"
-							}`}>
-							{state === "success" ? "Konfirmasi" : "Langkah 2 dari 2"}
-						</span>
-					</div>
+			<div className="mb-4 text-left">
+				<p
+					className={`text-[11px] font-bold uppercase tracking-wider ${
+						state === "success" ? "text-emerald-600" : "text-[#3b5bdb]"
+					}`}>
+					{state === "success" ? "Konfirmasi Akhir" : "Langkah 2 dari 2"}
+				</p>
+				<h1 className="mt-0.5 text-xl font-bold tracking-tight text-[#1e2a4a]">
+					{state === "success"
+						? "Persetujuan Face ID"
+						: "Ambil Foto Wajah"}
+				</h1>
+				<p className="mt-1 text-xs leading-relaxed text-slate-500">
+					{state === "success"
+						? "Periksa hasil foto wajah Anda dan setujui syarat & ketentuan di bawah."
+						: "Posisikan wajah di dalam bingkai tanpa masker atau kacamata."}
+				</p>
+			</div>
 
-					{/* Card Body */}
-					<div className="px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-						{state === "failed" && <FailedState />}
-						{state === "success" && (
-							<SuccessState
-								faceBlob={faceBlobRef.current ?? faceBlob}
-								isMobile={isMobile}
-								tncAccepted={tncAccepted}
-								setTncAccepted={setTncAccepted}
-							/>
-						)}
-						{state === "verifying" && (
-							<VerifyingState
-								webcamRef={webcamRef}
-								faceInFrame={faceInFrame}
-								setFaceInFrame={setFaceInFrame}
-								onCapture={capture}
-								onBackToTicket={returnToTicket}
-								isMobile={isMobile}
-								submitting={submitting}
-							/>
-						)}
-					</div>
-
-					{/* Card Footer */}
-
-					<FooterMobileBtn
-						children={
-							<>
-								{state === "failed" && (
-									<Button
-										onClick={() => setState("verifying")}
-										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
-										<RefreshCw className="w-4 h-4" />
-										Ulangi
-									</Button>
-								)}
-								{state === "verifying" && (
-									<>
-										<Button
-											disabled={submitting}
-											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
-												submitting ? "opacity-60 cursor-not-allowed" : ""
-											}`}>
-											<ArrowLeft className="w-4 h-4" />
-											Kembali
-										</Button>
-										{/* Desktop-only capture button in footer */}
-										{!isMobile && (
-											<button
-												disabled={!faceInFrame || submitting}
-												onClick={capture}
-												className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-													faceInFrame && !submitting
-														? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-														: "bg-gray-300 cursor-not-allowed"
-												}`}>
-												{submitting ? (
-													<Loader2 className="w-4 h-4 animate-spin" />
-												) : (
-													<Camera className="w-4 h-4" />
-												)}
-												{submitting ? "Mengirim..." : "Ambil Foto"}
-											</button>
-										)}
-									</>
-								)}
-								{state === "success" && (
-									<>
-										<Button
-											type="button"
-											disabled={submitting}
-											onClick={returnToTicket}
-											className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
-												submitting ? "cursor-not-allowed opacity-60" : ""
-											}`}>
-											<TicketX className="h-4 w-4" />
-											Batal
-										</Button>
-										<Button
-											type="button"
-											disabled={submitting || !tncAccepted}
-											onClick={confirmSubmit}
-											className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
-												submitting || !tncAccepted
-													? "cursor-not-allowed opacity-70"
-													: ""
-											}`}>
-											{submitting ? (
-												<Loader2 className="h-4 w-4 animate-spin" />
-											) : (
-												<Send className="h-4 w-4" />
-											)}
-											{submitting ? "Mengirim..." : "Daftarkan"}
-											</Button>
-									</>
-								)}
-							</>
-						}
+			<div className="flex-1 flex flex-col items-center text-center pb-4">
+				{state === "failed" && <FailedState />}
+				{state === "success" && (
+					<SuccessState
+						faceBlob={faceBlobRef.current ?? faceBlob}
+						isMobile={isMobile}
+						tncAccepted={tncAccepted}
+						setTncAccepted={setTncAccepted}
 					/>
+				)}
+				{state === "verifying" && (
+					<VerifyingState
+						webcamRef={webcamRef}
+						faceInFrame={faceInFrame}
+						setFaceInFrame={setFaceInFrame}
+						onCapture={capture}
+						onBackToTicket={returnToTicket}
+						isMobile={isMobile}
+						submitting={submitting}
+					/>
+				)}
+			</div>
 
-					<div className="px-4 md:flex hidden sm:px-6 py-3 sm:py-4 border-t border-gray-100  items-center justify-between">
+			<FooterMobileBtn
+				children={
+					<>
 						{state === "failed" && (
-							<button
+							<Button
 								onClick={() => setState("verifying")}
-								className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+								className="inline-flex items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#3451c5] transition-colors">
 								<RefreshCw className="w-4 h-4" />
 								Ulangi
-							</button>
+							</Button>
 						)}
 						{state === "verifying" && (
 							<>
-								<button
+								<Button
 									disabled={submitting}
 									onClick={returnToTicket}
-									className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors ${
+									className={`inline-flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors ${
 										submitting ? "opacity-60 cursor-not-allowed" : ""
 									}`}>
 									<ArrowLeft className="w-4 h-4" />
 									Kembali
-								</button>
-								{/* Desktop-only capture button in footer */}
-								{!isMobile && (
-									<button
-										disabled={!faceInFrame || submitting}
-										onClick={capture}
-										className={`ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors ${
-											faceInFrame && !submitting
-												? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-												: "bg-gray-300 cursor-not-allowed"
-										}`}>
-										{submitting ? (
-											<Loader2 className="w-4 h-4 animate-spin" />
-										) : (
-											<Camera className="w-4 h-4" />
-										)}
-										{submitting ? "Mengirim..." : "Ambil Foto"}
-									</button>
-								)}
+								</Button>
 							</>
 						)}
 						{state === "success" && (
-							<div className="flex w-full flex-wrap items-center justify-between gap-3">
-								<button
+							<>
+								<Button
 									type="button"
 									disabled={submitting}
 									onClick={returnToTicket}
-									className={`inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+									className={`inline-flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 transition-colors hover:bg-slate-50 ${
 										submitting ? "cursor-not-allowed opacity-60" : ""
 									}`}>
 									<TicketX className="h-4 w-4" />
 									Batal
-								</button>
-								<button
+								</Button>
+								<Button
 									type="button"
 									disabled={submitting || !tncAccepted}
 									onClick={confirmSubmit}
-									className={`inline-flex items-center gap-2 rounded-lg bg-[#3b5bdb] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3451c5] ${
+									className={`inline-flex items-center justify-center gap-2 bg-[#3b5bdb] text-white transition-colors hover:bg-[#3451c5] ${
 										submitting || !tncAccepted
-											? "cursor-not-allowed opacity-70"
+											? "cursor-not-allowed opacity-60"
 											: ""
 									}`}>
 									{submitting ? (
@@ -428,13 +345,13 @@ export default function FaceVerificationPage() {
 										<Send className="h-4 w-4" />
 									)}
 									{submitting ? "Mengirim..." : "Daftarkan"}
-									</button>
-							</div>
+								</Button>
+							</>
 						)}
-					</div>
-				</div>
-			</div>
-		</>
+					</>
+				}
+			/>
+		</div>
 	);
 }
 
@@ -528,20 +445,72 @@ function SuccessState({
 	const frame = isMobile ? FRAME.mobile : FRAME.desktop;
 
 	return (
-		<div className="flex w-full flex-col items-center mx-auto">
-			{/* Compact Text-only T&C */}
-			<div className="w-full mb-6 text-left">
-				<div className="flex items-center gap-2 mb-3">
-					<Shield className="h-5 w-5 text-[#3b5bdb]" />
-					<h2 className="text-base font-bold text-[#1e2a4a]">
-						Syarat & Ketentuan Pendaftaran Face ID
-					</h2>
+		<div className="flex w-full flex-col items-center mx-auto space-y-4">
+			{/* Captured Face Thumbnail Row Card */}
+			{previewUrl ? (
+				<Sheet>
+					<SheetTrigger asChild>
+						<button
+							type="button"
+							className="flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-left transition-all hover:border-[#3b5bdb]/40 active:scale-[0.99]">
+							<div className="flex items-center gap-3 min-w-0">
+								<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-900 ring-1 ring-black/10">
+									<img
+										src={previewUrl}
+										alt="Thumbnail Wajah"
+										className="h-full w-full object-cover scale-x-[-1]"
+									/>
+								</div>
+								<div className="min-w-0">
+									<p className="text-xs font-bold text-[#1e2a4a] truncate">
+										Foto Wajah Berhasil Diambil
+									</p>
+									<p className="text-[11px] text-slate-500 truncate">
+										Ketuk untuk melihat ukuran penuh
+									</p>
+								</div>
+							</div>
+							<span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#3b5bdb] shadow-2xs border border-slate-200/80">
+								<Maximize2 className="h-3.5 w-3.5" />
+								Lihat
+							</span>
+						</button>
+					</SheetTrigger>
+					<SheetContent
+						side="bottom"
+						showCloseButton={false}
+						className="mx-auto h-auto w-full max-w-md rounded-t-3xl border-t-0 bg-white px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
+						<div className="mx-auto mb-1 h-1.5 w-12 shrink-0 rounded-full bg-slate-200" />
+						<SheetHeader className="flex flex-row items-center justify-between p-0">
+							<SheetTitle className="text-base font-bold text-[#1e2a4a]">
+								Preview Foto Wajah
+							</SheetTitle>
+							<SheetClose className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none active:scale-95">
+								<X className="h-5 w-5" />
+								<span className="sr-only">Tutup preview</span>
+							</SheetClose>
+						</SheetHeader>
+						<div className="relative mx-auto w-full overflow-hidden rounded-2xl bg-gray-950 ring-1 ring-black/5">
+							<img
+								src={previewUrl}
+								alt="Preview"
+								className="block h-auto max-h-[75vh] w-full object-contain scale-x-[-1]"
+							/>
+						</div>
+					</SheetContent>
+				</Sheet>
+			) : (
+				<div className="flex w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-6 text-xs text-slate-500">
+					Preview tidak tersedia.
 				</div>
-				<p className="mb-4 text-sm leading-relaxed text-gray-600 font-medium">
-					Dengan melakukan registrasi Face ID, saya menyatakan telah membaca,
-					memahami, dan menyetujui ketentuan berikut:
-				</p>
-				<div className="flex flex-col space-y-3 text-sm leading-relaxed text-gray-600">
+			)}
+
+			{/* Compact Text-only T&C */}
+			<div className="w-full text-left">
+				<div className="flex flex-col space-y-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 text-xs leading-relaxed text-slate-600">
+					<p className="font-semibold text-[#1e2a4a]">
+						Dengan melakukan registrasi Face ID, saya menyetujui ketentuan berikut:
+					</p>
 					{[
 						"Saya hanya mendaftarkan 1 (satu) wajah untuk 1 (satu) kode tiket/1 (satu) barcode yang dimiliki.",
 						"Data wajah yang saya daftarkan adalah data diri saya sendiri dan bukan milik orang lain.",
@@ -550,65 +519,32 @@ function SuccessState({
 						"Dengan melanjutkan proses pendaftaran Face ID, saya menyetujui seluruh syarat dan ketentuan yang berlaku.",
 					].map((text, i) => (
 						<div key={i} className="flex items-start gap-2">
-							<span className="font-semibold w-4 shrink-0 text-right">
+							<span className="font-bold text-[#3b5bdb] w-3.5 shrink-0 text-right">
 								{i + 1}.
 							</span>
 							<p>{text}</p>
 						</div>
 					))}
 				</div>
-				<div className="mt-4 flex items-center gap-2">
+				<label
+					htmlFor="tnc"
+					className={`mt-3 flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all ${
+						tncAccepted
+							? "border-[#3b5bdb] bg-blue-50/50"
+							: "border-slate-200 bg-white hover:bg-slate-50"
+					}`}>
 					<input
 						type="checkbox"
 						id="tnc"
-						className="peer size-4 shrink-0 cursor-pointer rounded-lg border border-gray-900 shadow-xs transition-shadow outline-none focus-visible:ring-[3px] focus-visible:ring-[#3b5bdb]/50 disabled:cursor-not-allowed disabled:opacity-50 accent-[#3b5bdb]"
+						className="mt-0.5 size-4 shrink-0 cursor-pointer rounded border border-slate-400 accent-[#3b5bdb] outline-none focus-visible:ring-2 focus-visible:ring-[#3b5bdb]/50"
 						checked={tncAccepted}
 						onChange={(e) => setTncAccepted(e.target.checked)}
 					/>
-
-					<label
-						htmlFor="tnc"
-						className="text-sm font-bold leading-relaxed text-[#1e2a4a] cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+					<span className="text-xs font-semibold leading-relaxed text-[#1e2a4a]">
 						Saya telah membaca dan menyetujui syarat & ketentuan di atas.
-					</label>
-				</div>
+					</span>
+				</label>
 			</div>
-
-			{previewUrl ? (
-				<Dialog>
-					<DialogTrigger asChild>
-						<button
-							type="button"
-							className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3b5bdb] px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#3451c5] active:scale-95">
-							<Maximize2 className="h-4 w-4" />
-							<span>Lihat Hasil Capture Wajah</span>
-						</button>
-					</DialogTrigger>
-					<DialogContent
-						className="border-0 bg-transparent p-0 shadow-none"
-						showCloseButton={false}>
-						<DialogHeader className="sr-only">
-							<DialogTitle>Preview Foto Wajah</DialogTitle>
-						</DialogHeader>
-						{/* Matching aspect ratio to camera */}
-						<div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl bg-gray-950 aspect-3/4 sm:aspect-video ring-1 ring-white/10 shadow-2xl animate-in zoom-in-95 duration-300">
-							<img
-								src={previewUrl}
-								alt="Preview"
-								className="absolute inset-0 block h-full w-full object-cover scale-x-[-1]"
-							/>
-							<DialogClose className="absolute right-4 top-4 z-50 flex aspect-square h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 p-0 text-white backdrop-blur-md transition-all hover:bg-black/70 focus:outline-none active:scale-95">
-								<X className="h-5 w-5" />
-								<span className="sr-only">Tutup preview</span>
-							</DialogClose>
-						</div>
-					</DialogContent>
-				</Dialog>
-			) : (
-				<div className="flex w-full items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-8 text-xs text-gray-500">
-					Preview tidak tersedia.
-				</div>
-			)}
 		</div>
 	);
 }
@@ -993,9 +929,9 @@ function VerifyingState({
 	return (
 		<>
 			{/* Camera Preview with Face Frame */}
-			<div className="relative w-full max-w-lg mb-8 rounded-xl bg-gray-900 aspect-3/4 sm:aspect-video">
+			<div className="relative w-full mb-3.5 rounded-2xl bg-gray-900 aspect-3/4 shadow-inner ring-1 ring-slate-900/10">
 				{/* Webcam + SVG overlay wrapper (clips video to rounded corners) */}
-				<div className="absolute inset-0 rounded-xl overflow-hidden">
+				<div className="absolute inset-0 rounded-2xl overflow-hidden">
 					{cameraMounted && (
 						<Webcam
 							key={`face-camera-${cameraInstanceKey}`}
@@ -1110,34 +1046,21 @@ function VerifyingState({
 						<RefreshCw className="h-4 w-4" />
 					</button>
 				)}
-				{/* Liveness status badge – top-right on mobile, bottom-center on desktop */}
+				{/* Liveness status badge – centered inside top of camera frame */}
 				<div
-					className={`absolute text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm z-10 ${statusMeta.className}`}
-					style={
-						isMobile
-							? {
-									top: "-15px",
-									left: "50%",
-									transform: "translateX(-50%)",
-								}
-							: {
-									bottom: "0.75rem",
-									left: "50%",
-									transform: "translateX(-50%)",
-								}
-					}>
+					className={`absolute top-3 left-1/2 -translate-x-1/2 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-md backdrop-blur-md z-10 whitespace-nowrap ${statusMeta.className}`}>
 					{statusMeta.label}
 				</div>
 				{/* Mobile-only capture button – centered at the bottom of the frame */}
 				{isMobile && (
-					<div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
+					<div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
 						<button
 							disabled={!faceInFrame || submitting}
 							onClick={onCapture}
-							className={`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/80 shadow-lg transition-all active:scale-95 ${
+							className={`flex items-center justify-center w-16 h-16 rounded-full border-4 border-white/90 shadow-xl ring-4 ring-black/20 transition-all active:scale-90 ${
 								faceInFrame && !submitting
 									? "bg-[#3b5bdb] hover:bg-[#3451c5]"
-									: "bg-gray-400 cursor-not-allowed"
+									: "bg-slate-400/80 cursor-not-allowed"
 							}`}>
 							<Camera className="w-7 h-7 text-white" />
 						</button>
@@ -1235,56 +1158,62 @@ function FaceTipsModal() {
 	}, []);
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#3b5bdb] font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer">
-					<Info className="w-4 h-4" />
-					Lihat Tips Pengambilan Foto
+		<Sheet open={open} onOpenChange={setOpen}>
+			<SheetTrigger asChild>
+				<button className="w-full inline-flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 text-[#3b5bdb] font-semibold text-xs hover:bg-blue-50/60 transition-colors cursor-pointer">
+					<span className="inline-flex items-center gap-2">
+						<Info className="w-4 h-4 shrink-0" />
+						Lihat Tips Pengambilan Foto
+					</span>
+					<span className="text-[11px] text-slate-400 font-medium">Buka</span>
 				</button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-md bg-white">
-				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2 text-[#1e2a4a]">
+			</SheetTrigger>
+			<SheetContent
+				side="bottom"
+				className="mx-auto w-full max-w-md rounded-t-3xl border-t-0 bg-white px-5 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl">
+				<div className="mx-auto mb-1 h-1.5 w-12 shrink-0 rounded-full bg-slate-200" />
+				<SheetHeader className="p-0 text-left">
+					<SheetTitle className="flex items-center gap-2 text-base font-bold text-[#1e2a4a]">
 						<Info className="w-5 h-5 text-[#3b5bdb]" />
 						Tips Pengambilan Foto
-					</DialogTitle>
-				</DialogHeader>
-				<p className="text-gray-500 text-sm leading-relaxed">
+					</SheetTitle>
+				</SheetHeader>
+				<p className="text-slate-500 text-xs leading-relaxed">
 					Pastikan pencahayaan cukup terang dan wajah Anda terlihat jelas tanpa
 					aksesoris (masker, kacamata, topi).
 				</p>
-				<div className="flex items-center justify-around gap-4 py-4">
-					<div className="flex flex-col gap-2 items-center">
-						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
+				<div className="grid grid-cols-3 gap-2.5 py-2">
+					<div className="flex flex-col gap-2 items-center rounded-2xl bg-slate-50 p-3 border border-slate-100">
+						<div className="size-11 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-xl text-[22px]">
 							<RiSurgicalMaskLine />
 						</div>
-						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
+						<p className="text-[11px] text-center text-slate-600 font-semibold">
 							Tanpa Masker
 						</p>
 					</div>
-					<div className="flex flex-col gap-2 items-center">
-						<div className="size-12 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-full text-[24px]">
+					<div className="flex flex-col gap-2 items-center rounded-2xl bg-slate-50 p-3 border border-slate-100">
+						<div className="size-11 bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center rounded-xl text-[22px]">
 							<RiSunFill />
 						</div>
-						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
+						<p className="text-[11px] text-center text-slate-600 font-semibold">
 							Cahaya Cukup
 						</p>
 					</div>
-					<div className="flex flex-col gap-2 items-center">
-						<div className="size-12 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-full text-[24px]">
+					<div className="flex flex-col gap-2 items-center rounded-2xl bg-slate-50 p-3 border border-slate-100">
+						<div className="size-11 bg-[#DC2626]/10 text-[#DC2626] flex items-center justify-center rounded-xl text-[22px]">
 							<RiEmotionFill />
 						</div>
-						<p className="text-[12px] text-center text-[#6B7280] uppercase font-medium">
+						<p className="text-[11px] text-center text-slate-600 font-semibold">
 							Wajah Jelas
 						</p>
 					</div>
 				</div>
 				<button
 					onClick={() => setOpen(false)}
-					className="mt-2 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#3b5bdb] text-white font-medium text-sm hover:bg-[#3451c5] transition-colors">
+					className="mt-1 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[#3b5bdb] text-white font-semibold text-sm hover:bg-[#3451c5] active:scale-[0.99] transition-all">
 					Mengerti
 				</button>
-			</DialogContent>
-		</Dialog>
+			</SheetContent>
+		</Sheet>
 	);
 }
