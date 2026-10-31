@@ -520,7 +520,7 @@ function TicketGuideCard() {
 					desc: "Temukan kode tiket di bawah QR/Barcode pada PDF e-ticket dari email penerima e-ticket.",
 				},
 				{
-					title: "Masukkan Kode & 16 Digit NIK",
+					title: "Masukkan 16 Digit NIK",
 					desc: "Pastikan NIK sesuai dengan identitas pemilik tiket. 1 tiket hanya berlaku untuk 1 identitas.",
 				},
 				{
