@@ -20,11 +20,7 @@ import {
 } from "lucide-react";
 import { RiEmotionFill, RiSunFill, RiSurgicalMaskLine } from "@remixicon/react";
 import Webcam from "react-webcam";
-import { useRouter } from "next/navigation";
-import {
-	useVerification,
-	useVerificationGuard,
-} from "../../VerificationContext";
+import { useVerification } from "../../VerificationContext";
 import {
 	Sheet,
 	SheetContent,
@@ -154,16 +150,14 @@ export default function FaceVerificationPage() {
 
 	const webcamRef = useRef<Webcam>(null);
 	const faceBlobRef = useRef<Blob | null>(null);
-	const router = useRouter();
-	const { faceBlob, ticketCode, nik, clearVerification, setFaceBlob } =
+	const { faceBlob, ticketCode, nik, setFaceBlob, setStep } =
 		useVerification();
-	const allowed = useVerificationGuard("face");
 
 	const returnToTicket = useCallback(() => {
 		webcamRef.current?.stream?.getTracks().forEach((track) => track.stop());
-		clearVerification();
-		router.push("/verification/ticket");
-	}, [clearVerification, router]);
+		setFaceBlob(null);
+		setStep("ticket");
+	}, [setFaceBlob, setStep]);
 
 	const resetToFaceCapture = useCallback(() => {
 		faceBlobRef.current = null;
@@ -231,8 +225,6 @@ export default function FaceVerificationPage() {
 
 		await handleSubmitWithFaceBlob(capturedFaceBlob);
 	}, [faceBlob, handleSubmitWithFaceBlob, setErrorMsg]);
-
-	if (!allowed) return null;
 
 	return (
 		<div className="flex flex-col flex-1">

@@ -19,15 +19,11 @@ import {
 	SkipForward,
 	X,
 } from "lucide-react";
-import {
-	useVerification,
-	useVerificationGuard,
-} from "../../VerificationContext";
+import { useVerification } from "../../VerificationContext";
 import {
 	getApiErrorMessage,
 	submitBiometricData,
 } from "@/services/verification.service";
-import { useRouter } from "next/navigation";
 import {
 	Sheet,
 	SheetContent,
@@ -51,15 +47,13 @@ export default function SoundVerificationPage() {
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const { faceBlob, ticketCode, nik, setFaceBlob, setStep, clearVerification } =
+	const { faceBlob, ticketCode, nik, setFaceBlob, setStep } =
 		useVerification();
-	const allowed = useVerificationGuard("sound");
 
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const router = useRouter();
 
 	// Cleanup on unmount
 	useEffect(() => {
@@ -148,13 +142,11 @@ export default function SoundVerificationPage() {
 		submitBiometricData,
 		getApiErrorMessage,
 		onTicketError: () => {
-			clearVerification();
-			router.push("/verification/ticket");
+			setStep("ticket");
 		},
 		onFaceError: () => {
 			setFaceBlob(null);
 			setStep("face");
-			router.push("/verification/face");
 		},
 	});
 
@@ -165,8 +157,6 @@ export default function SoundVerificationPage() {
 		const s = (seconds % 60).toString().padStart(2, "0");
 		return `${m}:${s}`;
 	};
-
-	if (!allowed) return null;
 
 	return (
 		<>
@@ -227,7 +217,6 @@ export default function SoundVerificationPage() {
 									onClick={() => {
 										setFaceBlob(null);
 										setStep("face");
-										router.push("/verification/face");
 									}}
 									className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors">
 									<ArrowLeft className="w-4 h-4" />

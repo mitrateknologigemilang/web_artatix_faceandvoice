@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { SubmitBiometricPayload } from "@/services/verification.service";
+import { useVerification } from "@/app/(verification)/VerificationContext";
 
 export type SubmitFailureStage = "ticket" | "face" | "retry" | null;
 
@@ -55,7 +55,7 @@ export function useHandleSubmit({
 	onTicketError?: () => void;
 	onFaceError?: () => void;
 }) {
-	const router = useRouter();
+	const { setStep } = useVerification();
 	const [failureStage, setFailureStage] = useState<SubmitFailureStage>(null);
 
 	const submit = useCallback(
@@ -90,7 +90,7 @@ export function useHandleSubmit({
 				});
 
 				setFailureStage(null);
-				router.replace("/verification/success");
+				setStep("success");
 				return true;
 			} catch (error) {
 				console.error("Submit error:", error);
@@ -113,7 +113,7 @@ export function useHandleSubmit({
 			setSubmitting,
 			submitBiometricData,
 			getApiErrorMessage,
-			router,
+			setStep,
 		],
 	);
 
@@ -136,7 +136,7 @@ export function useHandleSubmit({
 			if (onTicketError) {
 				onTicketError();
 			} else {
-				router.push("/verification/ticket");
+				setStep("ticket");
 			}
 			return;
 		}
@@ -144,7 +144,7 @@ export function useHandleSubmit({
 		if (stage === "face") {
 			onFaceError?.();
 		}
-	}, [errorMsg, failureStage, onFaceError, onTicketError, router, setErrorMsg]);
+	}, [errorMsg, failureStage, onFaceError, onTicketError, setErrorMsg, setStep]);
 
 	return {
 		handleSubmit,

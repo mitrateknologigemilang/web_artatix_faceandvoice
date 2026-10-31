@@ -5,30 +5,23 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useRef,
 	useState,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { PermissionPopup } from "./components/PermissionPopup";
 import type { TicketDetail } from "@/services/verification.service";
 
-export type VerificationStep = "ticket" | "face" | "sound";
-
-const STORAGE_KEY = "artatix_verification";
-
-export const STEP_ROUTE: Record<VerificationStep, string> = {
-	ticket: "/verification/ticket",
-	face: "/verification/face",
-	sound: "/verification/sound",
-};
+export type VerificationStep = "ticket" | "face" | "sound" | "success";
 
 interface VerificationContextType {
 	step: VerificationStep;
 	setStep: (s: VerificationStep) => void;
-	ticketCode: string | null;
-	setTicketCode: (code: string | null) => void;
-	nik: string | null;
-	setNik: (nik: string | null) => void;
+	ticketCode: string;
+	setTicketCode: (code: string) => void;
+	nik: string;
+	setNik: (nik: string) => void;
+	uploadMode: boolean;
+	setUploadMode: (mode: boolean) => void;
 	ticketDetail: TicketDetail | null;
 	setTicketDetail: (detail: TicketDetail | null) => void;
 	faceBlob: Blob | null;
@@ -36,16 +29,17 @@ interface VerificationContextType {
 	permissionGrantedTime: number | null;
 	setPermissionGrantedTime: (time: number | null) => void;
 	clearVerification: () => void;
-	hydrated: boolean;
 }
 
 const VerificationContext = createContext<VerificationContextType>({
 	step: "ticket",
 	setStep: () => {},
-	ticketCode: null,
+	ticketCode: "",
 	setTicketCode: () => {},
-	nik: null,
+	nik: "",
 	setNik: () => {},
+	uploadMode: false,
+	setUploadMode: () => {},
 	ticketDetail: null,
 	setTicketDetail: () => {},
 	faceBlob: null,
@@ -53,7 +47,6 @@ const VerificationContext = createContext<VerificationContextType>({
 	permissionGrantedTime: null,
 	setPermissionGrantedTime: () => {},
 	clearVerification: () => {},
-	hydrated: false,
 });
 
 export function VerificationProvider({
@@ -62,47 +55,31 @@ export function VerificationProvider({
 	children: React.ReactNode;
 }) {
 	const [step, setStep] = useState<VerificationStep>("ticket");
-	const [ticketCode, setTicketCode] = useState<string | null>(null);
-	const [nik, setNik] = useState<string | null>(null);
+	const [ticketCode, setTicketCode] = useState<string>("");
+	const [nik, setNik] = useState<string>("");
+	const [uploadMode, setUploadMode] = useState<boolean>(false);
 	const [ticketDetail, setTicketDetail] = useState<TicketDetail | null>(null);
-	const [faceBlob, setFaceBlobState] = useState<Blob | null>(null);
+	const [faceBlob, setFaceBlob] = useState<Blob | null>(null);
 	const [permissionGrantedTime, setPermissionGrantedTime] = useState<
 		number | null
 	>(null);
-	const [hydrated, setHydrated] = useState(false);
+
 	const router = useRouter();
 	const pathname = usePathname();
-	const initializedRef = useRef(false);
-
-	const setFaceBlob = useCallback((blob: Blob | null) => {
-		setFaceBlobState(blob);
-	}, []);
 
 	const clearVerification = useCallback(() => {
-		try {
-			localStorage.removeItem(STORAGE_KEY);
-			sessionStorage.removeItem(STORAGE_KEY);
-		} catch {}
 		setStep("ticket");
-		setTicketCode(null);
-		setNik(null);
+		setTicketCode("");
+		setNik("");
+		setUploadMode(false);
 		setTicketDetail(null);
-		setFaceBlobState(null);
+		setFaceBlob(null);
 	}, []);
 
-	// A fresh page load always starts a new verification flow.
+	// Normalize any legacy sub-route (/verification/ticket, /face, /success) to /verification
 	useEffect(() => {
-		if (initializedRef.current) return;
-		initializedRef.current = true;
-
-		try {
-			localStorage.removeItem(STORAGE_KEY);
-			sessionStorage.removeItem(STORAGE_KEY);
-		} catch {}
-		setHydrated(true);
-
-		if (pathname !== STEP_ROUTE.ticket) {
-			router.replace(STEP_ROUTE.ticket);
+		if (pathname && pathname !== "/verification") {
+			router.replace("/verification");
 		}
 	}, [pathname, router]);
 
@@ -115,6 +92,8 @@ export function VerificationProvider({
 				setTicketCode,
 				nik,
 				setNik,
+				uploadMode,
+				setUploadMode,
 				ticketDetail,
 				setTicketDetail,
 				faceBlob,
@@ -122,7 +101,6 @@ export function VerificationProvider({
 				permissionGrantedTime,
 				setPermissionGrantedTime,
 				clearVerification,
-				hydrated,
 			}}>
 			<PermissionPopup />
 			{children}
@@ -132,24 +110,4 @@ export function VerificationProvider({
 
 export function useVerification() {
 	return useContext(VerificationContext);
-}
-
-/**
- * Guard a step page. Redirects to the saved step when the user lands here out
- * of order (direct URL / refresh). "Kembali" buttons update `step` first, so
- * intentional back navigation still passes.
- * Returns true once hydrated and this page is the allowed step.
- */
-export function useVerificationGuard(pageStep: VerificationStep) {
-	const { step, hydrated } = useVerification();
-	const router = useRouter();
-
-	useEffect(() => {
-		if (!hydrated) return;
-		if (pageStep !== step) {
-			router.replace(STEP_ROUTE[step]);
-		}
-	}, [hydrated, step, pageStep, router]);
-
-	return hydrated && pageStep === step;
 }

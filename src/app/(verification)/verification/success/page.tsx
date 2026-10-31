@@ -5,34 +5,24 @@ import {
 	CheckCircle2,
 	ShieldCheck,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useVerification } from "../../VerificationContext";
-import { useRouter } from "next/navigation";
 import HeaderSection from "../../components/HeaderSection";
 import FooterMobileBtn from "../../components/FooterMobileBtn";
 import InfoListCard from "../../components/InfoListCard";
 import { Button } from "@/components/ui/button";
 
 export default function VerificationSuccessPage() {
-	const router = useRouter();
 	const { ticketCode, nik, ticketDetail, clearVerification } =
 		useVerification();
 
-	const [snapshot] = useState(() => ({
-		ticketCode: ticketDetail?.ticket?.ticketCode || ticketCode,
-		nik:
-			ticketDetail?.detailTransactionDocument?.identityNumber || nik,
-		ownerName:
-			ticketDetail?.detailTransactionDocument?.name ||
-			ticketDetail?.detailTransactionDocument?.fullname ||
-			null,
-		category: ticketDetail?.ticket?.category || null,
-	}));
-
-	// All steps done — drop the saved progress so a reload starts fresh.
-	useEffect(() => {
-		clearVerification();
-	}, [clearVerification]);
+	const displayTicketCode = ticketDetail?.ticket?.ticketCode || ticketCode;
+	const displayNik =
+		ticketDetail?.detailTransactionDocument?.identityNumber || nik;
+	const ownerName =
+		ticketDetail?.detailTransactionDocument?.name ||
+		ticketDetail?.detailTransactionDocument?.fullname ||
+		null;
+	const category = ticketDetail?.ticket?.category || null;
 
 	return (
 		<div className="flex flex-col flex-1">
@@ -66,8 +56,8 @@ export default function VerificationSuccessPage() {
 					</div>
 				</div>
 
-				{/* Registered Ticket Summary (if available from flow) */}
-				{(snapshot.ticketCode || snapshot.ownerName || snapshot.nik) && (
+				{/* Registered Ticket Summary */}
+				{(displayTicketCode || ownerName || displayNik) && (
 					<div className="mt-4 rounded-2xl border border-slate-200 bg-white overflow-hidden">
 						<div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-2.5">
 							<span className="text-xs font-bold text-[#1e2a4a]">
@@ -79,35 +69,35 @@ export default function VerificationSuccessPage() {
 							</span>
 						</div>
 						<div className="divide-y divide-slate-100 px-4">
-							{snapshot.ownerName && (
+							{ownerName && (
 								<div className="flex items-center justify-between gap-3 py-2.5">
 									<span className="text-xs text-slate-500">Nama Pemilik</span>
 									<span className="text-xs font-semibold text-[#1e2a4a] text-right truncate">
-										{snapshot.ownerName}
+										{ownerName}
 									</span>
 								</div>
 							)}
-							{snapshot.category && (
+							{category && (
 								<div className="flex items-center justify-between gap-3 py-2.5">
 									<span className="text-xs text-slate-500">Kategori Tiket</span>
 									<span className="text-xs font-semibold text-[#1e2a4a] text-right truncate">
-										{snapshot.category}
+										{category}
 									</span>
 								</div>
 							)}
-							{snapshot.ticketCode && (
+							{displayTicketCode && (
 								<div className="flex items-center justify-between gap-3 py-2.5">
 									<span className="text-xs text-slate-500">Kode Tiket</span>
 									<span className="font-mono text-xs font-bold text-[#1e2a4a]">
-										{snapshot.ticketCode}
+										{displayTicketCode}
 									</span>
 								</div>
 							)}
-							{snapshot.nik && (
+							{displayNik && (
 								<div className="flex items-center justify-between gap-3 py-2.5">
 									<span className="text-xs text-slate-500">NIK</span>
 									<span className="font-mono text-xs font-semibold text-[#1e2a4a]">
-										{snapshot.nik}
+										{displayNik}
 									</span>
 								</div>
 							)}
@@ -148,10 +138,7 @@ export default function VerificationSuccessPage() {
 			<FooterMobileBtn
 				children={
 					<Button
-						onClick={() => {
-							clearVerification();
-							router.push("/verification/ticket");
-						}}
+						onClick={clearVerification}
 						className="inline-flex items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#3451c5] transition-colors w-full">
 						<ArrowLeft className="w-4 h-4" />
 						Daftarkan Tiket Lain

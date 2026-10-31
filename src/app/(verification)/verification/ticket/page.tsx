@@ -13,18 +13,13 @@ import {
 	Upload,
 	XCircle,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import {
-	useVerification,
-	useVerificationGuard,
-} from "../../VerificationContext";
+import { useVerification } from "../../VerificationContext";
 import {
 	getApiErrorMessage,
 	getTicketDetail,
 	type TicketDetail,
 } from "@/services/verification.service";
 import { preloadFaceDetector } from "@/lib/face-liveness-detector";
-import { TransitionLoading } from "../../components/TransitionLoading";
 import HeaderSection from "../../components/HeaderSection";
 import FooterMobileBtn from "../../components/FooterMobileBtn";
 import InfoListCard from "../../components/InfoListCard";
@@ -59,34 +54,33 @@ export default function TicketVerificationPage() {
 	const [state, setState] = useState<ScanState>("idle");
 	const [errorMsg, setErrorMsg] = useState<string>("");
 	const [fileName, setFileName] = useState<string>("");
-	const [uploadMode, setUploadMode] = useState(false);
-	const [manualCode, setManualCode] = useState("");
-	const [nikInput, setNikInput] = useState("");
-	const [isNavigating, setIsNavigating] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const router = useRouter();
+
 	const {
 		ticketCode,
 		setTicketCode,
+		nik,
 		setNik,
+		uploadMode,
+		setUploadMode,
 		ticketDetail,
 		setTicketDetail,
 		setFaceBlob,
 		setStep,
+		clearVerification,
 	} = useVerification();
-	const allowed = useVerificationGuard("ticket");
 
 	// Step 2: validate the decoded/entered ticket code against the backend.
 	const validateCode = useCallback(
-		async (code: string, nik: string) => {
+		async (code: string, currentNik: string) => {
 			setState("validating");
 			setErrorMsg("");
 			setTicketDetail(null);
-			setTicketCode(null);
-			setNik(null);
+			setTicketCode(code);
+			setNik(currentNik);
 			setFaceBlob(null);
 			try {
-				const result = await getTicketDetail(code, nik);
+				const result = await getTicketDetail(code, currentNik);
 				console.log("🚀 ~ TicketVerificationPage ~ result:", result);
 
 				if (!result) {
@@ -107,8 +101,8 @@ export default function TicketVerificationPage() {
 
 				const { detail } = result;
 				setTicketDetail(detail);
-				setTicketCode(detail.ticket?.ticketCode || code);
-				setNik(nik);
+				setTicketCode(normalizeTicketCode(detail.ticket?.ticketCode || code));
+				setNik(currentNik);
 				setFaceBlob(null);
 				setState("success");
 				preloadFaceDetector();
@@ -129,7 +123,7 @@ export default function TicketVerificationPage() {
 	// Step 1: decode QR/barcode from the uploaded file.
 	const handleFile = useCallback(
 		async (file: File) => {
-			if (!isValidNik(nikInput)) {
+			if (!isValidNik(nik)) {
 				setErrorMsg("Masukkan NIK 16 digit sebelum mengunggah tiket.");
 				setState("failed");
 				return;
@@ -160,7 +154,9 @@ export default function TicketVerificationPage() {
 					setState("failed");
 					return;
 				}
-				await validateCode(code, nikInput);
+				const normalizedCode = normalizeTicketCode(code);
+				setTicketCode(normalizedCode);
+				await validateCode(normalizedCode, nik);
 			} catch (err) {
 				console.error(err);
 				setErrorMsg(
@@ -169,7 +165,7 @@ export default function TicketVerificationPage() {
 				setState("failed");
 			}
 		},
-		[nikInput, validateCode],
+		[nik, setTicketCode, validateCode],
 	);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,44 +185,36 @@ export default function TicketVerificationPage() {
 		setErrorMsg("");
 		setFileName("");
 		setTicketDetail(null);
-		setTicketCode(null);
-		setNik(null);
 		setFaceBlob(null);
-		setManualCode("");
-		setNikInput("");
-		setUploadMode(false);
+	};
+
+	const handleResetTicket = () => {
+		clearVerification();
+		setState("idle");
+		setErrorMsg("");
+		setFileName("");
 	};
 
 	const handleManualCodeChange = (value: string) => {
-		setManualCode(normalizeTicketCode(value));
+		setTicketCode(normalizeTicketCode(value));
 	};
 
 	const handleManualSubmit = () => {
-		const normalizedCode = normalizeTicketCode(manualCode);
-		if (!isValidTicketCode(normalizedCode) || !isValidNik(nikInput)) return;
+		const normalizedCode = normalizeTicketCode(ticketCode);
+		if (!isValidTicketCode(normalizedCode) || !isValidNik(nik)) return;
 		setFileName("Input manual");
-		validateCode(normalizedCode, nikInput);
+		validateCode(normalizedCode, nik);
 	};
 
 	const handleNikChange = (value: string) => {
-		const normalizedNik = normalizeNik(value);
-		setNikInput(normalizedNik);
-		setNik(normalizedNik || null);
+		setNik(normalizeNik(value));
 	};
 
 	const handleContinue = () => {
-		if (ticketCode && isValidNik(nikInput) && !isNavigating) {
-			setIsNavigating(true);
+		if (isValidTicketCode(ticketCode) && isValidNik(nik)) {
 			setStep("face");
-			router.push("/verification/face");
 		}
 	};
-
-	if (isNavigating) {
-		return <TransitionLoading message="Menyiapkan verifikasi wajah..." />;
-	}
-
-	if (!allowed) return null;
 
 	return (
 		<div className="flex flex-col flex-1">
@@ -288,9 +276,9 @@ export default function TicketVerificationPage() {
 			<div className="flex-1 flex flex-col">
 				{state === "idle" && !uploadMode && (
 					<ManualInputState
-						value={manualCode}
+						value={ticketCode}
 						onChange={handleManualCodeChange}
-						nik={nikInput}
+						nik={nik}
 						onNikChange={handleNikChange}
 						onSubmit={handleManualSubmit}
 						onSwitchUpload={() => setUploadMode(true)}
@@ -298,7 +286,7 @@ export default function TicketVerificationPage() {
 				)}
 				{state === "idle" && uploadMode && (
 					<UploadState
-						nik={nikInput}
+						nik={nik}
 						onNikChange={handleNikChange}
 						onPickFile={() => fileInputRef.current?.click()}
 						onDrop={handleDrop}
@@ -311,7 +299,7 @@ export default function TicketVerificationPage() {
 					<SuccessState
 						fileName={fileName}
 						ticketCode={ticketCode}
-						nik={nikInput}
+						nik={nik}
 						detail={ticketDetail}
 					/>
 				)}
@@ -347,7 +335,7 @@ export default function TicketVerificationPage() {
 							)}
 							{state === "success" && (
 								<Button
-									onClick={handleRetry}
+									onClick={handleResetTicket}
 									className="inline-flex min-w-0 w-full items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
 									Ganti Tiket
 								</Button>
@@ -356,7 +344,6 @@ export default function TicketVerificationPage() {
 							{state === "success" && (
 								<Button
 									onClick={handleContinue}
-									disabled={isNavigating}
 									className="inline-flex min-w-0 w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#3451c5] transition-colors">
 									Lanjutkan
 									<ArrowRight className="w-4 h-4" />
